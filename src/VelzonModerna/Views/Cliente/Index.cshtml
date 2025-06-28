@@ -48,6 +48,24 @@
                                 <th>
                                     Tipo de Pessoa
                                 </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DataCadastro)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UsuarioCadastro)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DataAtualizacao)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UsuarioAtualizacao)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Ativo)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Excluido)
+                                </th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -112,6 +130,24 @@
                                     <td><span class="badge bg-@tipoPessoaClass-subtle text-@tipoPessoaClass">
                                     @Html.DisplayFor(modelItem => item.TipoDePessoa)
                                 </span></td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DataCadastro)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UsuarioCadastro)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DataAtualizacao)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UsuarioAtualizacao)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Ativo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Excluido)
+                                </td>
 
 
                             <td>

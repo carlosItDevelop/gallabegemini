@@ -1,7 +1,5 @@
-﻿using FluentValidation;
+using FluentValidation;
 using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.Domain.Entities.Base;
-using GeneralLabSolutions.Domain.Enums;
 
 namespace GeneralLabSolutions.Domain.Validations
 {
@@ -9,38 +7,20 @@ namespace GeneralLabSolutions.Domain.Validations
     {
         public VendedorValidation()
         {
-            RuleFor(x => x.Nome)
-            .NotEmpty().WithMessage("O campo {PropertyName} precisa ser preenchido.")
-            .NotNull().WithMessage("O campo {PrpertyName} não pode ser nulo.")
-            .Length(2, 200).WithMessage("O campo '{PropertyName}' precisa ter entre {MinLength} e {MaxLength} caracteres.");
+            RuleFor(v => v.Nome)
+                .NotEmpty().WithMessage("O campo Nome precisa ser fornecido")
+                .Length(2, 150).WithMessage("O campo Nome precisa ter entre {MinLength} e {MaxLength} caracteres");
 
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("O campo {PropertyName} precisa ser preenchido.")
-                .NotNull().WithMessage("O campo {PrpertyName} não pode ser nulo.")
-                .Length(6, 200).WithMessage("O campo '{PropertyName}' precisa ter entre {MinLength} e {MaxLength} caracteres.")
-                .EmailAddress().WithMessage("O campo '{PropertyName}' está inválido!");
+            RuleFor(v => v.Documento)
+                .NotEmpty().WithMessage("O campo Documento precisa ser fornecido")
+                .Length(11, 14).WithMessage("O campo Documento precisa ter entre {MinLength} e {MaxLength} caracteres");
 
-            RuleFor(x => x.StatusDoVendedor)
-            .NotEmpty().WithMessage("O campo {PropertyName} precisa ser selecionado.")
-            .NotNull().WithMessage("O campo {PrpertyName} não pode ser nulo.");
+            RuleFor(v => v.Email)
+                .NotEmpty().WithMessage("O campo Email precisa ser fornecido")
+                .EmailAddress().WithMessage("O campo Email está em formato inválido");
 
-            // Todo Regx
-
-            When(f => f.TipoDePessoa == TipoDePessoa.Fisica, () =>
-            {
-                RuleFor(f => f.Documento.Length).Equal(CpfValidacao.TamanhoCpf)
-                    .WithMessage("O campo Documento precisa ter {ComparisonValue} caracteres e foi fornecido {PropertyValue}.");
-                RuleFor(f => CpfValidacao.Validar(f.Documento)).Equal(true)
-                    .WithMessage("O documento fornecido é inválido.");
-            });
-
-            When(f => f.TipoDePessoa == TipoDePessoa.Juridica, () =>
-            {
-                RuleFor(f => f.Documento.Length).Equal(CnpjValidacao.TamanhoCnpj)
-                    .WithMessage("O campo Documento precisa ter {ComparisonValue} caracteres e foi fornecido {PropertyValue}.");
-                RuleFor(f => CnpjValidacao.Validar(f.Documento)).Equal(true)
-                    .WithMessage("O documento fornecido é inválido.");
-            });
+            RuleFor(v => v.TipoDePessoa)
+                .IsInEnum().WithMessage("O campo Tipo de Pessoa precisa ser válido");
         }
     }
 }

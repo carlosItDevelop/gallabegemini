@@ -29,7 +29,16 @@ namespace VelzonModerna.Configuration.Mappings
             CreateMap<Contato, ContatoViewModel>().ReverseMap();
             CreateMap<Fornecedor, FornecedorViewModel>().ReverseMap();
             CreateMap<CategoriaProduto, CategoriaProdutoViewModel>().ReverseMap();
-            CreateMap<Vendedor, VendedorViewModel>().ReverseMap();
+            CreateMap<Vendedor, VendedorViewModel>()
+                .ForMember(dest => dest.PessoaId, opt => opt.MapFrom(src => src.PessoaId))
+                .ForMember(dest => dest.DadosBancarios, opt => opt.MapFrom(src => src.Pessoa.DadosBancarios))
+                .ForMember(dest => dest.Telefones, opt => opt.MapFrom(src => src.Pessoa.Telefones))
+                .ForMember(dest => dest.Contatos, opt => opt.MapFrom(src => src.Pessoa.Contatos))
+                .ForMember(dest => dest.Enderecos, opt => opt.MapFrom(src => src.Pessoa.Enderecos))
+                .ReverseMap()
+                    .ForMember(dest => dest.PessoaId, opt => opt.Ignore())
+                    .ForMember(dest => dest.Pessoa, opt => opt.Ignore())
+                    .ForMember(dest => dest.Pedidos, opt => opt.Ignore());
             CreateMap<Produto, ProdutoViewModel>().ReverseMap();
             CreateMap<Pedido, PedidoViewModel>().ReverseMap();
 

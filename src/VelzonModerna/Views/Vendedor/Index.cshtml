@@ -1,5 +1,13 @@
 ﻿@using GeneralLabSolutions.Domain.Enums
-@model IEnumerable<GeneralLabSolutions.Domain.Entities.Vendedor>
+@using VelzonModerna.ViewModels
+@model IEnumerable<VelzonModerna.ViewModels.VendedorViewModel>
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">Lista de Vendedor</li>
+    </ol>
+}
 
 @{
     ViewBag.Title = "Lista de Vendedores";
@@ -16,21 +24,23 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
 }
 
-
-<p>
-    <a asp-action="Create" class="btn btn-outline-success">Adicionar Vendedor</a>
-</p>
-
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title mb-0">Lista de Vendedores</h3>
+                <h5 class="card-title mb-0">
+                    <a asp-action="Create" class="btn btn-primary">+ Adicionar Vendedor</a>
+                </h5>
             </div>
             <div class="card-body">
-                <table id="fixed-header" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                     <thead>
                         <tr>
+                            <th scope="col" style="width: 10px;">
+                                <div class="form-check">
+                                    <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                </div>
+                            </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.Nome)
                             </th>
@@ -41,12 +51,10 @@
                                 @Html.DisplayNameFor(model => model.Documento)
                             </th>
                             <th>
-                                Tipo de Pessoa
-                                @* @Html.DisplayNameFor(model => model.TipoDePessoa) *@
+                                @Html.DisplayNameFor(model => model.TipoDePessoa)
                             </th>
                             <th>
-                                Status do Vndedor
-                                @* @Html.DisplayNameFor(model => model.StatusDoVendedor) *@
+                                @Html.DisplayNameFor(model => model.StatusDoVendedor)
                             </th>
                             <th></th>
                         </tr>
@@ -54,8 +62,7 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-
-                            string? statusClass = "info"; // Default value if item. Status is null or doesn't match any case
+                            string? statusClass = "info";
                             if (item.StatusDoVendedor == StatusDoVendedor.Admin)
                             {
                                 statusClass = "success";
@@ -71,6 +78,11 @@
                             }
 
                             <tr>
+                                <th scope="row">
+                                    <div class="form-check">
+                                        <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                    </div>
+                                </th>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Nome)
                                 </td>
@@ -88,8 +100,6 @@
                                         @Html.DisplayFor(modelItem => item.StatusDoVendedor)
                                     </span>
                                 </td>
-
-
                                 <td>
                                     <div class="dropdown d-inline-block">
                                         <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -113,8 +123,6 @@
                                         </ul>
                                     </div>
                                 </td>
-
-
                             </tr>
                         }
                     </tbody>
@@ -124,11 +132,16 @@
     </div>
 </div>
 
-
-
 @section scripts {
 
     <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 8
+        });
+    </script>
 
     <script src="~/assets/js/pages/datatables.init.js"></script>
 

@@ -1,46 +1,83 @@
-﻿@model GeneralLabSolutions.Domain.Entities.Vendedor
+﻿@using VelzonModerna.ViewModels
+@model VendedorViewModel
 
-@{
-    ViewData["Title"] = "Detalhes do Vendedor";
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Lista de Vendedor</a></li>
+        <li class="breadcrumb-item active">Detalhes</li>
+    </ol>
 }
 
-<div>
-    <h3>Detalhes do Vendedor</h3>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Documento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Documento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoDePessoa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoDePessoa)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusDoVendedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StatusDoVendedor)
-        </dd>
-    </dl>
+@{
+    ViewBag.Title = "Detalhes de Vendedor";
+    ViewBag.pTitle = "Detalhes de Vendedor";
+    ViewBag.pageTitle = "Vendedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<partial name="partialcooperchip/_cssindex" />
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1"> <strong>Vendedor >> @Model.Nome.ToUpper() </strong></h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <div class="live-preview">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Nome)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @Html.DisplayFor(model => model.Nome)
+                                </dd>
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Email)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @Html.DisplayFor(model => model.Email)
+                                </dd>
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Documento)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @Html.DisplayFor(model => model.Documento)
+                                </dd>
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.TipoDePessoa)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @Html.DisplayFor(model => model.TipoDePessoa)
+                                </dd>
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.StatusDoVendedor)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @Html.DisplayFor(model => model.StatusDoVendedor)
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    @* TODO: Adicionar seções para Dados Bancários, Telefones, Contatos e Endereços aqui, se necessário. *@
+
+                    <div class="text-end">
+                        <a asp-action="Edit" class="btn btn-primary" asp-route-id="@Model?.Id">Editar</a>
+                        <a asp-action="Index" class="btn btn-light">Voltar à lista</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> 
-    <a asp-action="Index" class="btn btn-outline-success">Listagem</a>
-</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="partialcooperchip/_scripts_datatables" />
+    <script src="~/assets/js/app.js"></script>
+}

@@ -44,6 +44,7 @@ namespace GeneralLabSolutions.InfraStructure.IoC
             services.AddScoped<IPedidoRepositoryDomain, PedidoRepository>();
             services.AddScoped<IPedidoRepositoryDto, PedidoRepository>();
             services.AddScoped<IFornecedorRepository, FornecedorRepository>();
+            services.AddScoped<IVendedorRepository, VendedorRepository>();
 
 
 
@@ -71,6 +72,7 @@ namespace GeneralLabSolutions.InfraStructure.IoC
             services.AddScoped<IClienteDomainService, ClienteDomainService>();
             services.AddScoped<ICategoriaDomainService, CategoriaDomainService>();
             services.AddScoped<IFornecedorDomainService, FornecedorDomainService>();
+            services.AddScoped<IVendedorDomainService, VendedorDomainService>();
 
             services.AddScoped<IKanbanTaskDomainService, KanbanTaskDomainService>();
             services.AddScoped<IParticipanteDomainService, ParticipanteDomainService>();

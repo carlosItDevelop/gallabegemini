@@ -11,6 +11,8 @@ namespace VelzonModerna.ViewModels
         [Key]
         public Guid Id { get; set; }
 
+        public Guid PessoaId { get; set; }
+
         [Required(ErrorMessage = "O campo '{0}' obrigatório!")]
         [StringLength(200, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres.", MinimumLength = 2)]
         public string Nome { get; set; } = string.Empty;
@@ -34,12 +36,20 @@ namespace VelzonModerna.ViewModels
         public StatusDoVendedor StatusDoVendedor { get; set; }
             = StatusDoVendedor.Contratado;
 
-
         public virtual ICollection<Pedido> Pedidos { get; set; }
             = new List<Pedido>();
 
         public virtual ICollection<TelefoneViewModel> Telefones { get; set; }
             = new List<TelefoneViewModel>();
+
+        public virtual ICollection<DadosBancariosViewModel> DadosBancarios { get; set; }
+            = new List<DadosBancariosViewModel>();
+
+        public virtual ICollection<ContatoViewModel> Contatos { get; set; }
+            = new List<ContatoViewModel>();
+
+        public virtual ICollection<EnderecoViewModel> Enderecos { get; set; }
+            = new List<EnderecoViewModel>();
 
     }
 }

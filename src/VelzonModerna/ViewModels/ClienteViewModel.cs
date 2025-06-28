@@ -75,17 +75,26 @@ namespace VelzonModerna.ViewModels
 
         // ToDo: Talvez seja desnecessário, pois estes dados de Audit geralmente são gerenciados pelo EF Core
 
-        [DisplayName(displayName: "Data Inclusão")]
-        public DateTime? DataInclusao { get; set; }
+        [DisplayName(displayName: "Data de Cadastro")]
+        public DateTime DataCadastro { get; set; }
 
-        [DisplayName(displayName: "Data Última Modificação")]
-        public DateTime? DataUltimaModificacao { get; set; }
+        [DisplayName(displayName: "Data de Atualização")]
+        public DateTime? DataAtualizacao { get; set; }
 
-        [DisplayName(displayName: "Usuário Inclusão")]
-        public string? UsuarioInclusao { get; set; }
+        [DisplayName(displayName: "Usuário de Cadastro")]
+        public string? UsuarioCadastro { get; set; }
 
-        [DisplayName(displayName: "Usuário Última Modificação")]
+        [DisplayName(displayName: "Usuário de Atualização")]
         public string? UsuarioUltimaModificacao { get; set; }
+
+        [DisplayName(displayName: "Usuário de Atualização")]
+        public string? UsuarioAtualizacao { get; set; }
+
+        [DisplayName("Ativo")]
+        public bool Ativo { get; set; }
+
+        [DisplayName("Excluído")]
+        public bool Excluido { get; set; }
 
         #endregion: Campos auditáveis
 

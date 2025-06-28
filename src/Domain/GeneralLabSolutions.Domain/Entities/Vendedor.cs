@@ -1,9 +1,10 @@
-﻿using GeneralLabSolutions.Domain.Entities.Base;
+﻿using GeneralLabSolutions.Domain.DomainObjects;
+using GeneralLabSolutions.Domain.Entities.Audit;
 using GeneralLabSolutions.Domain.Enums;
 
 namespace GeneralLabSolutions.Domain.Entities
 {
-    public class Vendedor : EntityBase
+    public class Vendedor : EntityAudit, IAggregateRoot
     {
         // EF
         public Vendedor() { }
@@ -27,7 +28,7 @@ namespace GeneralLabSolutions.Domain.Entities
         }
 
         public Guid PessoaId { get; private set; }
-
+         
         public Pessoa Pessoa { get; private set; }
 
         public string Nome { get; private set; }

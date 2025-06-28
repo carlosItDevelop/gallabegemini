@@ -1,0 +1,16 @@
+﻿@* File: Views/Shared/_page_title.cshtml (PREPARA LOCAL DO BREADCRUMB) *@
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">@ViewBag.pTitle</h4>
+
+            <div class="page-title-right" id="breadcrumb-container">
+                @* Adicionado ID para referência *@
+                @* O conteúdo do breadcrumb (<ol>...</ol>) será renderizado aqui pelo _Layout.cshtml *@
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title -->

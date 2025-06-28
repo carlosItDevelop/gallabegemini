@@ -1,0 +1,227 @@
+﻿@model GeneralLabSolutions.CoreShared.DTOs.DtosIdentidade.UserDto
+
+@{
+    ViewBag.Title = "Detalhes do Usuário";
+    ViewBag.pTitle = $"Detalhes: {Model.Apelido}";
+    ViewBag.pageTitle = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Usuários</a></li>
+        <li class="breadcrumb-item active">Detalhes</li>
+    </ol>
+}
+
+<vc:summary></vc:summary> @* Movido para cá para exibir mensagens TempData que podem vir de redirects para esta página *@
+
+<div class="row">
+    <div class="col-xxl-3">
+        @* Card da Foto e Infos Básicas *@
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="text-center">
+                    <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
+                        <img src="@Model.ImgProfilePath" class="rounded-circle avatar-xl img-thumbnail user-profile-image" alt="user-profile-image" onerror="this.onerror=null; this.src='/cooperchip/images/img-padrao.jpg';">
+                        <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
+                            <a asp-action="UploadImagem" asp-route-userId="@Model.UserId" class="btn btn-light bg-light avatar-xs p-0 rounded-circle profile-photo-edit" title="Alterar Foto">
+                                <i class="ri-image-edit-line"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <h5 class="fs-16 mb-1">@Model.NomeCompleto</h5>
+                    <p class="text-muted mb-0">Apelido: @Model.Apelido</p>
+                    <p class="text-muted mb-0 small">ID: @Model.UserId</p>
+                </div>
+            </div>
+        </div>
+
+        @* Card de Informações Adicionais e Botões de Ação Principais *@
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Informações Adicionais</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="ps-0" scope="row">Username:</th>
+                                <td class="text-muted">@Model.UserName</td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row">Email Confirmado:</th>
+                                <td class="text-muted">
+                                    @if (Model.EmailConfirmado?.ToLower() == "sim")
+                                    {
+                                        <span class="badge bg-success-subtle text-success">Sim</span>
+                                    } else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">Não</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row">Bloqueado:</th>
+                                <td class="text-muted">
+                                    @if (Model.UsuarioBloqueado?.ToLower() == "sim")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning">Sim</span>
+                                    } else
+                                    {
+                                        <span class="badge bg-info-subtle text-info">Não</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row">Falhas Login:</th>
+                                <td class="text-muted">@Model.NumeroDeErroDeLogin</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 d-grid gap-2">
+                    @* Usando d-grid para botões empilhados ou ajuste conforme preferir *@
+                    <a asp-action="Editar" asp-route-id="@Model.UserId" class="btn btn-primary waves-effect waves-light">
+                        <i class="ri-pencil-line align-bottom me-1"></i> Editar Usuário
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary waves-effect waves-light">
+                        <i class="ri-arrow-go-back-line align-bottom me-1"></i> Voltar para Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-9">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#personalDetailsTab" role="tab">
+                            <i class="ri-user-line"></i> Dados Pessoais
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#actionsTab" role="tab">
+                            <i class="ri-settings-3-line"></i> Ações Administrativas
+                        </a>
+                    </li>
+                    @* TODO: Adicionar aba para Logs de Atividade, Segurança, etc. *@
+                </ul>
+            </div>
+            <div class="card-body p-4">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="personalDetailsTab" role="tabpanel">
+                        <h5 class="mb-3">Detalhes Pessoais</h5>
+                        <form action="javascript:void(0);">
+                            @* Formulário apenas para layout dos campos readonly *@
+                            <div class="row">
+                                <div class="col-lg-6 mb-3">
+                                    <label asp-for="NomeCompleto" class="form-label"></label>
+                                    <input type="text" class="form-control-plaintext" asp-for="NomeCompleto" readonly>
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label asp-for="Apelido" class="form-label"></label>
+                                    <input type="text" class="form-control-plaintext" asp-for="Apelido" readonly>
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input type="email" class="form-control-plaintext" asp-for="Email" readonly>
+                                </div>
+                                <div class="col-lg-6 mb-3">
+                                    <label asp-for="DataNascimento" class="form-label"></label>
+                                    <input type="text" class="form-control-plaintext" value="@Model.DataNascimento.ToString("dd/MM/yyyy")" readonly>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="actionsTab" role="tabpanel">
+                        <h5 class="mb-4">Ações Administrativas para @Model.Apelido</h5>
+                        <div class="row gy-3">
+                            <div class="col-md-6 col-lg-4">
+                                <a asp-action="GerenciarRolesDoUsuario" asp-route-userId="@Model.UserId" class="btn btn-info w-100 waves-effect waves-light">
+                                    <i class="ri-shield-user-line align-bottom me-1"></i> Gerenciar Roles
+                                </a>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                @* Formulário para Ativar/Desativar Usuário *@
+                                <form asp-action="AtivarDesativar" asp-route-id="@Model.UserId" method="post" class="d-inline w-100">
+                                    @Html.AntiForgeryToken()
+                                    @if (Model.UsuarioBloqueado?.ToLower() == "sim" || Model.EmailConfirmado?.ToLower() != "sim")
+                                    {
+                                        <input type="hidden" name="ativar" value="true" />
+                                        <button type="submit" class="btn btn-success w-100 waves-effect waves-light" title="Ativar este usuário.">
+                                            <i class="ri-user-follow-line align-bottom me-1"></i> Ativar Usuário
+                                        </button>
+                                    } else
+                                    {
+                                        <input type="hidden" name="ativar" value="false" />
+                                        <button type="submit" class="btn btn-warning w-100 waves-effect waves-light" title="Desativar este usuário.">
+                                            <i class="ri-user-unfollow-line align-bottom me-1"></i> Desativar Usuário
+                                        </button>
+                                    }
+                                </form>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <button type="button" class="btn btn-secondary w-100 waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#bloquearUsuarioModal">
+                                    <i class="ri-lock-unlock-line align-bottom me-1"></i> Bloquear/Desbloquear
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <a asp-action="Excluir" asp-route-id="@Model.UserId" class="btn btn-danger w-100 waves-effect waves-light">
+                                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir Usuário
+                                </a>
+                            </div>
+                            @* TODO: Adicionar botões para:
+                                - Gerenciar Claims
+                                - Alterar Senha (Admin)
+                            *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Bloquear/Desbloquear Usuário (código do modal permanece o mesmo) -->
+<div class="modal fade" id="bloquearUsuarioModal" tabindex="-1" aria-labelledby="bloquearUsuarioModalLabel" aria-hidden="true">
+    @* ... seu código do modal aqui ... *@
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bloquearUsuarioModalLabel">Bloquear/Desbloquear Usuário: @Model.Apelido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="UserAdmin" asp-action="BloquearDesbloquearUsuario" asp-route-userId="@Model.UserId" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p>Selecione o tempo de bloqueio ou deixe em branco para desbloquear o usuário.</p>
+                    <div class="mb-3">
+                        <label for="minutosBloqueio" class="form-label">Tempo de Bloqueio (em minutos):</label>
+                        <input type="number" class="form-control" id="minutosBloqueio" name="minutosBloqueio" placeholder="Ex: 60 (para 1 hora). Deixe vazio para desbloquear.">
+                        <small class="form-text text-muted">Se o usuário estiver bloqueado, informar um tempo aqui irá ATUALIZAR o bloqueio. Deixar vazio e salvar irá DESBLOQUEAR.</small>
+                    </div>
+                    @if (Model.UsuarioBloqueado?.ToLower() == "sim")
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            Este usuário já está bloqueado. Salvar com um novo tempo atualizará o bloqueio. Salvar com o campo vazio irá desbloqueá-lo.
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script src="~/assets/js/pages/profile-setting.init.js"></script>
+    <script src="~/assets/js/app.js"></script>
+}

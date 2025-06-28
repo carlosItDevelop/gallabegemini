@@ -1,0 +1,93 @@
+﻿@* Conteúdo da Aba Dashboard *@
+
+<div class="section-header">
+    <h1>Dashboard</h1>
+    <button class="btn btn-primary" onclick="openLeadModal()">
+        <i class="fas fa-plus"></i>
+        Novo Lead
+    </button>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="kpi-content">
+            <h3>Total de Leads</h3>
+            <div class="kpi-value">247</div>
+            <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i> +12% este mês
+            </div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="kpi-content">
+            <h3>Leads Convertidos</h3>
+            <div class="kpi-value">23</div>
+            <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i> +8% este mês
+            </div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="kpi-content">
+            <h3>Receita Total</h3>
+            <div class="kpi-value">R$ 485K</div>
+            <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i> +25% este mês
+            </div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="kpi-content">
+            <h3>Taxa de Conversão</h3>
+            <div class="kpi-value">9.3%</div>
+            <div class="kpi-trend negative">
+                <i class="fas fa-arrow-down"></i> -2% este mês
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3>Funil de Vendas</h3>
+        <div id="funnelChart"></div>
+    </div>
+    <div class="chart-card">
+        <h3>Origem dos Leads</h3>
+        <div id="sourceChart"></div>
+    </div>
+    <div class="chart-card">
+        <h3>Vendas por Período</h3>
+        <div id="salesChart"></div>
+    </div>
+    <div class="chart-card">
+        <h3>Taxa de Conversão por Vendedor</h3>
+        <div id="conversionChart"></div>
+    </div>
+    <div class="chart-card">
+        <h3>Atividades por Período</h3>
+        <div id="activityChart"></div>
+    </div>
+    <div class="chart-card">
+        <h3>Tempo Médio no Pipeline</h3>
+        <div id="pipelineTimeChart"></div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <h3>Próximas Ações Importantes</h3>
+    <div class="action-list" id="importantActionsList">
+    </div>
+</div>

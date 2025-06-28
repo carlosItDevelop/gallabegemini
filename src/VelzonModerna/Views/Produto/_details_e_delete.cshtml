@@ -1,0 +1,45 @@
+@model GeneralLabSolutions.Domain.Entities.Produto
+                    <dl class="row">
+                        <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.Codigo)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.Codigo)
+                        </dd>
+                        @* <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.Descricao)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.Descricao)
+                        </dd> *@
+                        <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.Ncm)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.Ncm)
+                        </dd>
+                        <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.ValorUnitario)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.ValorUnitario)
+                        </dd>
+                        <dt class = "col-sm-2">
+        @Html.DisplayNameFor(model => model.StatusDoProduto)
+                        </dt>
+                        <dd class = "col-sm-10">
+        @Html.DisplayFor(model => model.StatusDoProduto)
+                        </dd>
+                        <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.CategoriaProduto)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.CategoriaProduto.Descricao)
+                        </dd>
+                        <dt class = "col-sm-2">
+                            @Html.DisplayNameFor(model => model.Fornecedor)
+                        </dt>
+                        <dd class = "col-sm-10">
+                            @Html.DisplayFor(model => model.Fornecedor.Documento)
+                        </dd>
+                    </dl>

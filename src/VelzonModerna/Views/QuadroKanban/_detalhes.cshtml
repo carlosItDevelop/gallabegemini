@@ -1,0 +1,50 @@
+﻿@* _detalhes.cshtml *@
+@* @model SeuNamespace.ViewModels.AlgumViewModelSeNecessario *@
+
+<div class="offcanvas offcanvas-end offcanvas-modern" tabindex="-1" id="offcanvasUser" aria-labelledby="offcanvasUserLabel">
+    <div class="offcanvas-header">
+        <div class="d-flex align-items-center gap-3">
+            <div class="user-avatar">AI</div>
+            <div>
+                <h5 class="mb-0">Adit Irawan</h5>
+                <div class="text-secondary" style="font-size:1em;">Jr UI/UX Designer</div>
+                <div class="text-muted" style="font-size:0.95em;">aditirwan@mail.com</div>
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs" id="offcanvasTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="atividade-tab" data-bs-toggle="tab" data-bs-target="#atividade" type="button" role="tab" aria-controls="atividade" aria-selected="true">
+                    Atividade
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="atribuido-tab" data-bs-toggle="tab" data-bs-target="#atribuido" type="button" role="tab" aria-controls="atribuido" aria-selected="false">
+                    Atribuídos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="revisar-tab" data-bs-toggle="tab" data-bs-target="#revisar" type="button" role="tab" aria-controls="revisar" aria-selected="false">
+                    Precisa Revisar
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="offcanvasTabsContent">
+            <!-- Aba Atividade -->
+            <div class="tab-pane fade show active" id="atividade" role="tabpanel" aria-labelledby="atividade-tab">
+                <div id="atividade-content" class="fadein"></div>
+            </div>
+            <!-- Aba Atribuídos -->
+            <div class="tab-pane fade" id="atribuido" role="tabpanel" aria-labelledby="atribuido-tab">
+                <div id="atribuido-content" class="fadein"></div>
+            </div>
+            <!-- Aba Precisa Revisar -->
+            <div class="tab-pane fade" id="revisar" role="tabpanel" aria-labelledby="revisar-tab">
+                <div id="revisar-content" class="fadein"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+﻿@* Conteúdo da Aba Relatórios *@
+
+<div class="section-header">
+    <h1>Relatórios Customizáveis</h1>
+    <button class="btn btn-primary" onclick="generateCustomReport()">
+        <i class="fas fa-chart-bar"></i>
+        Gerar Relatório
+    </button>
+</div>
+
+<div class="report-filters">
+    <h3><i class="fas fa-filter"></i> Configurações do Relatório</h3>
+    <div class="filters-grid">
+        <div class="filter-group">
+            <label for="reportType">Tipo de Relatório:</label>
+            <select id="reportType" class="filter-select">
+                <option value="sales_performance">Performance de Vendas</option>
+                <option value="pipeline_time">Tempo no Pipeline</option>
+                <option value="vendor_analysis">Análise por Vendedor</option>
+                <option value="conversion_funnel">Funil de Conversão</option>
+                <option value="lead_source">Origem de Leads</option>
+                <option value="activity_summary">Resumo de Atividades</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="reportStartDate">Data Inicial:</label>
+            <input type="date" id="reportStartDate" class="filter-input">
+        </div>
+        <div class="filter-group">
+            <label for="reportEndDate">Data Final:</label>
+            <input type="date" id="reportEndDate" class="filter-input">
+        </div>
+        <div class="filter-group">
+            <label for="reportVendedor">Vendedor:</label>
+            <select id="reportVendedor" class="filter-select">
+            </select>
+        </div>
+    </div>
+    <div class="filter-actions">
+        <button class="btn btn-primary" onclick="generateCustomReport()">
+            <i class="fas fa-chart-line"></i> Gerar Relatório
+        </button>
+    </div>
+</div>
+
+<div id="reportResults" class="report-results" style="display: none;">
+    <div id="reportContent">
+    </div>
+</div>
+
+<div id="exportActions" class="export-actions" style="display: none;">
+    <h3><i class="fas fa-download"></i> Exportar Relatório</h3>
+    <div class="export-buttons">
+        <button class="btn btn-danger" onclick="exportToPDF()">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </button>
+        <button class="btn btn-success" onclick="exportToExcel()">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </button>
+        <button class="btn btn-secondary" onclick="printReport()">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+</div>
+
+<div class="predefined-reports">
+    <h3><i class="fas fa-chart-pie"></i> Relatórios Rápidos</h3>
+    <div class="reports-grid">
+        <div class="report-card" onclick="document.getElementById('reportType').value='sales_performance'; generateCustomReport();">
+            <div class="report-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h4>Performance de Vendas</h4>
+            <p>Análise completa das vendas por período, vendedor e conversões</p>
+        </div>
+        <div class="report-card" onclick="document.getElementById('reportType').value='pipeline_time'; generateCustomReport();">
+            <div class="report-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h4>Tempo no Pipeline</h4>
+            <p>Tempo médio de permanência em cada estágio do funil</p>
+        </div>
+        <div class="report-card" onclick="document.getElementById('reportType').value='vendor_analysis'; generateCustomReport();">
+            <div class="report-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h4>Análise por Vendedor</h4>
+            <p>Performance individual e comparativa entre vendedores</p>
+        </div>
+        <div class="report-card" onclick="document.getElementById('reportType').value='conversion_funnel'; generateCustomReport();">
+            <div class="report-icon">
+                <i class="fas fa-funnel-dollar"></i>
+            </div>
+            <h4>Funil de Conversão</h4>
+            <p>Taxa de conversão e pontos de maior drop-off</p>
+        </div>
+    </div>
+</div>
+
+<div class="classic-reports">
+    <h3><i class="fas fa-chart-bar"></i> Relatórios Clássicos</h3>
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Funil de Vendas</h3>
+            <div id="reportFunnelChart"></div>
+        </div>
+        <div class="chart-card">
+            <h3>Origem dos Leads</h3>
+            <div id="reportSourceChart"></div>
+        </div>
+        <div class="chart-card">
+            <h3>Vendas por Período</h3>
+            <div id="reportSalesChart"></div>
+        </div>
+        <div class="chart-card">
+            <h3>Taxa de Conversão por Vendedor</h3>
+            <div id="reportConversionChart"></div>
+        </div>
+    </div>
+</div>

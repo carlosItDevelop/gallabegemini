@@ -1,0 +1,121 @@
+﻿@model VelzonModerna.ViewModels.AtualizarUsuarioViewModel
+
+@{
+    ViewBag.Title = "Editar Usuário";
+    ViewBag.pTitle = $"Editar: {Model.NomeCompleto}"; // Usar NomeCompleto pois Apelido não está no ViewModel de Edição
+    ViewBag.pageTitle = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@* A seção "PageHeader" que tínhamos antes não é mais necessária, pois o título já é tratado
+   pela _page_title.cshtml e o breadcrumb virá da seção "Breadcrumb" abaixo. *@
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Usuários</a></li>
+        <li class="breadcrumb-item"><a asp-action="Detalhes" asp-route-id="@Model.UserId">Detalhes</a></li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Editar Informações do Usuário</h4>
+                <div class="ms-auto">
+                    <a asp-action="UploadImagem" asp-route-userId="@Model.UserId" class="btn btn-light waves-effect waves-light">
+                        <i class="ri-image-edit-line align-bottom me-1"></i> Alterar Foto de Perfil
+                    </a>
+                </div>
+            </div><!-- end card header -->
+            <div class="card-body">
+                <p class="text-muted">Modifique os campos abaixo para atualizar os dados do usuário. O apelido não pode ser alterado nesta tela.</p>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center align-self-start pt-3">
+                        @* Ajuste para alinhar imagem com o formulário *@
+                        <img src="@Model.ImagemAtualUrl" alt="Foto Perfil @Model.NomeCompleto"
+                             class="img-thumbnail rounded-circle avatar-xl"
+                             onerror="this.onerror=null; this.src='/cooperchip/images/img-padrao.jpg';" />
+                        <p class="text-muted mt-2 small">ID: @Model.UserId</p>
+                    </div>
+                    <div class="col-md-9">
+                        <form asp-action="Editar" asp-controller="UserAdmin" asp-route-id="@Model.UserId" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="UserId" />
+                            @* Incluir ImagemAtualUrl como hidden para repopular em caso de erro de validação ao retornar a view *@
+                            <input type="hidden" asp-for="ImagemAtualUrl" />
+
+                            <vc:summary></vc:summary>
+
+                            @* Linha 1: Nome Completo *@
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <input asp-for="NomeCompleto" class="form-control" placeholder="Nome completo do usuário">
+                                        <label asp-for="NomeCompleto"></label>
+                                        <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Linha 2: Email e Data de Nascimento *@
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="Email do usuário">
+                                        <label asp-for="Email"></label>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input asp-for="DataNascimento" type="date" class="form-control" placeholder="Data de nascimento">
+                                        <label asp-for="DataNascimento"></label>
+                                        <span asp-validation-for="DataNascimento" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Linha 3: Status Ativo *@
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch form-switch-lg mb-3" dir="ltr">
+                                        <input asp-for="IsAtivo" type="checkbox" class="form-check-input">
+                                        <label class="form-check-label" asp-for="IsAtivo"></label>
+                                    </div>
+                                    <span asp-validation-for="IsAtivo" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                        <i class="ri-save-3-line align-bottom me-1"></i> Salvar Alterações
+                                    </button>
+                                    <a asp-action="Detalhes" asp-route-id="@Model.UserId" class="btn btn-light waves-effect waves-light ms-2">
+                                        <i class="ri-close-line align-bottom me-1"></i> Cancelar
+                                    </a>
+                                </div>
+                                <a asp-action="Index" class="btn btn-outline-secondary waves-effect waves-light">
+                                    <i class="ri-arrow-go-back-line align-bottom me-1"></i> Voltar para Lista
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+@* Adicione quaisquer outros scripts necessários (ex: datepicker, máscaras) *@
+    <script src="~/assets/js/app.js"></script>
+}

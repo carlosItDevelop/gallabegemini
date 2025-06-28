@@ -1,0 +1,46 @@
+﻿@* ✅ ESTRUTURA BOOTSTRAP 5 CORRIGIDA *@
+<div class="modal fade" id="newCardModal" tabindex="-1" aria-labelledby="newCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newCardModalLabel">Novo Lead - Kanban</h5>
+                @* ✅ BOTÃO DE FECHAR PADRÃO *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newCardForm">
+                    @* O conteúdo do seu formulário permanece o mesmo *@
+                    <input type="hidden" id="newCardStatus" name="status">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newCardName">Nome *</label>
+                            <input type="text" id="newCardName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newCardCompany">Empresa *</label>
+                            <input type="text" id="newCardCompany" name="company" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newCardEmail">Email *</label>
+                            <input type="email" id="newCardEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newCardValue">Valor Estimado (R$)</label>
+                            <input type="number" id="newCardValue" name="value" min="0" step="0.01">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                @* ✅ BOTÃO DE CANCELAR PADRÃO *@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitNewCard()">
+                    <i class="fas fa-save"></i>
+                    Criar Lead
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

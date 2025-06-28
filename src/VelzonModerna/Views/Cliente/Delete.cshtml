@@ -1,0 +1,56 @@
+﻿@using VelzonModerna.ViewModels
+@model ClienteViewModel
+
+@{
+    ViewBag.Title = "Exclusão de Cliente";
+    ViewBag.pTitle = "Exclusão de Cliente";
+    ViewBag.pageTitle = "Cadastro";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Lista de Cliente</a></li>
+        <li class="breadcrumb-item active">Detalhes</li>
+    </ol>
+}
+
+<vc:summary></vc:summary>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1"> <strong>Excluir o registro de:  @Model.Nome.ToUpper() ?</strong></h4>
+            </div><!-- end card header -->
+
+            <div style="padding: 20px;">
+
+                <div>    
+                  
+                    <partial name="_details_e_delete" model="Model" />
+
+
+                    <form asp-action="Delete">
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="submit" value="SIM" class="btn btn-outline-danger" />
+                        <a asp-action="Index" class="btn btn-outline-info">Cancelar</a>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- prismjs plugin -->
+    <script src="~/assets/libs/prismjs/prism.js"></script>
+
+    <script src="~/assets/js/app.js"></script>
+}

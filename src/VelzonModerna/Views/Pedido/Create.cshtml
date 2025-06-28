@@ -1,0 +1,48 @@
+﻿@model GeneralLabSolutions.Domain.Entities.Pedido
+
+@{
+    ViewData["Title"] = "Adicionar Pedido";
+}
+
+<h4>Adicionar Pedido</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ClienteId" class="control-label"></label>
+                <select asp-for="ClienteId" class ="form-control" asp-items="ViewBag.ClienteId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="VendedorId" class="control-label"></label>
+                <select asp-for="VendedorId" class ="form-control" asp-items="ViewBag.VendedorId">
+                    <option value="Selecione..."></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataPedido" class="control-label"></label>
+                <input asp-for="DataPedido" class="form-control" />
+                <span asp-validation-for="DataPedido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StatusDoPedido" class="control-label"></label>
+                <select asp-for="StatusDoPedido" class="form-control" asp-items="ViewBag.StatusDoPedido">
+                    <option value="Selecione..."></option>
+                </select>
+                <span asp-validation-for="StatusDoPedido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Adicionar" class="btn btn-outline-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-success">Voltar à Lista</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,117 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@using VelzonModerna.ViewModels
+@model IEnumerable<ContaViewModel>
+
+@{
+    ViewBag.Title = "Contas";
+    ViewBag.pTitle = "Lista de Contas";
+    ViewBag.pageTitle = "Contas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<partial name="partialcooperchip/_cssindex" />
+
+<vc:summary></vc:summary>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <a asp-action="Create" class="btn btn-outline-info">+ Adicionar Conta</a>
+                </h5>
+            </div>
+            <div class="card-body">
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Instituição</th>
+                            <th>Documento</th>
+                            <th>Vencimento</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string statusClass = item.EstaPaga ? "success" : "warning";
+                            string statusText = item.EstaPaga ? "Paga" : "Pendente";
+                             string tipoContaClass = item.TipoDeConta == TipoDeConta.Pagar ? "danger" : "info";
+
+
+                            <tr>
+                                <td>@item.Instituicao</td>
+                                <td>@item.Documento</td>
+                                <td>@item.DataVencimento.ToShortDateString()</td>
+                                <td>@item.Valor.ToString("C")</td> @* Formatação de moeda *@
+                                <td><span class="badge bg-@tipoContaClass">@item.TipoDeConta</span></td>
+                                <td><span class="badge bg-@statusClass">@statusText</span></td>
+                                <td>
+                                    <div class="dropdown d-inline-block">
+                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="ri-more-fill align-middle"></i>
+                                    </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> Detalhes</a></li>
+                                            <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Editar</a></li>
+                                            @if (!item.Inativa)
+                                            {
+                                                @if (item.EstaPaga)
+                                                {
+                                                    <li>
+                                                        <form asp-action="MarcarComoNaoPaga" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="ri-arrow-go-back-fill align-bottom me-2 text-muted"></i> Estornar
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                } else
+                                                {
+                                                    <li>
+                                                        <form asp-action="MarcarComoPaga" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="ri-check-fill align-bottom me-2 text-muted"></i> Marcar como Paga
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                                <li>
+                                                    <form asp-action="Inativar" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="ri-close-circle-line align-bottom me-2 text-muted"></i> Inativar
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 8
+        });
+    </script>
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+    <script src="~/assets/js/app.js"></script>
+    }

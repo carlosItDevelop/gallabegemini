@@ -1,0 +1,44 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@using VelzonModerna.ViewModels
+@model ContatoViewModel
+
+
+<div class="form-group">
+    <label asp-for="Nome" class="control-label"></label>
+    <input asp-for="Nome" class="form-control" />
+    <span asp-validation-for="Nome" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Email" class="control-label"></label>
+    <input asp-for="Email" class="form-control" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Telefone" class="control-label"></label>
+    <input asp-for="Telefone" class="form-control" />
+    <span asp-validation-for="Telefone" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="EmailAlternativo" class="control-label"></label>
+    <input asp-for="EmailAlternativo" class="form-control" />
+    <span asp-validation-for="EmailAlternativo" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="TelefoneAlternativo" class="control-label"></label>
+    <input asp-for="TelefoneAlternativo" class="form-control" />
+    <span asp-validation-for="TelefoneAlternativo" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="TipoDeContato" class="control-label"></label>
+    <select asp-for="TipoDeContato" class="form-control" asp-items="Html.GetEnumSelectList<TipoDeContato>()">
+        <option value="">Selecione...</option>
+    </select>
+    <span asp-validation-for="TipoDeContato" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Observacao" class="control-label"></label>
+    <input asp-for="Observacao" class="form-control" />
+    <span asp-validation-for="Observacao" class="text-danger"></span>
+</div>

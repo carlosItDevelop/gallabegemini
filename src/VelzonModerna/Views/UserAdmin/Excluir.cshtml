@@ -1,0 +1,82 @@
+﻿@model GeneralLabSolutions.CoreShared.DTOs.DtosIdentidade.UserDto
+@*
+    O model é UserDto, contendo os dados do usuário a ser excluído.
+    O ImgProfilePath já foi ajustado no controller para ser uma URL completa ou a padrão.
+*@
+
+@{
+    ViewBag.Title = "Confirmar Exclusão";
+    ViewBag.pTitle = $"Excluir Usuário: {Model.Apelido}";
+    ViewBag.pageTitle = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Usuários</a></li>
+        <li class="breadcrumb-item"><a asp-action="Detalhes" asp-route-id="@Model.UserId">Detalhes</a></li>
+        <li class="breadcrumb-item active">Excluir</li>
+    </ol>
+}
+
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-danger-subtle text-danger">
+                <h5 class="card-title mb-0 text-danger"><i class="ri-alert-line align-middle me-1"></i> Atenção: Confirmação de Exclusão</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <img src="@Model.ImgProfilePath" alt="Foto Perfil @Model.Apelido"
+                         class="img-thumbnail rounded-circle avatar-lg"
+                         onerror="this.onerror=null; this.src='/cooperchip/images/img-padrao.jpg';" />
+                </div>
+
+                <div class="alert alert-danger" role="alert">
+                    <strong>Você tem certeza que deseja excluir permanentemente o usuário abaixo?</strong>
+                    <p class="mb-0 mt-2">Esta ação não poderá ser desfeita.</p>
+                    <p class="mb-0">Usuários com a role "Admin" não podem ser excluídos por este método.</p>
+                </div>
+
+                <h5 class="mb-3">Detalhes do Usuário a ser Excluído:</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">ID do Usuário:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.UserId)</dd>
+
+                    <dt class="col-sm-4">Nome Completo:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.NomeCompleto)</dd>
+
+                    <dt class="col-sm-4">Apelido:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Apelido)</dd>
+
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
+                </dl>
+
+                <hr />
+
+                <form asp-action="ExcluirConfirmado" asp-route-id="@Model.UserId" method="post">
+                    @Html.AntiForgeryToken()
+                    @* Não precisamos de um input hidden para o ID aqui, pois ele já está na rota da action *@
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Detalhes" asp-route-id="@Model.UserId" class="btn btn-secondary waves-effect waves-light">
+                            <i class="ri-close-line align-bottom me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger waves-effect waves-light">
+                            <i class="ri-delete-bin-2-line align-bottom me-1"></i> Sim, Excluir Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+@* Nenhum script específico geralmente é necessário para uma página de confirmação simples *@
+    <script src="~/assets/js/app.js"></script>
+}

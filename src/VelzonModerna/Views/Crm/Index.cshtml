@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "CRM de Leads";
+    ViewBag.pTitle = "CRM";
+    ViewBag.pageTitle = "General Lab Solutions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section styles {
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    @* <link href="/css/font-awesome-6.0.0/all.min.css" rel="stylesheet" /> *@
+
+    <link href="/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/crm-styles.css" />
+}
+
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard Geral</a></li>
+        <li class="breadcrumb-item active">CRM</li>
+    </ol>
+}
+
+@*
+   ToDo: O header do Replit será substituído pelo _topbar e _menu do _Layout.cshtml.
+      Abaixo, replicamos a estrutura de navegação por abas do index.html.
+*@
+<nav class="nav-tabs">
+    <div class="nav-tabs-container">
+        <a href="#" class="nav-tab active" data-tab="dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="leads-list">
+            <i class="fas fa-users"></i>
+            <span>Lista de Leads</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="kanban">
+            <i class="fas fa-columns"></i>
+            <span>Kanban</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="tasks">
+            <i class="fas fa-tasks"></i>
+            <span>Tarefas</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="calendar">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Calendário</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="reports">
+            <i class="fas fa-chart-bar"></i>
+            <span>Relatórios</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="files">
+            <i class="fas fa-folder"></i>
+            <span>Arquivos</span>
+        </a>
+        <a href="#" class="nav-tab" data-tab="logs">
+            <i class="fas fa-history"></i>
+            <span>Logs</span>
+        </a>
+    </div>
+</nav>
+
+@*
+    Aqui temos os contêineres principais para cada aba. 
+    Note que eles estão vazios. Nos próximos passos, vamos preenchê-los com Partial Views.
+*@
+<main class="main-content">
+    <div id="dashboard" class="tab-content active">
+        <partial name="_Dashboard" />
+    </div>
+
+    <div id="leads-list" class="tab-content">
+        <partial name="_LeadsList" />
+    </div>
+
+    <div id="kanban" class="tab-content">
+        <partial name="_Kanban" />
+    </div>
+
+    <div id="tasks" class="tab-content">
+        <partial name="_Tasks" />
+    </div>
+
+    <div id="calendar" class="tab-content">
+        <partial name="_Calendar" />
+    </div>
+
+    <div id="reports" class="tab-content">
+        <partial name="_Reports" />
+    </div>
+
+    <div id="files" class="tab-content">
+        <partial name="_Files" />
+    </div>
+
+    <div id="logs" class="tab-content">
+        <partial name="_Logs" />
+    </div>
+</main>
+
+
+@* ======================================== *@
+@* HTML DOS MODAIS AQUI, FORA DA TAG <main> *@
+
+@{
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_taskModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_taskDetailsModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_leadModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_leadDetailModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_newCardModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_filePreviewModal");
+    await Html.RenderPartialAsync("partialcooperchip/CRM/_activityModal");
+}
+
+@* FIM DOS MODAIS AQUI, FORA DA TAG <main> *@
+@* ======================================= *@
+
+@section scripts {
+
+    <script src="~/js/fullcalendar-6.1.10/index.global.min.js"></script>
+    <script src="~/js/apexchart-3.44.0/apexcharts.min.js"></script>
+    <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+
+    <script src="~/js/crm-module.js"></script>
+}

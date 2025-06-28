@@ -1,0 +1,272 @@
+﻿body {
+    background-color: #1a202c;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 50rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-em-elaboracao {
+    background-color: #4b5563;
+    color: #ffffff;
+}
+
+.status-aguardando-aprovacao {
+    background-color: #f59e0b;
+    color: #1e293b;
+}
+
+.status-aprovado {
+    background-color: #10b981;
+    color: #1e293b;
+}
+
+.status-enviado {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+.status-recebido-parcial {
+    background-color: #8b5cf6;
+    color: #ffffff;
+}
+
+.status-recebido-total {
+    background-color: #22c55e;
+    color: #1e293b;
+}
+
+.status-cancelado {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+.offcanvas {
+    transition: transform 0.3s ease-in-out;
+    background-color: #1a202c !important;
+    color: #ffffff !important;
+    width: 33% !important;
+}
+
+.offcanvas-end {
+    transform: translateX(100%);
+}
+
+.offcanvas.show {
+    transform: translateX(0);
+}
+
+.backdrop {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+}
+
+    .backdrop.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+
+
+.btn-action {
+    padding: 0.25rem;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+}
+
+    .btn-action:hover {
+        opacity: 0.8;
+    }
+
+.btn-blue {
+    background-color: #2563eb;
+    color: white;
+}
+
+    .btn-blue:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+
+.btn-gray {
+    background-color: #4a5568;
+    color: white;
+}
+
+    .btn-gray:hover {
+        background-color: #2d3748;
+        color: white;
+    }
+
+.btn-green {
+    background-color: #10b981;
+    color: white;
+}
+
+    .btn-green:hover {
+        background-color: #0d9e6e;
+        color: white;
+    }
+
+.btn-yellow {
+    background-color: #d97706;
+    color: white;
+}
+
+    .btn-yellow:hover {
+        background-color: #b45309;
+        color: white;
+    }
+
+.btn-purple {
+    background-color: #7c3aed;
+    color: white;
+}
+
+    .btn-purple:hover {
+        background-color: #6d28d9;
+        color: white;
+    }
+
+.btn-red {
+    background-color: #dc2626;
+    color: white;
+}
+
+    .btn-red:hover {
+        background-color: #b91c1c;
+        color: white;
+    }
+
+
+
+.form-control, .form-select {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    color: #ffffff;
+}
+
+    .form-control:focus, .form-select:focus {
+        background-color: #2d3748;
+        border-color: #4299e1;
+        color: #ffffff;
+        box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+    }
+
+    .form-control::placeholder {
+        color: #a0aec0;
+    }
+
+.history-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.history-icon {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+}
+
+.history-content p {
+    margin-bottom: 0;
+    color: #ffffff;
+}
+
+.history-date {
+    font-size: 0.875rem;
+    color: #a0aec0;
+}
+
+.modal-content {
+    background-color: #2d3748;
+    color: #ffffff;
+    border: 1px solid #4a5568;
+}
+
+.modal-header {
+    border-bottom: 1px solid #4a5568;
+    color: #ffffff;
+}
+
+.modal-footer {
+    border-top: 1px solid #4a5568;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+#itemForm {
+    display: none;
+}
+
+    #itemForm.show {
+        display: block;
+    }
+
+.form-label {
+    color: #ffffff;
+}
+
+.text-muted {
+    color: #a0aec0 !important;
+}
+
+.text-primary {
+    color: #3b82f6 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+.offcanvas-title {
+    color: #3b82f6 !important;
+}
+
+
+.btn-link {
+    color: #3b82f6 !important;
+}
+
+@media (max-width: 768px) {
+    .offcanvas {
+        width: 100% !important;
+    }
+
+    .header-buttons {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .offcanvas {
+        width: 75% !important;
+    }
+}

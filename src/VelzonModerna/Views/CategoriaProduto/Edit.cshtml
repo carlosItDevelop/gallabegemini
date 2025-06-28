@@ -1,0 +1,49 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@using VelzonModerna.ViewModels
+@model CategoriaProdutoViewModel
+
+@{
+    ViewData["Title"] = "Edição de Categoria";
+}
+
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1"> <strong>CATEGORIA >> @Model.Descricao.ToUpper() </strong></h4>
+            </div><!-- end card header -->
+
+            <div style="padding: 20px;">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                     <partial name="_edit_e_create" model="Model" /> 
+                    
+
+                    <input type="hidden" asp-for="Id" />
+                    <hr>
+                    <div>
+                        <input type="submit" value="Atualizar" class="btn btn-outline-primary" />
+                        <a asp-action="Index" class="btn btn-outline-warning">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+    <!-- prismjs plugin -->
+    <script src="~/assets/libs/prismjs/prism.js"></script>
+
+    <script src="~/assets/js/app.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

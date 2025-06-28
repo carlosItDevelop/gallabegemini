@@ -1,0 +1,191 @@
+﻿@using GeneralLabSolutions.CoreShared.DTOs
+@using GeneralLabSolutions.SharedKernel.Enums
+@model IEnumerable<GeneralLabSolutions.Domain.Entities.Pedido>
+
+@{
+    ViewBag.Title = "Pedidos";
+    ViewBag.pTitle = "Lista de Pedidos";
+    ViewBag.pageTitle = "Pedidos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <partial name="partialcooperchip/_cssindex" />
+}
+
+
+<div class="row">
+
+    <vc:card-resumo-pedido status="@StatusDoPedido.Pago" titulo="Pagos" css-color="success"
+                           icon="bx bx-shopping-bag text-success" link="/pedido">
+    </vc:card-resumo-pedido>
+
+    <vc:card-resumo-pedido status="@StatusDoPedido.Cancelado" titulo="Cancelados" css-color="danger"
+                           icon="bx bx-shopping-bag text-danger" link="/pedido">
+    </vc:card-resumo-pedido>
+
+    <vc:card-resumo-pedido status="@StatusDoPedido.EmProcessamento" titulo="Processando" css-color="warning"
+                           icon="bx bx-shopping-bag text-warning" link="/pedido">
+    </vc:card-resumo-pedido>
+
+    <vc:card-resumo-pedido status="@StatusDoPedido.Orcamento" titulo="Orçamento" css-color="mutted"
+                           icon="bx bx-wallet text-primary" link="/pedido">
+    </vc:card-resumo-pedido>
+
+
+</div> <!-- end row-->
+
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <a asp-action="Create" class="btn btn-primary">+ Adicionar Pedido</a>
+                </h5>
+            </div>
+            <div class="card-body">
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 10px;">
+                                <div class="form-check">
+                                    <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                </div>
+                            </th>
+                            <th>
+                                Data do Pedido
+                                @* @Html.DisplayNameFor(model => model.DataPedido) *@
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.StatusDoPedido)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Cliente)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Vendedor)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            string? statusClass = "info";
+
+                            if (item.StatusDoPedido == StatusDoPedido.Orcamento)
+                            {
+                                statusClass = "secondary";
+                            } else if (item.StatusDoPedido == StatusDoPedido.EmProcessamento)
+                            {
+                                statusClass = "warning";
+                            } else if (item.StatusDoPedido == StatusDoPedido.Pago)
+                            {
+                                statusClass = "success";
+                            } else if (item.StatusDoPedido == StatusDoPedido.Enviado)
+                            {
+                                statusClass = "primary";
+                            } else if (item.StatusDoPedido == StatusDoPedido.Cancelado)
+                            {
+                                statusClass = "danger";
+                            } else if (item.StatusDoPedido == StatusDoPedido.Entregue)
+                            {
+                                statusClass = "primary";
+                            }
+
+
+                            <tr>
+                                <th scope="row">
+                                    <div class="form-check">
+                                        <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                    </div>
+                                </th>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DataPedido)
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-@statusClass">
+                                        @Html.DisplayFor(modelItem => item.StatusDoPedido)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Cliente.Nome)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Vendedor.Nome)
+                                </td>
+                                <td>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ri-more-fill align-middle"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> Detalhes</a></li>
+                                            <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Editar</a></li>
+                                            <li>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item remove-item-btn">
+                                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Excluir
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 5,
+            "language": {
+                "decimal":        "",
+                "emptyTable":     "Nenhum registro encontrado",
+                "info":           "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty":      "Mostrando 0 até 0 de 0 registros",
+                "infoFiltered":   "(filtrado de _MAX_ registros no total)",
+                "infoPostFix":    "",
+                "thousands":      ".",
+                "lengthMenu":     "Mostrar _MENU_ registros",
+                "loadingRecords": "Carregando...",
+                "processing":     "Processando...",
+                "search":         "Buscar:",
+                "zeroRecords":    "Nenhum registro correspondente encontrado",
+                "paginate": {
+                    "first":      "Primeiro",
+                    "last":       "Último",
+                    "next":       "Próximo",
+                    "previous":   "Anterior"
+                },
+                "aria": {
+                    "sortAscending":  ": ativar para classificar a coluna em ordem crescente",
+                    "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                }
+            }
+        });
+    </script>
+
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+
+
+}

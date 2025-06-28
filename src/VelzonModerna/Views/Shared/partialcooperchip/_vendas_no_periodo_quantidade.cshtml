@@ -1,0 +1,38 @@
+﻿<div class="col-xl-6">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title mb-0">4 Melhores Clientes no Periodo (Qtde. de Compras)</h4>
+            <hr />
+
+            <div class="form-group row col-12">
+                
+                <div class="col-6">
+                    <label for="ano-select-quantidade">Selecione o Ano:</label>
+                    <select id="ano-select-quantidade" class="form-control">
+                        <option value="2024" selected>2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                    </select>
+                </div>
+
+                <div class="col-6">               
+                    <label for="periodo-select-quantidade">Selecione o Período:</label>
+                    <select id="periodo-select-quantidade" class="form-control">
+                        <option value="3">Trimestral</option>
+                        <option value="4">Quadrimestral</option>
+                        <option value="6" selected>Semestral</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="card-body">
+            <div id="chart-bar-label-rotation-glsolutions" data-colors='["--vz-primary", "--vz-success", "--vz-warning", "--vz-danger"]' class="e-charts"></div>
+        </div>
+    </div>
+    <!-- end card -->
+</div>

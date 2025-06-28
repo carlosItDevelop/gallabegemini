@@ -1,0 +1,26 @@
+﻿@* Conteúdo da Aba Arquivos *@
+
+<div class="section-header">
+    <h1>Gerenciador de Arquivos</h1>
+    <label for="fileUploadInput" class="btn btn-primary">
+        <i class="fas fa-upload"></i>
+        Fazer Upload
+    </label>
+    <input type="file" id="fileUploadInput" style="display: none;" multiple onchange="handleFileUpload()">
+</div>
+
+<div class="file-filters">
+    <input type="text" id="fileSearchInput" placeholder="Buscar por nome do arquivo...">
+    <select id="fileTypeFilter">
+        <option value="">Todos os Tipos</option>
+        <option value="image">Imagens</option>
+        <option value="document">Documentos</option>
+        <option value="spreadsheet">Planilhas</option>
+        <option value="pdf">PDFs</option>
+        <option value="other">Outros</option>
+    </select>
+</div>
+
+<div class="file-grid" id="fileGrid">
+</div>
+

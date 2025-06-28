@@ -1,0 +1,59 @@
+﻿@* Conteúdo da Aba Lista de Leads *@
+
+<div class="section-header">
+    <h1>Lista de Leads</h1>
+    <button class="btn btn-primary" onclick="openLeadModal()">
+        <i class="fas fa-plus"></i>
+        Novo Lead
+    </button>
+</div>
+
+<div class="filters">
+    <input type="text" id="searchInput" placeholder="Buscar por nome, empresa...">
+    <select id="statusFilter">
+        <option value="">Todos os Status</option>
+        <option value="novo">Novo</option>
+        <option value="contato">Contato</option>
+        <option value="qualificado">Qualificado</option>
+        <option value="proposta">Proposta</option>
+        <option value="negociacao">Negociação</option>
+        <option value="ganho">Ganho</option>
+        <option value="perdido">Perdido</option>
+    </select>
+    <select id="responsibleFilter">
+        <option value="">Todos os Responsáveis</option>
+        <option value="Maria Santos">Maria Santos</option>
+        <option value="Carlos Oliveira">Carlos Oliveira</option>
+    </select>
+    @* <button class="btn" onclick="applyFilters()">Filtrar</button> *@
+
+    <button class="btn btn-info" onclick="filterLeads()">Filtrar</button>
+
+</div>
+
+<div class="table-container">
+    <table class="leads-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAllLeads"></th>
+                <th>Nome</th>
+                <th>Empresa</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th>Responsável</th>
+                <th>Último Contato</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="leadsTableBody">
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    <button class="btn" id="prevPage">Anterior</button>
+    <span id="pageInfo">Página 1 de 10</span>
+    <button class="btn" id="nextPage">Próxima</button>
+</div>
+

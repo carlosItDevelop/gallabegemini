@@ -1,0 +1,82 @@
+﻿@* Cole este bloco no final de Views/Cliente/Details.cshtml e Views/Cliente/Edit.cshtml, ABAIXO do Offcanvas de Telefone e ANTES de @section Scripts *@
+
+<!-- ========== Offcanvas Contato ========== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasContato" aria-labelledby="offcanvasContatoLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="offcanvasContatoLabel">Contato</h5> @* Título pode ser alterado via JS *@
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="contatoOffcanvasForm" novalidate>
+            @* Novo ID para o formulário *@
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" id="contato_Id" name="Id" value="00000000-0000-0000-0000-000000000000" />
+            <input type="hidden" id="contato_PessoaId" name="PessoaId" value="@Model.PessoaId" /> @* PessoaId do Cliente principal *@
+
+            <div class="mb-3">
+                <label for="contato_Nome" class="form-label">Nome do Contato</label>
+                <input type="text" class="form-control" id="contato_Nome" name="Nome" required placeholder="Nome completo do contato">
+                <div class="invalid-feedback">Por favor, informe o nome do contato.</div>
+                <span id="validation_Contato_Nome" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_Email" class="form-label">Email Principal</label>
+                <input type="email" class="form-control" id="contato_Email" name="Email" required placeholder="email@dominio.com">
+                <div class="invalid-feedback">Por favor, informe um email válido.</div>
+                <span id="validation_Contato_Email" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_Telefone" class="form-label">Telefone Principal</label>
+                <input type="text" class="form-control" id="contato_Telefone" name="Telefone" required placeholder="(XX) XXXXX-XXXX">
+                <div class="invalid-feedback">Por favor, informe o telefone principal.</div>
+                <span id="validation_Contato_Telefone" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_TipoDeContato" class="form-label">Tipo de Contato</label>
+                <select class="form-select" id="contato_TipoDeContato" name="TipoDeContato" required>
+                    <option value="">-- Selecione --</option>
+                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeContato>())
+                    {
+                        <option value="@tipo.Value">@tipo.Text</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Por favor, selecione o tipo do contato.</div>
+                <span id="validation_Contato_TipoDeContato" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_EmailAlternativo" class="form-label">Email Alternativo (Opcional)</label>
+                <input type="email" class="form-control" id="contato_EmailAlternativo" name="EmailAlternativo" placeholder="email.alt@dominio.com">
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_TelefoneAlternativo" class="form-label">Telefone Alternativo (Opcional)</label>
+                <input type="text" class="form-control" id="contato_TelefoneAlternativo" name="TelefoneAlternativo" placeholder="(XX) XXXXX-XXXX">
+            </div>
+
+            <div class="mb-3">
+                <label for="contato_Observacao" class="form-label">Observação (Opcional)</label>
+                <textarea class="form-control" id="contato_Observacao" name="Observacao" rows="3" placeholder="Detalhes adicionais sobre o contato"></textarea>
+            </div>
+
+            <div id="offcanvasContatoFormErrors" class="text-danger mt-2 mb-3"></div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success" id="btnSalvarContato">
+                    <i class="ri-save-line align-bottom me-1"></i> Salvar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluirContato" style="display: none;">
+                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir
+                </button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line align-bottom me-1"></i> Fechar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- ========== End Offcanvas Contato ========== -->

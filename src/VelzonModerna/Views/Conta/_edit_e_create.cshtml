@@ -1,0 +1,43 @@
+﻿@using VelzonModerna.ViewModels
+@using GeneralLabSolutions.Domain.Enums
+@model ContaViewModel
+
+<div class="form-group">
+    <label asp-for="Instituicao" class="control-label"></label>
+    <input asp-for="Instituicao" class="form-control" />
+    <span asp-validation-for="Instituicao" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Documento" class="control-label"></label>
+    <input asp-for="Documento" class="form-control" />
+    <span asp-validation-for="Documento" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="DataVencimento" class="control-label"></label>
+    <input asp-for="DataVencimento" class="form-control" type="date" /> @* type="date" para data *@
+    <span asp-validation-for="DataVencimento" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Valor" class="control-label"></label>
+    <input asp-for="Valor" class="form-control" type="number" step="0.01" /> @* type="number" para valor, step para casas decimais *@
+    <span asp-validation-for="Valor" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="TipoDeConta" class="control-label"></label>
+    <select asp-for="TipoDeConta" class="form-control" asp-items="Html.GetEnumSelectList<TipoDeConta>()">
+        <option value="">Escolha...</option>
+    </select>
+    <span asp-validation-for="TipoDeConta" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Observacao" class="control-label"></label>
+    <textarea asp-for="Observacao" class="form-control"></textarea> @* textarea para observações *@
+    <span asp-validation-for="Observacao" class="text-danger"></span>
+</div>
+
+
+@* Campos ocultos para EstaPaga, DataPagamento e Inativa (controlados pelo backend) *@
+<input type="hidden" asp-for="EstaPaga" />
+<input type="hidden" asp-for="DataPagamento" />
+<input type="hidden" asp-for="Inativa" />

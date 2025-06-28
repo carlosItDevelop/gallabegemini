@@ -1,0 +1,114 @@
+﻿@model VelzonModerna.ViewModels.GerenciarRolesUsuarioViewModel
+
+@{
+    ViewBag.Title = "Gerenciar Permissões"; // Alterado
+    ViewBag.pTitle = $"Permissões de: {Model.ApelidoUsuario}";
+    ViewBag.pageTitle = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Usuários</a></li>
+        <li class="breadcrumb-item"><a asp-action="Detalhes" asp-route-id="@Model.UserId">Detalhes (@Model.ApelidoUsuario)</a></li>
+        <li class="breadcrumb-item active">Gerenciar Permissões</li>
+    </ol>
+}
+
+<!-- Mensagens TempData (usando seu ViewComponent Summary) -->
+<vc:summary></vc:summary>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h5 class="card-title mb-0 flex-grow-1">Gerenciando Permissões para: <strong>@Model.NomeUsuario</strong> (ID: @Model.UserId)</h5>
+                    <div class="flex-shrink-0">
+                        <a asp-action="Detalhes" asp-route-id="@Model.UserId" class="btn btn-light waves-effect waves-light">
+                            <i class="ri-arrow-left-s-line align-middle"></i> Voltar para Detalhes
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <!-- Seção para Adicionar Permissão -->
+                    <div class="col-md-5">
+                        <div class="card border shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">Adicionar Nova Permissão ao Usuário</h6>
+                            </div>
+                            <div class="card-body">
+                                @if (Model.DropdownTodasAsRoles != null && Model.DropdownTodasAsRoles.Any())
+                                {
+                                    <form asp-action="AdicionarRoleAoUsuario" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" asp-for="UserId" />
+                                        @* Outras propriedades do ViewModel podem ser hidden se necessário para o POST,
+                                           mas para AdicionarRoleAoUsuario, UserId e RoleSelecionadaParaAdicionar são chave. *@
+
+                                        <div class="mb-3">
+                                            <label asp-for="RoleSelecionadaParaAdicionar" class="form-label"></label>
+                                            <select asp-for="RoleSelecionadaParaAdicionar" asp-items="Model.DropdownTodasAsRoles" class="form-select">
+                                                <option value="">Selecione uma Permissão...</option>
+                                            </select>
+                                            <span asp-validation-for="RoleSelecionadaParaAdicionar" class="text-danger"></span>
+                                        </div>
+                                        <button type="submit" class="btn btn-success waves-effect waves-light">
+                                            <i class="ri-add-circle-line align-bottom me-1"></i> Adicionar Permissão
+                                        </button>
+                                    </form>
+                                } else
+                                {
+                                    <p class="text-muted">Não há novas permissões disponíveis para adicionar a este usuário, ou todas as permissões do sistema já foram atribuídas.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção para Listar Roles Atuais -->
+                    <div class="col-md-7">
+                        <div class="card border shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">Permissões Atuais do Usuário</h6>
+                            </div>
+                            <div class="card-body">
+                                @if (Model.RolesAtuaisDoUsuario != null && Model.RolesAtuaisDoUsuario.Any())
+                                {
+                                    <ul class="list-group">
+                                        @foreach (var roleName in Model.RolesAtuaisDoUsuario)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                @roleName
+                                                <form asp-action="RemoverRoleDoUsuario" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover a permissão \'@roleName\' deste usuário?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@Model.UserId" />
+                                                    <input type="hidden" name="roleName" value="@roleName" />
+                                                    <button type="submit" class="btn btn-danger btn-sm waves-effect waves-light" title="Remover Permissão @roleName">
+                                                        <i class="ri-delete-bin-line"></i> Remover
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
+                                    </ul>
+                                } else
+                                {
+                                    <p class="text-muted">Este usuário não possui nenhuma permissão atribuída no momento.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/assets/js/app.js"></script>
+}

@@ -1,0 +1,75 @@
+﻿<table class="table">
+    <thead style="background-color: #313131;">
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Valor Unitário</th>
+            <th>Valor Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Itens)
+        {
+            <tr>
+                <td>@item.NomeProduto</td>
+                <td>@item.Quantidade</td>
+                <td class="text-end">@item.ValorUnitario.ToString("C")</td>
+                <td class="text-end">@item.ValorTotal.ToString("C")</td>
+            </tr>
+        }
+        <tr></tr>
+
+        <tr class="border-top border-top-dashed">
+            <td></td>
+            <td colspan="3" class="fw-medium p-0">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+
+
+                        <tr>
+                            <td>Total de Itens :</td>
+                            <td class="text-end">
+                                @Model.QuantidadeTotalItens
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>Sub Total :</td>
+                            <td class="text-end">
+                                @Model.ValorTotalItens.ToString("C")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Descont0 <span class="text-muted">(VOUCHER)</span> :
+                            </td>
+                            <td class="text-end">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Taxa de Entrega :</td>
+                            <td class="text-end">R$ 0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Imposto Estimado :</td>
+                            <td class="text-end">R$ 0,00</td>
+                        </tr>
+                        <tr class="border-top border-top-dashed">
+                            <th scope="row">Total (R$) :</th>
+                            <th class="text-end">@Model.ValorTotalItens.ToString("C")</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+
+    </tbody>
+</table>
+
+
+@*
+<div class="text-end">
+    <h4>Total de Itens: &nbsp;&nbsp;&nbsp; @Model.QuantidadeTotalItens</h4>
+    <h4>Valor Total: &nbsp;&nbsp;&nbsp; @Model.ValorTotalItens.ToString("C")</h4>
+</div> *@

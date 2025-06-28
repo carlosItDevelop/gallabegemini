@@ -1,0 +1,137 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@model IEnumerable<GeneralLabSolutions.Domain.Entities.Vendedor>
+
+@{
+    ViewBag.Title = "Lista de Vendedores";
+    ViewBag.pTitle = "Lista de Vendedores";
+    ViewBag.pageTitle = "Vendedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <!--datatable css-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <!--datatable responsive css-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+}
+
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-success">Adicionar Vendedor</a>
+</p>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title mb-0">Lista de Vendedores</h3>
+            </div>
+            <div class="card-body">
+                <table id="fixed-header" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Nome)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Email)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Documento)
+                            </th>
+                            <th>
+                                Tipo de Pessoa
+                                @* @Html.DisplayNameFor(model => model.TipoDePessoa) *@
+                            </th>
+                            <th>
+                                Status do Vndedor
+                                @* @Html.DisplayNameFor(model => model.StatusDoVendedor) *@
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            string? statusClass = "info"; // Default value if item. Status is null or doesn't match any case
+                            if (item.StatusDoVendedor == StatusDoVendedor.Admin)
+                            {
+                                statusClass = "success";
+                            } else if (item.StatusDoVendedor == StatusDoVendedor.FreeLance)
+                            {
+                                statusClass = "warning";
+                            } else if (item.StatusDoVendedor == StatusDoVendedor.Contratado)
+                            {
+                                statusClass = "info";
+                            } else if (item.StatusDoVendedor == StatusDoVendedor.Inativo)
+                            {
+                                statusClass = "danger";
+                            }
+
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Nome)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Documento)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TipoDePessoa)
+                                </td>
+                                <td>
+                                    <span class="badge bg-@statusClass-subtle text-@statusClass">
+                                        @Html.DisplayFor(modelItem => item.StatusDoVendedor)
+                                    </span>
+                                </td>
+
+
+                                <td>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ri-more-fill align-middle"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> Detalhes</a></li>
+                                            <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Editar</a></li>
+                                            <li>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item remove-item-btn">
+                                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Excluir
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a asp-action="ObterConsolidado" asp-controller="ConsolidadoVendedor" asp-route-vendedorId="@item.Id" class="dropdown-item remove-item-btn">
+                                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Consolidado
+                                                </a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </td>
+
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

@@ -1,0 +1,67 @@
+﻿@* ✅ ESTRUTURA BOOTSTRAP 5 CORRIGIDA *@
+<div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalTitle">Nova Tarefa</h5>
+                @* ✅ BOTÃO DE FECHAR PADRÃO *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* O conteúdo do seu formulário permanece o mesmo *@
+                <form id="taskForm">
+                    <input type="hidden" id="taskId" name="id">
+                    <div class="form-group">
+                        <label for="taskTitle">Título *</label>
+                        <input type="text" id="taskTitle" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Descrição</label>
+                        <textarea id="taskDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskDueDate">Data de Vencimento *</label>
+                            <input type="date" id="taskDueDate" name="dueDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority">Prioridade</label>
+                            <select id="taskPriority" name="priority">
+                                <option value="baixa">Baixa</option>
+                                <option value="media" selected>Média</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskLeadId">Lead Relacionado</label>
+                            <select id="taskLeadId" name="leadId">
+                                <option value="">Selecione um lead</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskAssignee">Responsável</label>
+                            <select id="taskAssignee" name="assignee">
+                                <option value="Maria Santos">Maria Santos</option>
+                                <option value="Carlos Oliveira">Carlos Oliveira</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskProgress">Progresso (%): <span id="progressDisplay">0</span>%</label>
+                        <input type="range" id="taskProgress" name="progress" min="0" max="100" value="0" oninput="updateProgressDisplay(this.value)">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                @* ✅ BOTÃO DE CANCELAR PADRÃO *@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitTask()">
+                    <i class="fas fa-save"></i>
+                    Salvar Tarefa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

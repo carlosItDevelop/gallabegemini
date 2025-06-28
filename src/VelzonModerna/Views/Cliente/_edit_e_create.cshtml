@@ -1,0 +1,133 @@
+﻿@using VelzonModerna.ViewModels
+@using GeneralLabSolutions.Domain.Enums
+@model ClienteViewModel
+
+@* Linha 1 *@
+<div class="row g-3 mb-3">
+
+    <div class="col-md-2">
+        @* Coluna para Documento *@
+        <div class="form-floating">
+            <input type="text" asp-for="Documento" class="form-control" id="Documento" placeholder=" ">
+            <label asp-for="Documento">CPF / CNPJ</label> @* Usar asp-for no label é melhor *@
+            <span asp-validation-for="Documento" class="text-danger"></span>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="form-floating">
+            <input type="text" asp-for="Nome" class="form-control" id="Nome" placeholder=" "> @* Placeholder vazio ou espaço é comum para floating labels *@
+            <label asp-for="Nome">Nome ou Razão Social</label>
+            <span asp-validation-for="Nome" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    
+    <div class="col-md-4">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="NomeFantasia" placeholder=" ">
+            <label>Nome Fantasia</label>
+            @* <span asp-validation-for="NomeFantasia" class="text-danger"></span> *@
+        </div>
+    </div>
+
+</div>
+
+
+
+@* Linha 2 *@
+
+<div class="row g-3 mb-3">
+
+
+    <div class="col-md-4">
+        <div class="form-floating">
+            <input type="email" asp-for="Email" class="form-control" id="Email" placeholder=" ">
+            <label asp-for="Email">Email Principal</label>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-floating">
+            <input type="text" asp-for="TelefonePrincipal" class="form-control" id="TelefonePrincipal" placeholder=" ">
+            <label asp-for="TelefonePrincipal">Telefone Principal</label>
+            <span asp-validation-for="TelefonePrincipal" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating">
+            <input type="text" asp-for="ContatoRepresentante" class="form-control" id="ContatoRepresentante" placeholder=" ">
+            <label asp-for="ContatoRepresentante">Contato Principal / Representante</label>
+            <span asp-validation-for="ContatoRepresentante" class="text-danger"></span>
+        </div>
+    </div>
+
+</div>
+
+@* Linha 3 *@
+<div class="row g-3 mb-3">
+
+    <div class="col-md-6">
+        <div class="form-floating">
+            <input type="text" asp-for="InscricaoEstadual" class="form-control" id="InscricaoEstadual" placeholder=" ">
+            <label asp-for="InscricaoEstadual"> Inscrição Estadual (opcional)</label>
+            <span asp-validation-for="InscricaoEstadual" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-floating">
+            <select asp-for="StatusDoCliente" class="form-select"
+                    asp-items="Html.GetEnumSelectList<StatusDoCliente>()"
+                    id="StatusDoCliente" aria-label="Status do Cliente">
+
+                <option value="">Escolha...</option>
+            </select>
+            <label asp-for="StatusDoCliente">Status</label> @* Label aqui *@
+            <span asp-validation-for="StatusDoCliente" class="text-danger"></span>
+        </div>
+    </div>
+
+</div>
+
+@* Linha 4 *@
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="form-floating">
+            
+            <select asp-for="TipoDeCliente"
+                    asp-items="Html.GetEnumSelectList<TipoDeCliente>()"
+                    id="TipoDeCliente" aria-label="Tipo de Cliente" class="form-select">
+                @* Mudei ID *@
+                <option value="">Escolha...</option>
+            </select>
+            <label asp-for="TipoDeCliente">Tipo de Cliente</label> @* Label aqui *@
+            <span asp-validation-for="TipoDeCliente" class="text-danger"></span>
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-floating">
+            
+            <select asp-for="TipoDePessoa" asp-items="Html.GetEnumSelectList<TipoDePessoa>()" class="form-select" id="TipoDePessoa" aria-label="Tipo de Pessoa">
+                @* Mudei ID *@
+                <option value="">Escolha...</option>
+            </select>
+            <label asp-for="TipoDePessoa">Tipo de Pessoa</label> @* Label aqui *@
+            <span asp-validation-for="TipoDePessoa" class="text-danger"></span>
+
+        </div>
+    </div>
+</div>
+
+@* Linha 5 *@
+<div class="row g-3 mb-3">
+    <div class="col-md-12">
+        <div class="form-floating">
+            <textarea asp-for="Observacao" class="form-control" id="Observacao" placeholder=" " style="min-height: 120px;"></textarea>
+            <label asp-for="Observacao">Observação (opcional)</label>
+            <span asp-validation-for="Observacao" class="text-danger"></span>
+        </div>
+    </div>
+</div>

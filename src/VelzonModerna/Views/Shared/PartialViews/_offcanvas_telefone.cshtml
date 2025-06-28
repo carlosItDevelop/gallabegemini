@@ -1,0 +1,60 @@
+﻿@* Cole este bloco no final de Views/Cliente/Details.cshtml e Views/Cliente/Edit.cshtml, ANTES de @section Scripts *@
+
+<!-- ========== Offcanvas Telefone ========== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasTelefone" aria-labelledby="offcanvasTelefoneLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="offcanvasTelefoneLabel">Telefone</h5> @* Título pode ser alterado via JS *@
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="telefoneOffcanvasForm" novalidate>
+            @* Novo ID para o formulário *@
+            @Html.AntiForgeryToken() @* Essencial para segurança *@
+
+            <input type="hidden" id="telefone_Id" name="Id" value="00000000-0000-0000-0000-000000000000" />
+            <input type="hidden" id="telefone_PessoaId" name="PessoaId" value="@Model.PessoaId" /> @* PessoaId do Cliente principal *@
+
+            <div class="mb-3">
+                <label for="telefone_DDD" class="form-label">DDD</label>
+                <input type="text" class="form-control" id="telefone_DDD" name="DDD" required placeholder="Ex: 21" maxlength="3">
+                <div class="invalid-feedback">Por favor, informe o DDD.</div>
+                <span id="validation_Telefone_DDD" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="telefone_Numero" class="form-label">Número</label>
+                <input type="text" class="form-control" id="telefone_Numero" name="Numero" required placeholder="Ex: 98765-4321" maxlength="15">
+                <div class="invalid-feedback">Por favor, informe o número.</div>
+                <span id="validation_Telefone_Numero" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="telefone_TipoDeTelefone" class="form-label">Tipo de Telefone</label>
+                <select class="form-select" id="telefone_TipoDeTelefone" name="TipoDeTelefone" required>
+                    <option value="">-- Selecione --</option>
+                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeTelefone>())
+                    {
+                        <option value="@tipo.Value">@tipo.Text</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Por favor, selecione o tipo do telefone.</div>
+                <span id="validation_Telefone_TipoDeTelefone" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div id="offcanvasTelefoneFormErrors" class="text-danger mt-2 mb-3"></div> @* Para erros gerais *@
+
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success" id="btnSalvarTelefone">
+                    <i class="ri-save-line align-bottom me-1"></i> Salvar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluirTelefone" style="display: none;">
+                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir
+                </button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line align-bottom me-1"></i> Fechar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- ========== End Offcanvas Telefone ========== -->

@@ -1,0 +1,286 @@
+﻿<script>
+        $(document).ready(function () {
+
+        function showToast(message, type = 'success') {
+            // Cor de fundo conforme o tipo
+            const bg =
+                type === 'success' ? 'linear-gradient(#198754, #157347)' :   // verde
+                    type === 'error' ? 'linear-gradient(#dc3545, #bb2d3b)' :   // vermelho
+                        type === 'warning' ? 'linear-gradient(#f39c12, #e58e09)' :   // laranja
+                            'linear-gradient(#0d6efd, #0a58ca)';    // info / azul
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',              // 'top' ou 'bottom'
+                position: 'right',           // 'left', 'center' ou 'right'
+                close: true,
+                style: { background: bg }
+            }).showToast();
+        }
+
+
+        const offcanvasElement = document.getElementById('offcanvasDadosBancarios');
+        const offcanvasInstance = new bootstrap.Offcanvas(offcanvasElement); // Instância do Offcanvas Bootstrap
+        const form = $('#dadosBancariosOffcanvasForm');
+        const listContainerId = '#dados-bancarios-list-container';
+        const clienteId = '@Model.Id'; // ID do Cliente principal da página
+
+        // Função para resetar o formulário do Offcanvas
+        function resetOffcanvasForm() {
+            form[0].reset(); // Reseta campos do formulário
+            form.removeClass('was-validated'); // Remove classes de validação Bootstrap
+            $('#dadosBancarios_Id').val('00000000-0000-0000-0000-000000000000'); // Reseta ID oculto
+            $('#dadosBancarios_PessoaId').val('@Model.PessoaId'); // Garante PessoaId do Cliente atual
+            $('.field-validation-error').text(''); // Limpa spans de erro antigos
+            $('#offcanvasFormErrors').text(''); // Limpa erros gerais
+            $('#btnExcluirDadosBancarios').hide(); // Esconde botão excluir por padrão
+            $('#offcanvasDadosBancariosLabel').text('Dados Bancários'); // Reseta título
+
+            // <<< NOVO: restaura o botão Salvar >>>
+            $('#btnSalvarDadosBancarios')
+                .prop('disabled', false)
+                .html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+
+        }
+
+        // Função para exibir erros de validação do servidor
+        function displayServerErrors(errors) {
+            $('#offcanvasFormErrors').text(''); // Limpa erros gerais primeiro
+            $('.field-validation-error').text(''); // Limpa erros de campo
+
+            if (Array.isArray(errors)) {
+                // Tenta exibir erros gerais se houver
+                if (errors.length > 0) {
+                    $('#offcanvasFormErrors').html(errors.join('<br>'));
+                }
+                // Poderia tentar mapear erros para campos específicos se a resposta JSON incluísse nomes de campos
+            } else if (typeof errors === 'string') {
+                $('#offcanvasFormErrors').text(errors);
+            } else {
+                $('#offcanvasFormErrors').text('Ocorreu um erro inesperado.');
+            }
+        }
+
+        // Função para recarregar a lista via AJAX
+        function refreshDadosBancariosList() {
+            // Pega o PessoaId do cliente atual (poderia ser do form ou de um atributo)
+            const currentPessoaId = $('#dadosBancarios_PessoaId').val() || '@Model.PessoaId';
+
+            if (!currentPessoaId || currentPessoaId === '00000000-0000-0000-0000-000000000000') {
+
+                showToast('PessoaId inválido para recarregar a lista.', 'error');
+
+                return; // Não tentar recarregar sem ID
+            }
+
+            const url = '@Url.Action("GetDadosBancariosListPartial", "Cliente")'
+                + '?clienteId=' + clienteId;   // <-- usa o id do cliente, não da pessoa
+
+            // Adiciona um spinner/loading (opcional)
+            $(listContainerId).html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregando...</span></div></div>');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (result) {
+                    $(listContainerId).html(result);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    //console.error("Erro ao recarregar lista de dados bancários: ", textStatus, errorThrown);
+
+                    showToast('Erro ao recarregar lista de dados bancários!', 'error');
+
+                    // Mostrar mensagem de erro ao usuário
+                    $(listContainerId).html('<div class="alert alert-danger">Erro ao carregar os dados bancários. Tente novamente mais tarde.</div>');
+                }
+            });
+        }
+
+        // 1. Abrir Offcanvas para ADICIONAR
+        $('.add-dados-bancarios-btn').on('click', function () {
+            resetOffcanvasForm();
+            const pessoaId = $(this).data('pessoa-id');
+            $('#dadosBancarios_PessoaId').val(pessoaId); // Define o PessoaId correto
+            $('#offcanvasDadosBancariosLabel').text('Adicionar Dados Bancários');
+            $('#btnExcluirDadosBancarios').hide(); // Garante que excluir está escondido
+            // O Offcanvas é aberto pelos atributos data-bs-*
+        });
+
+        // 2. Abrir Offcanvas para EDITAR (Usando delegação de eventos)
+        $(listContainerId).on('click', '.dados-bancarios-row', function () {
+            resetOffcanvasForm();
+            const dadosBancariosId = $(this).data('id');
+            const pessoaId = $(this).data('pessoa-id'); // Pega o PessoaId da linha
+
+            $('#offcanvasDadosBancariosLabel').text('Editar Dados Bancários');
+            // Adiciona loading visual (opcional)
+            form.find('input, select').prop('disabled', true); // Desabilita form enquanto carrega
+
+            $.ajax({
+                url: '@Url.Action("GetDadosBancariosFormData", "Cliente")',
+                type: 'GET',
+                data: { dadosBancariosId: dadosBancariosId, clienteId: '@Model.Id' }, // Passa ambos IDs
+                success: function (data) {
+                    if (data) {
+                        // Preenche o formulário
+                        $('#dadosBancarios_Id').val(data.id);
+                        $('#dadosBancarios_PessoaId').val(data.pessoaId); // Confirma o PessoaId
+                        $('#dadosBancarios_Banco').val(data.banco);
+                        $('#dadosBancarios_Agencia').val(data.agencia);
+                        $('#dadosBancarios_Conta').val(data.conta);
+                        $('#dadosBancarios_TipoDeContaBancaria').val(data.tipoDeContaBancaria); // Valor numérico do enum
+
+                        $('#btnExcluirDadosBancarios').show(); // Mostra o botão Excluir
+                    } else {
+
+                        showToast('Dados bancários não encontrados!', 'error');
+
+                        offcanvasInstance.hide(); // Fecha se deu erro
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    showToast('Erro ao buscar dados bancários. Tente novamente!', 'error');
+                    offcanvasInstance.hide(); // Fecha se deu erro
+                },
+                complete: function () {
+                    // Remove loading visual
+                    form.find('input, select').prop('disabled', false); // Reabilita form
+                }
+            });
+            // O Offcanvas é aberto pelos atributos data-bs-* na linha <tr>
+        });
+
+
+        // 3. Submeter Formulário (SALVAR - Adicionar ou Editar)
+        form.on('submit', function (event) {
+            event.preventDefault(); // Impede submissão normal
+
+            // Validação básica do Bootstrap 5
+            if (this.checkValidity() === false) {
+                event.stopPropagation();
+                $(this).addClass('was-validated');
+                return;
+            }
+            $(this).removeClass('was-validated'); // Limpa validação se passou
+
+            // --- INÍCIO DA MODIFICAÇÃO ---
+            // Pega os dados do formulário como um array de objetos {name: ..., value: ...}
+            const formDataArray = $(this).serializeArray();
+
+            // Adiciona o ID do Cliente principal (que está na variável 'clienteId' do escopo superior) ao array
+            // O nome "ClienteId" DEVE corresponder ao nome do parâmetro na Action do Controller
+            formDataArray.push({ name: "ClienteId", value: clienteId });
+
+            // Re-serializa o array modificado para o formato query string (necessário para 'data' do $.ajax com POST padrão)
+            const dataToSend = $.param(formDataArray);
+            // --- FIM DA MODIFICAÇÃO ---
+
+            const url = '@Url.Action("SalvarDadosBancarios", "Cliente")';
+
+            // Adiciona loading no botão Salvar
+            const btnSalvar = $('#btnSalvarDadosBancarios');
+            btnSalvar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvando...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                // Usa os dados modificados que agora incluem o ClienteId
+                data: dataToSend,
+                // Inclui o AntiForgeryToken
+                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                    if (response.success) {
+                        offcanvasInstance.hide();
+                        refreshDadosBancariosList();
+                        showToast('Dados bancários salvos com sucesso!', 'success');
+                    } else {
+                        displayServerErrors(response.errors);
+                        showToast('Ocorreu um erro ao salvar.', 'Erro');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    displayServerErrors("Erro de comunicação com o servidor. Verifique o console para detalhes.");
+                    showToast('Ocorreu um erro ao salvar.', 'Erro');
+                },
+                complete: function () {
+                    btnSalvar.prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+                }
+            });
+        });
+
+
+        // 4. EXCLUIR Item
+        $('#btnExcluirDadosBancarios').on('click', function () {
+            const dadosBancariosId = $('#dadosBancarios_Id').val();
+            const currentClienteId = clienteId;   // já definido no topo do script
+
+            if (!dadosBancariosId || dadosBancariosId === '00000000-0000-0000-0000-000000000000') {
+                Swal.fire('Ops!', 'ID inválido para exclusão.', 'error');
+                return;
+            }
+
+            // *** SweetAlert2 de confirmação ***
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: 'Esta operação removerá permanentemente estes dados bancários.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-secondary ms-2'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (!result.isConfirmed) return;   // Usuário cancelou
+
+                // --- se confirmou, faz AJAX ---
+                const url = '@Url.Action("ExcluirDadosBancarios", "Cliente")';
+                const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+
+                // Habilita spinner no botão excluir
+                const btnExcluir = $('#btnExcluirDadosBancarios');
+                btnExcluir.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm" role="status"></span> Excluindo...');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        clienteId: currentClienteId,
+                        dadosBancariosId: dadosBancariosId,
+                        __RequestVerificationToken: antiForgeryToken
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            offcanvasInstance.hide();           // fecha o painel
+                            refreshDadosBancariosList();        // atualiza tabela
+
+                            // ToastR depois — por enquanto usamos SweetAlert
+                            Swal.fire('Excluído!', 'Dados bancários removidos.', 'success');
+                        } else {
+                            Swal.fire('Erro', (response.errors ?? ['Erro desconhecido']).join('<br>'), 'error');
+                        }
+                    },
+                    error: function (jqXHR, textStatus) {
+                        Swal.fire('Erro', 'Falha de comunicação com o servidor.', 'error');
+                    },
+                    complete: function () {
+                        btnExcluir.prop('disabled', false)
+                            .html('<i class="ri-delete-bin-line align-bottom me-1"></i> Excluir');
+                    }
+                });
+            });
+        });
+
+
+        // Opcional: Limpar o formulário quando o Offcanvas for fechado
+        offcanvasElement.addEventListener('hidden.bs.offcanvas', event => {
+            resetOffcanvasForm();
+        });
+
+    }); // Fim do $(document).ready()
+
+</script>

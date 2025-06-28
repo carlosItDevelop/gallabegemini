@@ -1,0 +1,11 @@
+{
+  "projects": [ "src", "tests" ],
+  "sdk": {
+    "version": "8.0.405",
+    "rollForward": "latestMinor",
+    "allowPrerelease": false
+  },
+  "msbuild-sdks": {
+    "MyCustomSdk": "1.0.0"
+  }
+}

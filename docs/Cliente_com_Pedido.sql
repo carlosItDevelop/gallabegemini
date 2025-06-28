@@ -1,0 +1,1 @@
+﻿select top 100 c.Id as IdDoCliente, c.Nome, p.Id as IdDoPedido from Cliente c inner join Pedido p on p.ClienteId = c.Id;

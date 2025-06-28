@@ -1,0 +1,74 @@
+﻿@using VelzonModerna.Helpers
+
+@* Default.cshtml (da partial view Summary) *@
+
+@if (ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-warning alert-border-left alert-dismissible fade show"
+         role="alert">
+        <i class="ri-alert-line me-3 align-middle fs-16"></i>
+        <strong><h3 id="msgRetorno" style="padding-top: 20px">Opa! Algo deu errado :(</h3></strong>
+        <div style="padding-top: 20px" asp-validation-summary="All" class="text-danger"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* Para mensagens de sucesso genéricas *@
+@if (TempData ["Success"] != null) // CHAVE CORRIGIDA PARA "Success"
+{
+    <div style="padding-top: 15px"></div>
+    <div id="msg_box_success" class="alert alert-success alert-border-left alert-dismissible fade show" role="alert">
+        <i class="ri-check-double-line me-3 align-middle fs-16"></i> @* Ícone diferente para sucesso *@
+        <strong>Sucesso!</strong>
+        <h4 id="msgRetornoSuccess">@Html.Raw(TempData ["Success"].ToString())</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* Para mensagens de erro genéricas (se você usar TempData["Error"] no controller) *@
+@if (TempData ["Error"] != null) // Exemplo para uma chave "Error"
+{
+    <div style="padding-top: 15px"></div>
+    <div id="msg_box_error" class="alert alert-danger alert-border-left alert-dismissible fade show" role="alert">
+        <i class="ri-error-warning-line me-3 align-middle fs-16"></i>
+        <strong>Erro!</strong>
+        <h4 id="msgRetornoError">@Html.Raw(TempData ["Error"].ToString())</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@* Mantendo seu TempData["Excluido"] se você o usa especificamente *@
+@if (TempData ["Excluido"] != null)
+{
+    <div style="padding-top: 15px"></div>
+    <div id="msg_box_excluido" class="alert alert-danger alert-border-left alert-dismissible fade show mb-xl-0" role="alert">
+        <i class="ri-delete-bin-line me-3 align-middle fs-16"></i> @* Ícone de lixeira *@
+        <strong>Atenção!</strong>
+        <h4 id="msgRetornoExcluido">@Html.Raw(TempData ["Excluido"].ToString())</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* Você também mencionou ViewBag.Sucesso, se ele ainda for usado: *@
+@if (!string.IsNullOrEmpty(ViewBag.Sucesso))
+{
+    <div style="padding-top: 15px"></div>
+    <div id="msg_box_viewbag_sucesso" class="alert alert-success alert-border-left alert-dismissible fade show" role="alert">
+        <i class="ri-check-double-line me-3 align-middle fs-16"></i>
+        <strong>Sucesso!</strong>
+        <h3 id="msgRetornoViewBag">@ViewBag.Sucesso</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData [TempDataKeys.InfoMessage] != null) // NOVO BLOCO PARA INFO
+{
+    <div style="padding-top: 15px"></div>
+    <div id="msg_box_info" class="alert alert-info alert-border-left alert-dismissible fade show" role="alert">
+        <i class="ri-information-line me-3 align-middle fs-16"></i> @* Ícone de informação *@
+        <strong>Informação:</strong>
+        <h4 id="msgRetornoInfo">@Html.Raw(TempData [TempDataKeys.InfoMessage].ToString())</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

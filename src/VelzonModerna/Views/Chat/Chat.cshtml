@@ -1,0 +1,205 @@
+﻿@using GeneralLabSolutions.WebApiCore.Usuario
+@model GeneralLabSolutions.Domain.Entities.MensagemChat
+@inject IAspNetUser _user
+
+@{
+    ViewBag.Title = "Chat";
+    ViewBag.pTitle = "Agente de IA";
+    ViewBag.pageTitle = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var historicoChat = ViewBag.HistoricoChat as List<GeneralLabSolutions.Domain.Entities.MensagemChat> ?? new();
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="chat-wrapper d-lg-flex gap-1 mx-n4 mt-n4 p-1">
+                <div class="user-chat w-100 overflow-hidden">
+                    <div class="chat-content d-lg-flex">
+                        <div class="w-100 overflow-hidden position-relative">
+                            <div class="position-relative">
+                                <!-- Topbar -->
+                                <div class="p-3 user-chat-topbar">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm-4 col-8">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flex-shrink-0 chat-user-img online user-own-img align-self-center me-3">
+                                                            <img src="~/assets/images/users/user-dummy-img.jpg"
+                                                                 class="rounded-circle avatar-xs" alt="">
+                                                            <span class="user-status"></span>
+                                                        </div>
+                                                        <div class="flex-grow-1 overflow-hidden">
+                                                            <h5 class="text-truncate mb-0 fs-16">
+                                                                <a class="text-reset username" data-bs-toggle="offcanvas"
+                                                                   href="#userProfileCanvasExample"
+                                                                   aria-controls="userProfileCanvasExample">
+                                                                    @_user.ObterApelido()
+                                                                </a>
+                                                            </h5>
+                                                            <p class="text-truncate text-muted mb-0 userStatus">
+                                                                <span>Online</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8 col-4 text-end">
+                                            <button type="button" class="btn btn-ghost-secondary btn-icon"
+                                                    data-bs-toggle="offcanvas"
+                                                    data-bs-target="#userProfileCanvasExample">
+                                                <i data-feather="info" class="icon-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Conversation list -->
+                                <div class="chat-conversation p-3 p-lg-4" id="chat-conversation" data-simplebar>
+                                    @* Carrega a partial com o histórico inicial *@
+                                    @await Html.PartialAsync("_ChatMessagesPartial", historicoChat)
+                                </div>
+                                <!-- Spinner/Loading visual -->
+                                <div class="text-center py-2" id="chat-loading" style="display:none;">
+                                    <div class="spinner-border text-primary" role="status" style="width:2.5rem;height:2.5rem;">
+                                        <span class="visually-hidden">Carregando...</span>
+                                    </div>
+                                    <div class="small text-muted mt-2">O assistente está digitando...</div>
+                                </div>
+                                <!-- Input Section -->
+                                <div class="chat-input-section p-3 p-lg-4">
+                                    @if (TempData ["ChatError"] is string err)
+                                    {
+                                        <div class="alert alert-danger py-2 px-3 mb-3">@err</div>
+                                    }
+                                    <form asp-controller="Chat"
+                                          asp-action="SendMessage"
+                                          method="post"
+                                          id="chatinput-form"
+                                          autocomplete="off">
+                                        @Html.AntiForgeryToken()
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col">
+                                                <input type="text"
+                                                       class="form-control chat-input bg-light border-light"
+                                                       name="pergunta"
+                                                       id="chat-pergunta"
+                                                       placeholder="Digite sua pergunta…"
+                                                       autocomplete="off"
+                                                       required />
+                                            </div>
+                                            <div class="col-auto">
+                                                <button type="submit" class="btn btn-success chat-send waves-effect waves-light">
+                                                    <i class="ri-send-plane-2-fill align-bottom"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /Input Section -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Função para pegar o token antiforgery do input
+        function getRequestVerificationToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        }
+
+        // Função para mostrar ou esconder o loading visual
+        function setLoading(isLoading) {
+            const loadingDiv = document.getElementById('chat-loading');
+            if (loadingDiv) {
+                loadingDiv.style.display = isLoading ? '' : 'none';
+            }
+        }
+
+        // Função para scrollar até o final do chat, com scroll suave
+        function scrollChatToBottom() {
+            const conv = document.getElementById('chat-conversation');
+            if (conv) {
+                conv.scrollTo({ top: conv.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        // Função para inserir mensagem de erro no chat
+        function inserirErroNoChat(mensagem) {
+            const usersConv = document.getElementById('users-conversation');
+            if (usersConv) {
+                const errorHtml = `<li class="chat-list">
+                       <div class="conversation-list">
+                           <div class="user-chat-content">
+                               <h6 class="text-danger mb-1 fw-semibold">Sistema</h6>
+                               <div class="ctext-wrap">
+                                   <div class="ctext-wrap-content bg-light text-danger">
+                                       ${mensagem}
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </li>`;
+                usersConv.insertAdjacentHTML('beforeend', errorHtml);
+                scrollChatToBottom();
+            }
+        }
+
+        // Intercepta o envio do formulário para AJAX
+        document.getElementById('chatinput-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const perguntaInput = document.getElementById('chat-pergunta');
+            const pergunta = perguntaInput.value;
+            if (!pergunta.trim()) return;
+
+            // Desabilita campo e botão durante o envio
+            perguntaInput.disabled = true;
+            this.querySelector('button[type="submit"]').disabled = true;
+            setLoading(true);
+
+            try {
+                const response = await fetch('@Url.Action("SendMessageAjax", "Chat")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getRequestVerificationToken()
+                    },
+                    body: JSON.stringify({ pergunta })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Substitui a lista do chat pelas novas mensagens
+                    document.getElementById('users-conversation').outerHTML = result.html;
+                    perguntaInput.value = '';
+                    perguntaInput.focus(); // Foco automático após enviar
+                    scrollChatToBottom();
+                } else {
+                    inserirErroNoChat(result.error || 'Erro ao enviar mensagem');
+                }
+            } catch (err) {
+                inserirErroNoChat('Erro inesperado ao enviar mensagem.');
+            } finally {
+                perguntaInput.disabled = false;
+                this.querySelector('button[type="submit"]').disabled = false;
+                setLoading(false);
+            }
+        });
+
+        // Garante scroll ao carregar página (duas vezes, para garantir render e imagens)
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(scrollChatToBottom, 100);
+            setTimeout(scrollChatToBottom, 350);
+            // Foco automático no campo input ao abrir
+            const perguntaInput = document.getElementById('chat-pergunta');
+            if (perguntaInput) perguntaInput.focus();
+        });
+    </script>
+}

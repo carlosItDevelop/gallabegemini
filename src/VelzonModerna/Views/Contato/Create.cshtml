@@ -1,0 +1,33 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@using VelzonModerna.ViewModels
+@model ContatoViewModel
+
+@{
+    ViewData["Title"] = "Adicionar Contato";
+}
+
+<h4>Adicionar Contato</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            @* <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
+
+            <vc:summary></vc:summary>
+
+            <partial name="_edit_e_create" model="Model" />
+
+            <div class="form-group">
+                <input type="submit" value="Adicionar" class="btn btn-outline-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-success">Voltar à Lista</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,32 @@
+﻿@model List<GeneralLabSolutions.Domain.Entities.MensagemChat>
+
+<ul class="list-unstyled chat-conversation-list" id="users-conversation">
+    @foreach (var msg in Model)
+    {
+        var isIa = msg.EhRespostaIA;
+        var side = isIa ? "" : " right"; // Classe Velzon para lado da mensagem
+        var bubble = isIa ? "bg-light text-muted" : "bg-primary";
+
+        <li class="chat-list @side">
+            <div class="conversation-list">
+                <div class="user-chat-content">
+
+                    <!-- Nome -->
+                    <h6 class="text-muted mb-1 fw-semibold">@msg.Usuario</h6>
+
+                    <!-- Mensagem -->
+                    <div class="ctext-wrap">
+                        <div class="ctext-wrap-content @bubble">
+                            @Html.Raw(msg.Conteudo)
+                        </div>
+                    </div>
+
+                    <!-- Hora -->
+                    <div class="text-end text-muted small mt-1">
+                        @msg.DataHora.ToString("HH:mm")
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+</ul>

@@ -1,0 +1,293 @@
+﻿@using System.Globalization
+@using GeneralLabSolutions.CoreShared.DTOs.DtosConsolidados
+@using GeneralLabSolutions.Domain.Enums
+@model VendedorConsolidadoDto
+
+@{
+    ViewBag.Title = "Consolidado de Vendedor";
+    ViewBag.pTitle = "Consolidado de Vendedor / Vendas";
+    ViewBag.pageTitle = "Consolidado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@* @section styles {
+    <partial name="partialcooperchip/_cssindex" />
+} *@
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title mb-0">
+                    Consolidado do Vendedor: <strong><span class="badge bg-primary">@Model.Nome</span></strong>
+                </h1>
+            </div>
+            <div class="card-body">
+
+                @* ### INÍCIO DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX PARA VENDEDOR ### *@
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card crm-widget shadow-none mb-4">
+                            <div class="card-body p-0">
+                                <div class="row row-cols-xl-5 row-cols-md-3 row-cols-sm-2 row-cols-1 g-0">
+
+                                    @* Tile 1: Total de Vendas *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Total de Vendas</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-coupon-3-line display-6 text-muted"></i> @* Ícone para vendas/cupons *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0"><span class="counter-value" data-target="@Model.TotalDeVendas">@Model.TotalDeVendas</span></h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 2: Valor Total de Vendas *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Valor Total de Vendas</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-line-chart-line display-6 text-muted"></i> @* Ícone para valor/gráfico *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0">
+                                                        <span class="counter-value" data-target="@Model.ValorTotalDeVendas.ToString("N2", CultureInfo.InvariantCulture).Replace(",", "")">
+                                                            @Model.ValorTotalDeVendas.ToString("C", new CultureInfo("pt-BR"))
+                                                        </span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 3: Última Venda *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Última Venda</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-calendar-event-line display-6 text-muted"></i> @* Ícone para data/evento *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0 fs-20">@Model.UltimaVenda?.ToString("dd/MM/yyyy")</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 4: Ticket Médio por Venda *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Ticket Médio por Venda</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-price-tag-3-line display-6 text-muted"></i> @* Ícone para ticket/preço *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0">
+                                                        <span class="counter-value" data-target="@Model.TicketMedioPorVenda.ToString("N2", CultureInfo.InvariantCulture).Replace(",", "")">
+                                                            @Model.TicketMedioPorVenda.ToString("C", new CultureInfo("pt-BR"))
+                                                        </span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 5: Intervalo Médio entre Vendas *@
+                                    <div class="col">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Intervalo Médio (dias)</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-time-interval-line display-6 text-muted"></i> @* Ícone para intervalo/tempo *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0"><span class="counter-value" data-target="@Model.IntervaloMedioEntreVendas">@Model.IntervaloMedioEntreVendas</span></h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* ### FIM DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX PARA VENDEDOR ### *@
+
+                <hr />
+
+                <h2>Histórico de Vendas</h2>
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Data da Venda</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var venda in Model.HistoricoDeVendas)
+                        {
+                            string statusClassVenda; // Renomeada para evitar conflito se houver outra statusClass na página
+                            switch (venda.Status)
+                            {
+                                case "Pago":
+                                    statusClassVenda = "success";
+                                    break;
+                                case "EmProcessamento":
+                                    statusClassVenda = "warning";
+                                    break;
+                                case "Enviado":
+                                    statusClassVenda = "primary";
+                                    break; // Exemplo
+                                case "Entregue":
+                                    statusClassVenda = "success";
+                                    break; // Exemplo
+                                case "Orcamento":
+                                    statusClassVenda = "secondary";
+                                    break; // Exemplo
+                                default:
+                                    statusClassVenda = "danger";
+                                    break;
+                            }
+
+                            <tr>
+                                <td>@venda.DataVenda.ToShortDateString()</td>
+                                <td>
+                                    @* Removi o badge daqui para ficar consistente com o Histórico de Pedidos do Cliente *@
+                                    @venda.ValorTotal.ToString("C2", new CultureInfo("pt-BR"))
+                                </td>
+                                <td>
+                                    <span class="badge bg-@statusClassVenda">
+                                        @venda.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasVenda"
+                                            onclick="carregarItensVenda('@venda.Id')">
+                                        Ver Itens
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" style="width: 50%;" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" id="offcanvasVenda" aria-labelledby="offcanvasVendaLabel">
+    <div class="offcanvas-header">
+        <h3 class="offcanvas-title" id="offcanvasVendaLabel"><strong><span class="badge bg-primary"> Itens da Venda </span></strong></h3>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="itensVendaConteudo">
+            <!-- Conteúdo será carregado via AJAX -->
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 5,
+            "language": {
+                "decimal":        "",
+                "emptyTable":     "Nenhum registro encontrado",
+                "info":           "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty":      "Mostrando 0 até 0 de 0 registros",
+                "infoFiltered":   "(filtrado de _MAX_ registros no total)",
+                "infoPostFix":    "",
+                "thousands":      ".",
+                "lengthMenu":     "Mostrar _MENU_ registros",
+                "loadingRecords": "Carregando...",
+                "processing":     "Processando...",
+                "search":         "Buscar:", // Label do campo de busca
+                "zeroRecords":    "Nenhum registro correspondente encontrado",
+                "paginate": {
+                    "first":      "Primeiro",
+                    "last":       "Último",
+                    "next":       "Próximo",
+                    "previous":   "Anterior"
+                },
+                "aria": {
+                    "sortAscending":  ": ativar para classificar a coluna em ordem crescente",
+                    "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                }
+            },
+            // NOVA CONFIGURAÇÃO DOM:
+            "dom":  "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end'f>>" + // Busca à direita
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 d-flex justify-content-end'p>>"  // Paginação à direita
+        });
+
+        function carregarItensVenda(vendaId) {
+            $.ajax({
+                url: '/ConsolidadoVendedor/ObterItensVenda', // Verifique se esta URL está correta
+                type: 'GET',
+                data: { vendaId: vendaId },
+                success: function (data) {
+                    $('#itensVendaConteudo').html(data);
+                },
+                error: function () {
+                    alert('Erro ao carregar os itens da venda.');
+                }
+            });
+        }
+    </script>
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    @* Adicionar o mesmo script de animação de contador que usamos antes *@
+    <script>
+        function GFG_Fun(target, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                let current = Math.floor(progress * (end - start) + start);
+                if (target.innerHTML.includes('R$') || target.innerHTML.includes('$')) {
+                    let prefix = target.innerHTML.includes('R$') ? 'R$ ' : '$';
+                    let parts = current.toString().split('.');
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    target.innerHTML = prefix + parts.join(',');
+                } else {
+                     target.innerHTML = current;
+                }
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var Clcounter = document.querySelectorAll(".counter-value");
+            Clcounter.forEach(function (element) {
+                var targetValue = parseFloat(element.getAttribute("data-target").replace(/[R$\.\s]/g, '').replace(',', '.'));
+                var startValue = 0;
+                var duration = 1000;
+
+                GFG_Fun(element, startValue, targetValue, duration);
+            });
+        });
+    </script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

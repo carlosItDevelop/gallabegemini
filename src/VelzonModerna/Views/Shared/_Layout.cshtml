@@ -1,0 +1,77 @@
+﻿<!doctype html>
+<html lang="en" data-layout="vertical" data-bs-theme="dark" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+<head>
+
+
+    @* data-bs-theme="dark" data-sidebar-size="lg" *@
+
+    <partial name="_title_meta" />
+
+    @RenderSection("styles", required: false)
+
+    <partial name="_head_css" />
+
+
+
+</head>
+<body>
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+        <partial name="_menu" />        
+
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="container-fluid">
+
+
+                    @* === Início da Seção do Cabeçalho da Página === *@
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0">@ViewBag.pTitle</h4> @* Título principal da página *@
+
+                                <div class="page-title-right">
+                                    @if (IsSectionDefined("Breadcrumb")) // Verifica se a view definiu um breadcrumb customizado
+                                    {
+                                        @RenderSection("Breadcrumb", required: false)
+                                        // Renderiza o breadcrumb da view
+                                    } else
+                                    {
+                                        // Fallback: Breadcrumb genérico original (se existir e for desejado)
+                                        <ol class="breadcrumb m-0">
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">@ViewBag.pageTitle</a></li> @* Usado se a view não definir a seção Breadcrumb *@
+                                            <li class="breadcrumb-item active">@ViewBag.pTitle</li>
+                                        </ol>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @* === Fim da Seção do Cabeçalho da Página === *@
+              
+
+                    @RenderBody()
+                </div>
+            </div>
+            <partial name="_footer" />           
+        </div>
+
+    </div>
+    <!-- END layout-wrapper -->
+
+    <partial name="_customizer" />
+    <partial name="_vendor_scripts" />
+    <script src="~/cooperchip/js/jquerylocal/jquery-3.7.0.min.js"></script>
+    <script src="~/cooperchip/js/site.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+
+
+
+</body>
+</html>

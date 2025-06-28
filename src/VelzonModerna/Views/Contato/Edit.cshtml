@@ -1,0 +1,34 @@
+﻿@using VelzonModerna.ViewModels
+@model ContatoViewModel
+
+@{
+    ViewData["Title"] = "Editar Contato";
+}
+
+<h4>Editar Contato</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            @* <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
+
+            <vc:summary></vc:summary>
+
+            <partial name="_edit_e_create" model="Model" />
+
+
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <input type="submit" value="Salvar" class="btn btn-outline-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-success">Voltar à Lista</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

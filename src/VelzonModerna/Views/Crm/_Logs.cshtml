@@ -1,0 +1,20 @@
+﻿@* Conteúdo da Aba Logs *@
+
+<div class="section-header">
+    <h1>Logs de Atividade</h1>
+</div>
+
+<div class="log-filters">
+    <input type="text" id="logSearchInput" placeholder="Buscar por título ou descrição...">
+    <select id="logTypeFilter">
+        <option value="">Todos os Tipos</option>
+        <option value="lead_creation">Criação de Lead</option>
+        <option value="status_change">Mudança de Status</option>
+        <option value="task_creation">Criação de Tarefa</option>
+        <option value="note_added">Nota Adicionada</option>
+    </select>
+    <input type="date" id="logDateFilter">
+</div>
+
+<div class="logs-timeline" id="logsTimeline">
+</div>

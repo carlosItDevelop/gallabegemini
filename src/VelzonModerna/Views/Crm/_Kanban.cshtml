@@ -1,0 +1,76 @@
+﻿@* Conteúdo da Aba Kanban *@
+
+<div class="section-header">
+    <h1>Pipeline de Vendas</h1>
+    <button class="btn btn-primary" onclick="openLeadModal()">
+        <i class="fas fa-plus"></i>
+        Novo Lead
+    </button>
+</div>
+
+<div class="kanban-board">
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Novo</h3>
+            <span class="lead-count" id="count-novo">0</span>
+        </div>
+        <div class="column-cards" id="novo-cards" data-status="novo">
+        </div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Contato</h3>
+            <span class="lead-count" id="count-contato">0</span>
+        </div>
+        <div class="column-cards" id="contato-cards" data-status="contato">
+        </div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Qualificado</h3>
+            <span class="lead-count" id="count-qualificado">0</span>
+        </div>
+        <div class="column-cards" id="qualificado-cards" data-status="qualificado">
+        </div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Proposta</h3>
+            <span class="lead-count" id="count-proposta">0</span>
+        </div>
+        <div class="column-cards" id="proposta-cards" data-status="proposta">
+        </div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>Negociação</h3>
+            <span class="lead-count" id="count-negociacao">0</span>
+        </div>
+        <div class="column-cards" id="negociacao-cards" data-status="negociacao">
+        </div>
+    </div>
+
+    <div class="kanban-column">
+        <div class="column-header success">
+            <h3>Ganho</h3>
+            <span class="lead-count" id="count-ganho">0</span>
+        </div>
+        <div class="column-cards" id="ganho-cards" data-status="ganho">
+        </div>
+    </div>
+
+    <div class="kanban-column lost">
+        <div class="column-header">
+            <h3>Perdido</h3>
+            <span class="lead-count" id="count-perdido">0</span>
+        </div>
+        <div class="column-cards" id="perdido-cards" data-status="perdido">
+        </div>
+    </div>
+</div>
+
+

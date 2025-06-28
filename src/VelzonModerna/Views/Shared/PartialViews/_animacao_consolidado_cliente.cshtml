@@ -1,0 +1,43 @@
+﻿@* IMPORTANTE: Velzon usa um script para animar os contadores. Se não estiver global, adicione aqui ou garanta que está no _Layout.cshtml *@
+@* Exemplo (verifique o nome exato no seu template Velzon): *@
+@* <script src="~/assets/js/pages/widgets.init.js"></script>  OU só a parte do counter *@
+@* Se o counter não animar, você pode precisar de algo como isto, adaptado do widgets.init.js do Velzon: *@
+<script>
+    function GFG_Fun(target, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            let current = Math.floor(progress * (end - start) + start);
+            if (target.innerHTML.includes('R$') || target.innerHTML.includes('$')) { // Manter formatação de moeda
+                let prefix = target.innerHTML.includes('R$') ? 'R$ ' : '$';
+                let parts = current.toString().split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Milhar
+                target.innerHTML = prefix + parts.join(',');
+            } else {
+                 target.innerHTML = current;
+            }
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var Clcounter = document.querySelectorAll(".counter-value");
+        Clcounter.forEach(function (element) {
+            var targetValue = parseFloat(element.getAttribute("data-target").replace(/[R$\.\s]/g, '').replace(',', '.'));
+            var startValue = 0; // ou o valor atual se não for para animar de zero
+            var duration = 1000; // 1 segundo
+
+            // Para valores monetários, precisamos formatar o data-target
+            if (element.innerHTML.includes('R$') || element.innerHTML.includes('$')) {
+                // O data-target já foi formatado para ter só números e ponto decimal
+                // GFG_Fun irá lidar com a adição do prefixo e formatação
+            }
+
+            GFG_Fun(element, startValue, targetValue, duration);
+        });
+    });
+</script>

@@ -1,0 +1,71 @@
+@using GeneralLabSolutions.Domain.Enums
+@model GeneralLabSolutions.Domain.Entities.Produto
+
+@* Linha 1: Código (col-4), Descrição (col-8) *@
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        @* Bootstrap usa um sistema de 12 colunas, então col-4 é 1/3 *@
+        <div class="form-floating">
+            <input asp-for="Codigo" class="form-control" id="CodigoProduto" placeholder=" " />
+            <label asp-for="Codigo">Código</label>
+            <span asp-validation-for="Codigo" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-8">
+        @* col-8 é 2/3 *@
+        <div class="form-floating">
+            <input asp-for="Descricao" class="form-control" id="DescricaoProduto" placeholder=" " />
+            <label asp-for="Descricao">Descrição</label>
+            <span asp-validation-for="Descricao" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+@* Linha 2: NCM (col-8), Valor Unitário (col-4) *@
+<div class="row g-3 mb-3">
+    <div class="col-md-8">
+        <div class="form-floating">
+            <input asp-for="Ncm" class="form-control" id="NcmProduto" placeholder=" " />
+            <label asp-for="Ncm">NCM</label>
+            <span asp-validation-for="Ncm" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating">
+            <input asp-for="ValorUnitario" class="form-control" id="ValorUnitarioProduto" placeholder=" " type="number" step="0.01" /> @* Adicionado type="number" e step para valores monetários *@
+            <label asp-for="ValorUnitario">Valor Unitário</label>
+            <span asp-validation-for="ValorUnitario" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+@* Linha 3: Status (col-4), Categoria (col-4), Fornecedor (col-4) *@
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="form-floating">
+            <select asp-for="StatusDoProduto" class="form-select" id="StatusDoProduto" asp-items="Html.GetEnumSelectList<StatusDoProduto>()">
+                <option value="">Selecione...</option>
+            </select>
+            <label asp-for="StatusDoProduto">Status do Produto</label>
+            <span asp-validation-for="StatusDoProduto" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating">
+            <select asp-for="CategoriaId" class="form-select" id="CategoriaIdProduto" asp-items="ViewBag.CategoriaId">
+                <option value="">Selecione...</option>
+            </select>
+            <label asp-for="CategoriaId">Categoria</label>
+            <span asp-validation-for="CategoriaId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating">
+            <select asp-for="FornecedorId" class="form-select" id="FornecedorIdProduto" asp-items="ViewBag.FornecedorId">
+                <option value="">Selecione...</option>
+            </select>
+            <label asp-for="FornecedorId">Fornecedor</label>
+            <span asp-validation-for="FornecedorId" class="text-danger"></span>
+        </div>
+    </div>
+</div>

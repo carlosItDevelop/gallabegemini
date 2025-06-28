@@ -1,0 +1,234 @@
+﻿<script>
+
+    $(document).ready(function () {
+
+                 // --- Referências e Variáveis para Telefone ---
+                 const offcanvasTelefoneElement = document.getElementById('offcanvasTelefone');
+                 // Verifica se o elemento existe antes de criar a instância
+                 const offcanvasTelefoneInstance = offcanvasTelefoneElement ? new bootstrap.Offcanvas(offcanvasTelefoneElement) : null;
+                 const formTelefone = $('#telefoneOffcanvasForm');
+                 const listTelefoneContainerId = '#telefones-list-container'; // ID do container da lista de telefones
+                 const clienteIdTelefone = '@Model.Id'; // ID do Cliente principal da página (mesmo que o de Dados Bancários)
+                 // Reutiliza a função showToast definida no bloco anterior ou defina-a globalmente
+                 // function showToast(message, type = 'success') { ... }
+
+
+                 // --- Funções Auxiliares para Telefone ---
+
+                 function resetTelefoneOffcanvasForm() {
+                     if (formTelefone.length === 0) return; // Sai se o form não existir
+                     formTelefone[0].reset();
+                     formTelefone.removeClass('was-validated');
+                     $('#telefone_Id').val('00000000-0000-0000-0000-000000000000');
+                     $('#telefone_PessoaId').val('@Model.PessoaId'); // Garante PessoaId do Cliente atual
+                     $('.field-validation-error').text(''); // Limpa spans de erro (talvez precise de seletores mais específicos)
+                     $('#offcanvasTelefoneFormErrors').text(''); // Limpa erros gerais do form de telefone
+                     $('#btnExcluirTelefone').hide();
+                     $('#offcanvasTelefoneLabel').text('Telefone'); // Reseta título
+                     $('#btnSalvarTelefone').prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar'); // Restaura botão Salvar
+                 }
+
+                 function displayTelefoneServerErrors(errors) {
+                     $('#offcanvasTelefoneFormErrors').text('');
+                     // Limpar spans específicos do formulário de telefone se necessário
+                     // $('.telefone-validation-error').text('');
+
+                     if (Array.isArray(errors)) {
+                         if (errors.length > 0) $('#offcanvasTelefoneFormErrors').html(errors.join('<br>'));
+                     } else if (typeof errors === 'string') {
+                         $('#offcanvasTelefoneFormErrors').text(errors);
+                     } else {
+                         $('#offcanvasTelefoneFormErrors').text('Ocorreu um erro inesperado.');
+                     }
+                 }
+
+                 function refreshTelefonesList() {
+                     if (!clienteIdTelefone || clienteIdTelefone === '00000000-0000-0000-0000-000000000000') {
+                         console.error("ClienteId inválido para recarregar a lista de telefones.");
+                         return;
+                     }
+                     // *** URL CORRIGIDA PARA TELEFONE ***
+                     const url = '@Url.Action("GetTelefonesListPartial", "Cliente")?clienteId=' + clienteIdTelefone;
+
+                     $(listTelefoneContainerId).html('<div class="text-center p-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregando...</span></div></div>');
+
+                     $.ajax({
+                         url: url,
+                         type: 'GET',
+                         success: function (result) {
+                             $(listTelefoneContainerId).html(result);
+                         },
+                         error: function (jqXHR, textStatus, errorThrown) {
+                             console.error("Erro ao recarregar lista de telefones: ", textStatus, errorThrown);
+                             showToast('Erro ao carregar a lista de telefones!', 'error'); // Usa a função Toast
+                             $(listTelefoneContainerId).html('<div class="alert alert-danger">Erro ao carregar os telefones.</div>');
+                         }
+                     });
+                 }
+
+                 // --- Event Listeners para Telefone ---
+
+                 // 1. Abrir Offcanvas para ADICIONAR Telefone
+                 //    Listener ligado ao container pai pois o botão é carregado dinamicamente na partial
+                 $('#telefones-list-container').on('click', '.add-telefone-btn', function () {
+                    if (!offcanvasTelefoneInstance) return; // Verifica se a instância existe
+                    resetTelefoneOffcanvasForm();
+                    const pessoaId = $(this).data('pessoa-id');
+                    $('#telefone_PessoaId').val(pessoaId);
+                    $('#offcanvasTelefoneLabel').text('Adicionar Telefone');
+                    $('#btnExcluirTelefone').hide();
+                    // Offcanvas é aberto via data-bs-*
+                 });
+
+
+                 // 2. Abrir Offcanvas para EDITAR Telefone (Delegação de eventos)
+                 $(listTelefoneContainerId).on('click', '.telefone-row', function () {
+                     if (!offcanvasTelefoneInstance) return; // Verifica se a instância existe
+                     resetTelefoneOffcanvasForm();
+                     const telefoneId = $(this).data('id');
+                     // const pessoaId = $(this).data('pessoa-id'); // Já temos via Model.PessoaId no form
+
+                     $('#offcanvasTelefoneLabel').text('Editar Telefone');
+                     formTelefone.find('input, select').prop('disabled', true);
+
+                     $.ajax({
+                         // *** URL CORRIGIDA PARA TELEFONE ***
+                         url: '@Url.Action("GetTelefoneFormData", "Cliente")',
+                         type: 'GET',
+                         data: { telefoneId: telefoneId, clienteId: clienteIdTelefone },
+                         success: function (data) {
+                             if (data) {
+                                 $('#telefone_Id').val(data.id);
+                                 $('#telefone_PessoaId').val(data.pessoaId); // Confirma PessoaId
+                                 $('#telefone_DDD').val(data.ddd); // Campo DDD
+                                 $('#telefone_Numero').val(data.numero); // Campo Numero
+                                 $('#telefone_TipoDeTelefone').val(data.tipoDeTelefone); // Campo Tipo
+                                 $('#btnExcluirTelefone').show();
+                             } else {
+                                 showToast('Telefone não encontrado.', 'error');
+                                 offcanvasTelefoneInstance.hide();
+                             }
+                         },
+                         error: function (jqXHR, textStatus, errorThrown) {
+                             showToast('Erro ao buscar dados do telefone.', 'error');
+                             offcanvasTelefoneInstance.hide();
+                         },
+                         complete: function() {
+                             formTelefone.find('input, select').prop('disabled', false);
+                         }
+                     });
+                      // Offcanvas é aberto via data-bs-* na linha <tr>
+                 });
+
+                 // 3. Submeter Formulário (SALVAR Telefone - Add/Edit)
+                 formTelefone.on('submit', function (event) {
+                     event.preventDefault();
+                     if (!offcanvasTelefoneInstance) return;
+
+                     if (this.checkValidity() === false) {
+                         event.stopPropagation();
+                         $(this).addClass('was-validated');
+                         return;
+                     }
+                     $(this).removeClass('was-validated');
+
+                     const formDataArray = $(this).serializeArray();
+                     // Adiciona ClienteId aos dados a serem enviados
+                     formDataArray.push({ name: "ClienteId", value: clienteIdTelefone });
+                     const dataToSend = $.param(formDataArray);
+
+                     // *** URL CORRIGIDA PARA TELEFONE ***
+                     const url = '@Url.Action("SalvarTelefone", "Cliente")';
+                     const btnSalvar = $('#btnSalvarTelefone');
+                     btnSalvar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Salvando...');
+
+                     $.ajax({
+                         url: url,
+                         type: 'POST',
+                         data: dataToSend,
+                         headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, // Reutiliza o token da página
+                         success: function (response) {
+                             if (response.success) {
+                                 offcanvasTelefoneInstance.hide();
+                                 refreshTelefonesList(); // Atualiza a lista de TELEFONES
+                                 showToast('Telefone salvo com sucesso!', 'success');
+                             } else {
+                                 displayTelefoneServerErrors(response.errors);
+                                 showToast('Erro ao salvar telefone.', 'error');
+                             }
+                         },
+                         error: function (jqXHR, textStatus, errorThrown) {
+                             displayTelefoneServerErrors("Erro de comunicação com o servidor.");
+                             showToast('Erro ao salvar telefone.', 'error');
+                         },
+                         complete: function() {
+                             btnSalvar.prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+                         }
+                     });
+                 });
+
+                 // 4. EXCLUIR Telefone
+                 $('#btnExcluirTelefone').on('click', function () {
+                     const telefoneId = $('#telefone_Id').val();
+                     const currentClienteId = clienteIdTelefone;
+                     if (!offcanvasTelefoneInstance) return;
+
+                     if (!telefoneId || telefoneId === '00000000-0000-0000-0000-000000000000') {
+                          Swal.fire('Ops!', 'ID inválido para exclusão.', 'error');
+                         return;
+                     }
+
+                     Swal.fire({
+                         title: 'Tem certeza?',
+                         text: "Você realmente deseja excluir este telefone?", // Mensagem específica
+                         icon: 'warning',
+                         showCancelButton: true,
+                         confirmButtonText: 'Sim, excluir!',
+                         cancelButtonText: 'Cancelar',
+                         customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+                         buttonsStyling: false
+                     }).then((result) => {
+                         if (!result.isConfirmed) return;
+
+                         // *** URL CORRIGIDA PARA TELEFONE ***
+                         const url = '@Url.Action("ExcluirTelefone", "Cliente")';
+                         const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+                         const btnExcluir = $('#btnExcluirTelefone');
+                         btnExcluir.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Excluindo...');
+
+                         $.ajax({
+                             url: url,
+                             type: 'POST',
+                             data: {
+                                 clienteId: currentClienteId,
+                                 telefoneId: telefoneId, // Nome do parâmetro na Action
+                                 __RequestVerificationToken: antiForgeryToken
+                             },
+                             success: function (response) {
+                                 if (response.success) {
+                                     offcanvasTelefoneInstance.hide();
+                                     refreshTelefonesList(); // Atualiza a lista de TELEFONES
+                                     Swal.fire('Excluído!', 'O telefone foi removido.', 'success');
+                                 } else {
+                                     Swal.fire('Erro!', (response.errors ?? ['Erro desconhecido']).join('<br>'), 'error');
+                                 }
+                             },
+                             error: function (jqXHR, textStatus) {
+                                 Swal.fire('Erro de Comunicação!', 'Não foi possível excluir o telefone.', 'error');
+                             },
+                             complete: function() {
+                                 btnExcluir.prop('disabled', false).html('<i class="ri-delete-bin-line align-bottom me-1"></i> Excluir');
+                             }
+                         });
+                     });
+                 });
+
+                 // Opcional: Limpar o formulário quando o Offcanvas de Telefone for fechado
+                 if(offcanvasTelefoneElement) {
+                     offcanvasTelefoneElement.addEventListener('hidden.bs.offcanvas', event => {
+                        resetTelefoneOffcanvasForm();
+                     });
+                 }
+
+            }); // Fim do $(document).ready() para Telefones
+</script>

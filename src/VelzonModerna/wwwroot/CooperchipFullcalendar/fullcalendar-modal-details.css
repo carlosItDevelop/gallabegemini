@@ -1,0 +1,16 @@
+﻿body {
+
+}
+
+.detail-fullcalendar tr{
+    font-size: large;
+    color: white;
+}
+
+.detail-fullcalendar tr td{
+    color: papayawhip;
+}
+
+.title-modal-detail{
+    color: lightpink
+}

@@ -1,0 +1,58 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@model IEnumerable<VelzonModerna.ViewModels.TelefoneViewModel>
+@{
+    // Obtém o PessoaId do Cliente principal, passado via ViewData
+    var pessoaIdDoCliente = ViewData ["PessoaId"] ?? Guid.Empty;
+}
+
+<div class="card mb-3">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Telefones</h4>
+        <div class="flex-shrink-0">
+            <button type="button" class="btn btn-primary btn-sm add-telefone-btn"
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasTelefone" @* Alvo do OffCanvas de Telefone *@
+                    aria-controls="offcanvasTelefone"
+                    data-pessoa-id="@pessoaIdDoCliente">
+                @* PessoaId do Cliente para o JS *@
+                <i class="ri-add-line align-bottom me-1"></i> Adicionar Novo
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>DDD</th>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            @* Sem coluna de ações, a linha é clicável *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="clickable-row telefone-row" @* Classes para JS/CSS *@
+                                data-id="@item.Id" @* ID do Telefone *@
+                                data-pessoa-id="@item.PessoaId" @* PessoaId associado a este telefone *@
+                                data-bs-toggle="offcanvas" data-bs-target="#offcanvasTelefone"
+                                aria-controls="offcanvasTelefone"
+                                title="Clique para ver detalhes ou editar">
+                                <td>@Html.DisplayFor(modelItem => item.DDD)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Numero)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TipoDeTelefone)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } else
+        {
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">Nenhum telefone cadastrado para este cliente.</p>
+            </div>
+        }
+    </div><!-- end card-body -->
+</div><!-- end card -->

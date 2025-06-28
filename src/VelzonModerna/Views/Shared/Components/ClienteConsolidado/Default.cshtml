@@ -1,0 +1,108 @@
+﻿@using System.Globalization
+@using GeneralLabSolutions.CoreShared.DTOs.DtosConsolidados
+@using GeneralLabSolutions.Domain.Enums
+@model ClienteConsolidadoDto
+
+
+@* ### INÍCIO DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX ### *@
+<div class="row">
+	<div class="col-xl-12">
+		<div class="card crm-widget shadow-none mb-4">
+			@* shadow-none e mb-4 para melhor integração *@
+			<div class="card-body p-0">
+				<div class="row row-cols-xl-5 row-cols-md-3 row-cols-sm-2 row-cols-1 g-0">
+					@* Ajuste o número de colunas conforme desejar (xl-5 para 5 tiles em telas extra grandes) *@
+
+					@* Tile 1: Quantidade de Pedidos *@
+					<div class="col border-end">
+						<div class="py-4 px-3 text-center">
+							@* text-center pode ajudar no alinhamento *@
+							<h5 class="text-muted text-uppercase fs-13">Quantidade de Pedidos</h5>
+							<div class="d-flex align-items-center justify-content-center mt-2">
+								@* justify-content-center *@
+								<div class="flex-shrink-0">
+									<i class="ri-shopping-cart-2-line display-6 text-muted"></i>
+								</div>
+								<div class="flex-grow-1 ms-3 text-start">
+									@* text-start para alinhar o número à esquerda do ícone se não for centralizado *@
+									<h2 class="mb-0"><span class="counter-value" data-target="@Model.QuantidadeDePedidos">@Model.QuantidadeDePedidos</span></h2>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					@* Tile 2: Valor Total de Compras *@
+					<div class="col border-end">
+						<div class="py-4 px-3 text-center">
+							<h5 class="text-muted text-uppercase fs-13">Valor Total de Compras</h5>
+							<div class="d-flex align-items-center justify-content-center mt-2">
+								<div class="flex-shrink-0">
+									<i class="ri-exchange-dollar-line display-6 text-muted"></i>
+								</div>
+								<div class="flex-grow-1 ms-3 text-start">
+									<h2 class="mb-0">
+										<span class="counter-value" data-target="@Model.ValorTotalDeCompras.ToString("N2", CultureInfo.InvariantCulture).Replace(",", "")">
+											@Model.ValorTotalDeCompras.ToString("C", new CultureInfo("pt-BR"))
+										</span>
+									</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					@* Tile 3: Última Compra *@
+					<div class="col border-end">
+						<div class="py-4 px-3 text-center">
+							<h5 class="text-muted text-uppercase fs-13">Última Compra</h5>
+							<div class="d-flex align-items-center justify-content-center mt-2">
+								<div class="flex-shrink-0">
+									<i class="ri-calendar-check-line display-6 text-muted"></i>
+								</div>
+								<div class="flex-grow-1 ms-3 text-start">
+									<h2 class="mb-0 fs-20">@Model.UltimaCompraDesteCliente?.ToString("dd/MM/yyyy")</h2> @* Ajuste fs-20 para tamanho da fonte se h2 ficar muito grande só para data *@
+								</div>
+							</div>
+						</div>
+					</div>
+
+					@* Tile 4: Ticket Médio por Pedido *@
+					<div class="col border-end">
+						<div class="py-4 px-3 text-center">
+							<h5 class="text-muted text-uppercase fs-13">Ticket Médio por Pedido</h5>
+							<div class="d-flex align-items-center justify-content-center mt-2">
+								<div class="flex-shrink-0">
+									<i class="ri-ticket-2-line display-6 text-muted"></i>
+								</div>
+								<div class="flex-grow-1 ms-3 text-start">
+									<h2 class="mb-0">
+										<span class="counter-value" data-target="@Model.TicketMedioPorPedido.ToString("N2", CultureInfo.InvariantCulture).Replace(",", "")">
+											@Model.TicketMedioPorPedido.ToString("C", new CultureInfo("pt-BR"))
+										</span>
+									</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					@* Tile 5: Intervalo Médio entre Pedidos *@
+					<div class="col">
+						@* Último tile não precisa de border-end normalmente *@
+						<div class="py-4 px-3 text-center">
+							<h5 class="text-muted text-uppercase fs-13">Intervalo Médio (dias)</h5>
+							<div class="d-flex align-items-center justify-content-center mt-2">
+								<div class="flex-shrink-0">
+									<i class="ri-time-line display-6 text-muted"></i>
+								</div>
+								<div class="flex-grow-1 ms-3 text-start">
+									<h2 class="mb-0"><span class="counter-value" data-target="@Model.IntervaloMedioEntrePedidos">@Model.IntervaloMedioEntrePedidos</span></h2>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@* ### FIM DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX ### *@

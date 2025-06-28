@@ -1,0 +1,74 @@
+﻿@using VelzonModerna.ViewModels
+@model ClienteViewModel
+
+
+
+<div class="row col-12">
+
+    <div class="col-6">
+
+        <dl>
+
+            <dt>Nome Fantasia</dt>
+            <dd>Nome Fantasia</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Documento)</dt>
+            <dd>@Html.DisplayFor(model => model.Documento)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Email)</dt>
+            <dd>@Html.DisplayFor(model => model.Email)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.StatusDoCliente)</dt>
+            <dd>@Html.DisplayFor(model => model.StatusDoCliente)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.TipoDeCliente)</dt>
+            <dd>@Html.DisplayFor(model => model.TipoDeCliente)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.TipoDePessoa)</dt>
+            <dd>@Html.DisplayFor(model => model.TipoDePessoa)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.TelefonePrincipal)</dt>
+            <dd>@Html.DisplayFor(model => model.TelefonePrincipal)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.ContatoRepresentante)</dt>
+            <dd>@Html.DisplayFor(model => model.ContatoRepresentante)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.InscricaoEstadual)</dt>
+            <dd>@Html.DisplayFor(model => model.InscricaoEstadual)</dd>
+
+        </dl>
+
+    </div>
+
+    <div class="col-6">
+
+
+        <h4>Auditoria de Registros</h4>
+        <hr />
+
+        <dl>
+
+            <dt>@Html.DisplayNameFor(model => model.DataInclusao)</dt>
+            <dd>@Html.DisplayFor(model => model.DataInclusao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.UsuarioInclusao)</dt>
+            <dd>@Html.DisplayFor(model => model.UsuarioInclusao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.DataUltimaModificacao)</dt>
+            <dd>@Html.DisplayFor(model => model.DataUltimaModificacao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.UsuarioUltimaModificacao)</dt>
+            <dd>@Html.DisplayFor(model => model.UsuarioUltimaModificacao)</dd>
+        </dl>
+
+        <h4>Observação</h4>
+        <hr />
+
+        <dl>
+            <dd>@Html.DisplayFor(model => model.Observacao)</dd>
+        </dl>
+
+
+    </div>
+
+</div>

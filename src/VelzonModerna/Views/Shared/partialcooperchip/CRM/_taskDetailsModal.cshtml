@@ -1,0 +1,59 @@
+﻿@* ✅ ESTRUTURA BOOTSTRAP 5 CORRIGIDA *@
+<div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskDetailsModalLabel">Detalhes da Tarefa</h5>
+                @* ✅ BOTÃO DE FECHAR PADRÃO *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* O conteúdo interno do modal permanece o mesmo *@
+                <div class="task-details-container">
+                    <div class="task-section">
+                        <h3>Progresso</h3>
+                        <div class="progress-controls">
+                            <input type="range" id="taskProgressSlider" min="0" max="100" value="0" onchange="updateTaskProgress(this.value)">
+                            <span id="taskProgressText">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="taskProgressBar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="task-section">
+                        <h3>Anexos</h3>
+                        <div class="attachment-upload">
+                            <input type="file" id="attachmentFile" multiple onchange="handleFileUpload()" class="d-none">
+                            <button class="btn btn-sm btn-primary" onclick="document.getElementById('attachmentFile').click()">
+                                <i class="fas fa-paperclip"></i> Adicionar Anexo
+                            </button>
+                        </div>
+                        <div id="taskAttachmentsList" class="attachments-list">
+                        </div>
+                    </div>
+
+                    <div class="task-section">
+                        <h3>Comentários</h3>
+                        <div class="comment-form">
+                            <textarea id="newComment" placeholder="Adicionar comentário..." rows="3"></textarea>
+                            <button class="btn btn-sm btn-primary" onclick="addTaskComment()">
+                                <i class="fas fa-comment"></i> Adicionar Comentário
+                            </button>
+                        </div>
+                        <div id="taskCommentsList" class="comments-list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @* ✅ BOTÃO DE CANCELAR PADRÃO *@
+                <button type="button" class="btn btn-danger" onclick="deleteTaskWithConfirmation()">
+                    <i class="fas fa-trash"></i>
+                    Excluir Tarefa
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>

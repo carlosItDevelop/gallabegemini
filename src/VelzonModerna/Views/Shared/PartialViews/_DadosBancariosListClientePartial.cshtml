@@ -1,0 +1,83 @@
+﻿@using GeneralLabSolutions.Domain.Enums
+@model IEnumerable<VelzonModerna.ViewModels.DadosBancariosViewModel>
+@* Adicionamos o ViewData para receber o PessoaId do Cliente *@
+@{
+    var pessoaId = ViewData ["PessoaId"] ?? Guid.Empty;
+}
+
+<div class="card mb-3">
+    @* Agrupa a seção visualmente *@
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Dados Bancários</h4>
+        <div class="flex-shrink-0">
+            @* Botão "Adicionar Novo" - Fica fora da tabela *@
+            <button type="button" class="btn btn-primary btn-sm add-dados-bancarios-btn"
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasDadosBancarios"
+                    aria-controls="offcanvasDadosBancarios"
+                    data-pessoa-id="@pessoaId">
+                @* Passa o PessoaId para o JS saber a quem adicionar *@
+                <i class="ri-add-line align-bottom me-1"></i> Adicionar Novo
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                @* Boa prática para tabelas *@
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Banco</th>
+                            <th>Agência</th>
+                            <th>Conta</th>
+                            <th>Tipo</th>
+                            @* Removido o header de ações *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            @*
+                                Linha clicável para editar/excluir.
+                                data-id: Identificador do registro de DadosBancarios.
+                                data-pessoa-id: ID da Pessoa (Cliente) dona desta conta.
+                                data-bs-toggle/target: Para abrir o offcanvas.
+                            *@
+                            <tr class="clickable-row dados-bancarios-row"
+                                data-id="@item.Id"
+                                data-pessoa-id="@item.PessoaId" @* Adicionado PessoaId aqui também, pode ser útil *@
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasDadosBancarios"
+                                aria-controls="offcanvasDadosBancarios"
+                                title="Clique para ver detalhes ou editar">
+                                <td>@Html.DisplayFor(modelItem => item.Banco)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Agencia)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Conta)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TipoDeContaBancaria)</td>
+                                @* Removida a célula de ações *@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } else
+        {
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">Nenhum dado bancário cadastrado para este cliente.</p>
+            </div>
+        }
+    </div><!-- end card-body -->
+</div><!-- end card -->
+
+@* CSS Básico para indicar que a linha é clicável (adicione a um arquivo .css global ou <style> na view principal) *@
+@*
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+    .clickable-row:hover {
+        background-color: rgba(0,0,0,0.05); /* Ou cor do seu tema */
+    }
+</style>
+*@

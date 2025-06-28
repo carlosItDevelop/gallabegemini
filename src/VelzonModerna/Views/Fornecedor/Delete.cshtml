@@ -1,0 +1,62 @@
+﻿@model GeneralLabSolutions.Domain.Entities.Fornecedor
+
+@{
+    ViewData ["Title"] = "Delete";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">
+                    <strong>Excluir o registro de: @Model.Nome.ToUpper() ?</strong>
+                </h4>
+            </div><!-- end card header -->
+
+            <div style="padding: 20px;">
+
+
+                <div>
+
+                    @* <partial name="_details_e_delete" model="Model" /> *@
+
+                    <dl class="row">
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.Nome)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Nome)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.Documento)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.Documento)
+                        </dd>
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(model => model.StatusDoFornecedor)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.StatusDoFornecedor)
+                        </dd>
+                    </dl>
+
+                    <hr>
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="submit" value="SIM" class="btn btn-outline-danger" />
+                        <a asp-action="Index" class="btn btn-outline-info">Cancelar</a>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- prismjs plugin -->
+    <script src="~/assets/libs/prismjs/prism.js"></script>
+
+    <script src="~/assets/js/app.js"></script>
+}

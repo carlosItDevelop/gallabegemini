@@ -1,0 +1,190 @@
+﻿<script>
+
+    // ========================================================
+    // NOVO Bloco JS para Contatos
+    // ========================================================
+    $(document).ready(function () {
+
+         // --- Referências e Variáveis para Contato ---
+         const offcanvasContatoElement = document.getElementById('offcanvasContato');
+         const offcanvasContatoInstance = offcanvasContatoElement ? new bootstrap.Offcanvas(offcanvasContatoElement) : null;
+         const formContato = $('#contatoOffcanvasForm');
+         const listContatoContainerId = '#contatos-list-container'; // ID do container da lista de contatos
+         const clienteIdContato = '@Model.Id'; // ID do Cliente principal
+         // Reutiliza showToast
+         function showToast(message, type = 'success') {
+             const bg = type === 'success' ? 'linear-gradient(#198754, #157347)' : type === 'error' ? 'linear-gradient(#dc3545, #bb2d3b)' : type === 'warning' ? 'linear-gradient(#f39c12, #e58e09)' : 'linear-gradient(#0d6efd, #0a58ca)';
+             Toastify({ text: message, duration: 3000, gravity: 'top', position: 'right', close: true, style: { background: bg } }).showToast();
+         }
+
+         // --- Funções Auxiliares para Contato ---
+         function resetContatoOffcanvasForm() {
+             if (formContato.length === 0) return;
+             formContato[0].reset();
+             formContato.removeClass('was-validated');
+             $('#contato_Id').val('00000000-0000-0000-0000-000000000000');
+             $('#contato_PessoaId').val('@Model.PessoaId'); // PessoaId do Cliente atual
+             // Limpar spans de erro específicos do formulário de contato
+             $('#validation_Contato_Nome, #validation_Contato_Email, #validation_Contato_Telefone, #validation_Contato_TipoDeContato').text('');
+             $('#offcanvasContatoFormErrors').text('');
+             $('#btnExcluirContato').hide();
+             $('#offcanvasContatoLabel').text('Contato');
+             $('#btnSalvarContato').prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+         }
+
+         function displayContatoServerErrors(errors) {
+             $('#offcanvasContatoFormErrors').text('');
+             // Limpar spans de erro específicos se necessário
+             if (Array.isArray(errors)) {
+                 if (errors.length > 0) $('#offcanvasContatoFormErrors').html(errors.join('<br>'));
+             } else if (typeof errors === 'string') {
+                 $('#offcanvasContatoFormErrors').text(errors);
+             } else {
+                 $('#offcanvasContatoFormErrors').text('Ocorreu um erro inesperado.');
+             }
+         }
+
+         function refreshContatosList() {
+             if (!clienteIdContato || clienteIdContato === '00000000-0000-0000-0000-000000000000') {
+                 console.error("ClienteId inválido para recarregar a lista de contatos.");
+                 return;
+             }
+             const url = '@Url.Action("GetContatosListPartial", "Cliente")?clienteId=' + clienteIdContato;
+
+             $(listContatoContainerId).html('<div class="text-center p-3"><div class="spinner-border text-primary"><span>Carregando...</span></div></div>');
+
+             $.ajax({
+                 url: url, type: 'GET',
+                 success: function (result) { $(listContatoContainerId).html(result); },
+                 error: function () {
+                     showToast('Erro ao carregar a lista de contatos!', 'error');
+                     $(listContatoContainerId).html('<div class="alert alert-danger">Erro ao carregar os contatos.</div>');
+                 }
+             });
+         }
+
+         // --- Event Listeners para Contato ---
+
+         // 1. Abrir Offcanvas para ADICIONAR Contato
+         $(listContatoContainerId).on('click', '.add-contato-btn', function () {
+             if (!offcanvasContatoInstance) return;
+             resetContatoOffcanvasForm();
+             const pessoaId = $(this).data('pessoa-id');
+             $('#contato_PessoaId').val(pessoaId);
+             $('#offcanvasContatoLabel').text('Adicionar Contato');
+             $('#btnExcluirContato').hide();
+         });
+
+         // 2. Abrir Offcanvas para EDITAR Contato
+         $(listContatoContainerId).on('click', '.contato-row', function () {
+             if (!offcanvasContatoInstance) return;
+             resetContatoOffcanvasForm();
+             const contatoId = $(this).data('id');
+             $('#offcanvasContatoLabel').text('Editar Contato');
+             formContato.find('input, select, textarea').prop('disabled', true);
+
+             $.ajax({
+                 url: '@Url.Action("GetContatoFormData", "Cliente")', type: 'GET',
+                 data: { contatoId: contatoId, clienteId: clienteIdContato },
+                 success: function (data) {
+                     if (data) {
+                         $('#contato_Id').val(data.id);
+                         $('#contato_PessoaId').val(data.pessoaId);
+                         $('#contato_Nome').val(data.nome);
+                         $('#contato_Email').val(data.email);
+                         $('#contato_Telefone').val(data.telefone);
+                         $('#contato_TipoDeContato').val(data.tipoDeContato);
+                         $('#contato_EmailAlternativo').val(data.emailAlternativo);
+                         $('#contato_TelefoneAlternativo').val(data.telefoneAlternativo);
+                         $('#contato_Observacao').val(data.observacao);
+                         $('#btnExcluirContato').show();
+                     } else {
+                         showToast('Contato não encontrado.', 'error');
+                         offcanvasContatoInstance.hide();
+                     }
+                 },
+                 error: function () { showToast('Erro ao buscar dados do contato.', 'error'); offcanvasContatoInstance.hide(); },
+                 complete: function() { formContato.find('input, select, textarea').prop('disabled', false); }
+             });
+         });
+
+        // 3. Submeter Formulário (SALVAR Contato - Add/Edit)
+        formContato.on('submit', function (event) {
+             event.preventDefault();
+             if (!offcanvasContatoInstance) return;
+             if (this.checkValidity() === false) { event.stopPropagation(); $(this).addClass('was-validated'); return; }
+             $(this).removeClass('was-validated');
+
+             const formDataArray = $(this).serializeArray();
+             formDataArray.push({ name: "ClienteId", value: clienteIdContato });
+             const dataToSend = $.param(formDataArray);
+             const url = '@Url.Action("SalvarContato", "Cliente")';
+             const btnSalvar = $('#btnSalvarContato');
+             btnSalvar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Salvando...');
+
+             $.ajax({
+                 url: url, type: 'POST', data: dataToSend,
+                 headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                 success: function (response) {
+                     if (response.success) {
+                         offcanvasContatoInstance.hide();
+                         refreshContatosList();
+                         showToast('Contato salvo com sucesso!', 'success');
+                     } else {
+                         displayContatoServerErrors(response.errors);
+                         showToast('Erro ao salvar contato.', 'error');
+                     }
+                 },
+                 error: function () { displayContatoServerErrors("Erro de comunicação."); showToast('Erro ao salvar contato.', 'error'); },
+                 complete: function() { btnSalvar.prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar'); }
+             });
+         });
+
+         // 4. EXCLUIR Contato
+         $('#btnExcluirContato').on('click', function () {
+             const contatoId = $('#contato_Id').val();
+             if (!offcanvasContatoInstance) return;
+             if (!contatoId || contatoId === '00000000-0000-0000-0000-000000000000') {
+                 Swal.fire('Ops!', 'ID inválido para exclusão.', 'error'); return;
+             }
+
+             Swal.fire({
+                 title: 'Tem certeza?', text: "Você realmente deseja excluir este contato?", icon: 'warning',
+                 showCancelButton: true, confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar',
+                 customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+                 buttonsStyling: false
+             }).then((result) => {
+                 if (!result.isConfirmed) return;
+
+                 const url = '@Url.Action("ExcluirContato", "Cliente")';
+                 const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+                 const btnExcluir = $('#btnExcluirContato');
+                 btnExcluir.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Excluindo...');
+
+                 $.ajax({
+                     url: url, type: 'POST',
+                     data: { clienteId: clienteIdContato, contatoId: contatoId, __RequestVerificationToken: antiForgeryToken },
+                     success: function (response) {
+                         if (response.success) {
+                             offcanvasContatoInstance.hide();
+                             refreshContatosList();
+                             Swal.fire('Excluído!', 'O contato foi removido.', 'success');
+                         } else {
+                             Swal.fire('Erro!', (response.errors ?? ['Erro desconhecido']).join('<br>'), 'error');
+                         }
+                     },
+                     error: function () { Swal.fire('Erro de Comunicação!', 'Não foi possível excluir o contato.', 'error'); },
+                     complete: function() { btnExcluir.prop('disabled', false).html('<i class="ri-delete-bin-line align-bottom me-1"></i> Excluir'); }
+                 });
+             });
+         });
+
+         // Limpar formulário quando Offcanvas de Contato for fechado
+         if(offcanvasContatoElement) {
+             offcanvasContatoElement.addEventListener('hidden.bs.offcanvas', event => {
+                resetContatoOffcanvasForm();
+             });
+         }
+    }); // Fim do $(document).ready() para Contatos
+
+</script>

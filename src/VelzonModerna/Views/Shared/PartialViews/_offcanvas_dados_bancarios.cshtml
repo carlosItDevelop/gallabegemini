@@ -1,0 +1,78 @@
+﻿<!-- ========== Offcanvas Dados Bancários ========== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasDadosBancarios" aria-labelledby="offcanvasDadosBancariosLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="offcanvasDadosBancariosLabel">Dados Bancários</h5> @* O título pode ser alterado via JS *@
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        @* Formulário para Adicionar/Editar Dados Bancários *@
+        @* NOTA: Não usamos Tag Helpers aqui (asp-for) porque popularemos/submeteremos via JS/AJAX *@
+        <form id="dadosBancariosOffcanvasForm" novalidate>
+            @* Adicionar AntiForgeryToken se for validar no POST AJAX *@
+            @Html.AntiForgeryToken()
+
+            @* Campos ocultos essenciais para identificar o registro e o dono *@
+            <input type="hidden" id="dadosBancarios_Id" name="Id" value="00000000-0000-0000-0000-000000000000" /> @* Guid.Empty por padrão *@
+            <input type="hidden" id="dadosBancarios_PessoaId" name="PessoaId" value="@Model.PessoaId" /> @* Pega o PessoaId do ClienteViewModel principal *@
+
+            @* Campos do Formulário *@
+            <div class="mb-3">
+                <label for="dadosBancarios_Banco" class="form-label">Banco</label>
+                <input type="text" class="form-control" id="dadosBancarios_Banco" name="Banco" required placeholder="Nome do Banco">
+                <div class="invalid-feedback">Por favor, informe o nome do banco.</div> @* Para validação JS/HTML5 *@
+                <span id="validation_Banco" class="text-danger field-validation-error"></span> @* Para erros do servidor *@
+            </div>
+
+            <div class="mb-3">
+                <label for="dadosBancarios_Agencia" class="form-label">Agência</label>
+                <input type="text" class="form-control" id="dadosBancarios_Agencia" name="Agencia" required placeholder="Número da Agência">
+                <div class="invalid-feedback">Por favor, informe a agência.</div>
+                <span id="validation_Agencia" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="dadosBancarios_Conta" class="form-label">Conta</label>
+                <input type="text" class="form-control" id="dadosBancarios_Conta" name="Conta" required placeholder="Número da Conta">
+                <div class="invalid-feedback">Por favor, informe a conta.</div>
+                <span id="validation_Conta" class="text-danger field-validation-error"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="dadosBancarios_TipoDeContaBancaria" class="form-label">Tipo de Conta</label>
+                <select class="form-select" id="dadosBancarios_TipoDeContaBancaria" name="TipoDeContaBancaria" required>
+                    <option value="">-- Selecione --</option>
+                    @* Pré-carrega as opções do Enum usando o Helper do C# *@
+                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Entities.TipoDeContaBancaria>())
+                    {
+                        <option value="@tipo.Value">@tipo.Text</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Por favor, selecione o tipo da conta.</div>
+                <span id="validation_TipoDeContaBancaria" class="text-danger field-validation-error"></span>
+            </div>
+
+            @* Área para exibir erros gerais do formulário retornados pelo servidor *@
+            <div id="offcanvasFormErrors" class="text-danger mt-2 mb-3"></div>
+
+            @* Botões de Ação dentro do Offcanvas *@
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                @* Botão Salvar (aciona o submit do form) *@
+                <button type="submit" class="btn btn-success" id="btnSalvarDadosBancarios">
+                    <i class="ri-save-line align-bottom me-1"></i> Salvar
+                </button>
+
+                @* Botão Excluir (controlado via JS) *@
+                <button type="button" class="btn btn-danger" id="btnExcluirDadosBancarios" style="display: none;">
+                    @* Começa escondido *@
+                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir
+                </button>
+
+                @* Botão Fechar (usa o atributo data-bs-dismiss do Bootstrap) *@
+                <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line align-bottom me-1"></i> Fechar
+                </button>
+            </div>
+        </form>
+    </div> <!-- end offcanvas-body -->
+</div> <!-- end offcanvas -->
+<!-- ========== End Offcanvas Dados Bancários ========== -->

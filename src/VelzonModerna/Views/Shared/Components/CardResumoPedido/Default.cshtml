@@ -1,0 +1,38 @@
+﻿@using GeneralLabSolutions.CoreShared.DTOs.DtosViewComponents
+@using GeneralLabSolutions.Domain.Extensions.Helpers;
+@model CardPedidoViewModel
+
+<div class="col-xm-12 col-sm-6 col-md-3 col-lg-3">
+    <!-- card -->
+    <div class="card card-animate">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1 overflow-hidden">
+                    <p class="text-uppercase fw-medium text-@Model.CssColor text-truncate mb-0">
+                        @Model.Titulo
+                    </p>
+                </div>
+                <div class="flex-shrink-0">
+                    <h5 class="text-muted fs-12 mb-0">
+                        @Model.Quantidade @Model.Titulo
+                    </h5>
+                </div>
+            </div>
+            <div class="d-flex align-items-end justify-content-between mt-4">
+                <div>
+                    <h4 class="fs-17 fw-semibold ff-@Model.CssColor mb-4">
+                        R$ <span class="counter-value" data-target="@Model.Valor">0</span>
+                    </h4>
+                    <a href="" class="text-decoration-underline text-@Model.CssColor">
+                        Listar
+                    </a>
+                </div>
+                <div class="avatar-sm flex-shrink-0">
+                    <span class="avatar-title bg-primary-subtle rounded fs-3">
+                        <i class="@Model.Icon"></i>
+                    </span>
+                </div>
+            </div>
+        </div><!-- end card body -->
+    </div><!-- end card -->
+</div><!-- end col -->

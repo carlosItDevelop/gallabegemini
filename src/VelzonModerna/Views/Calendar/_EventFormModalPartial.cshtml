@@ -1,0 +1,101 @@
+﻿@model VelzonModerna.Models.CalendarEventInputModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+@* Adiciona o token para o JavaScript poder pegar *@
+<input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken" value="@token" />
+
+@* O formulário em si, inicialmente oculto quando em modo 'view' *@
+<form class="needs-validation event-form" name="event-form" id="form-event" novalidate>
+    @* ID oculto para saber se é edição ou criação *@
+    <input type="hidden" asp-for="Id" id="eventid" />
+
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="Category" class="form-label"></label>
+                @* Usar ViewBag ou Model para as opções *@
+                <select class="form-select" asp-for="Category" id="event-category" asp-items="@(ViewBag.EventCategories as List<SelectListItem>)" required>
+                    <option value="">Selecione um tipo...</option>
+                </select>
+                <span asp-validation-for="Category" class="invalid-feedback"></span>
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input class="form-control" placeholder="Digite o nome do evento" type="text" asp-for="Title" id="event-title" required />
+                <span asp-validation-for="Title" class="invalid-feedback"></span>
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="EventDate"></label>
+                @* O input real do Flatpickr - O JS vai inicializá-lo *@
+                <div class="input-group">
+                    <input type="text" asp-for="EventDate" id="event-start-date" class="form-control flatpickr flatpickr-input" placeholder="Selecione a(s) data(s)" readonly required>
+                    <span class="input-group-text"><i class="ri-calendar-event-line"></i></span>
+                </div>
+                <span asp-validation-for="EventDate" class="invalid-feedback d-block"></span> @* d-block para mostrar erro *@
+            </div>
+        </div>
+        <!--end col-->
+        @* Seção de Horas (mostrada/oculta pelo JS) *@
+        <div class="col-12" id="event-time">
+            <div class="row">
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label asp-for="StartTime" class="form-label"></label>
+                        <div class="input-group">
+                            @* Input real do Flatpickr Time *@
+                            <input asp-for="StartTime" id="timepicker1" type="text" class="form-control flatpickr flatpickr-input" placeholder="Início" readonly>
+                            <span class="input-group-text"><i class="ri-time-line"></i></span>
+                        </div>
+                        <span asp-validation-for="StartTime" class="invalid-feedback"></span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label asp-for="EndTime" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="EndTime" id="timepicker2" type="text" class="form-control flatpickr flatpickr-input" placeholder="Fim" readonly>
+                            <span class="input-group-text"><i class="ri-time-line"></i></span>
+                        </div>
+                        <span asp-validation-for="EndTime" class="invalid-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="Location"></label>
+                <div>
+                    <input type="text" class="form-control" asp-for="Location" id="event-location" placeholder="Localização do evento (opcional)">
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea class="form-control" asp-for="Description" id="event-description" placeholder="Descrição (opcional)" rows="3" spellcheck="false"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <!--end col-->
+    </div>
+    <!--end row-->
+    <div class="hstack gap-2 justify-content-end">
+        @* Botão Delete aparece no modo Edit/View *@
+        <button type="button" class="btn btn-soft-danger" id="btn-delete-event"><i class="ri-close-line align-bottom"></i> Deletar</button>
+        @* Botão Save/Update aparece no modo Edit *@
+        <button type="submit" class="btn btn-success" id="btn-save-event">Salvar Evento</button>
+    </div>
+</form>

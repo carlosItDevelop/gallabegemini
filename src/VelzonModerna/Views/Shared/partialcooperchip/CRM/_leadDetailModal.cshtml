@@ -1,0 +1,22 @@
+﻿@* ✅ ESTRUTURA BOOTSTRAP 5 CORRIGIDA *@
+<div class="modal fade" id="leadDetailModal" tabindex="-1" aria-labelledby="leadDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="leadDetailModalLabel">Detalhes do Lead</h5>
+                @* ✅ BOTÃO DE FECHAR PADRÃO *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* O JavaScript irá popular este container *@
+                <div id="leadDetailContent">
+                    <p>Carregando detalhes...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @* ✅ BOTÃO DE CANCELAR PADRÃO *@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>

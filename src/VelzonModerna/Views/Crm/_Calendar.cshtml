@@ -1,0 +1,63 @@
+﻿@* Conteúdo da Aba Calendário *@
+
+<div class="section-header">
+    <h1>Calendário de Atividades</h1>
+    <button class="btn btn-primary" onclick="openEventModal()">
+        <i class="fas fa-plus"></i>
+        Agendar Atividade
+    </button>
+</div>
+
+<div class="calendar-container">
+    <div class="calendar-sidebar">
+        <h3>Modelos de Eventos</h3>
+        <div class="predefined-events">
+            <div class="event-template" data-event-type="novo" draggable="true">
+                <div class="event-color novo"></div>
+                <div class="event-info">
+                    <span class="event-title">Novo Lead - Contato Inicial</span>
+                    <span class="event-subtitle">Primeiro contato com novo lead</span>
+                </div>
+            </div>
+            <div class="event-template" data-event-type="contato" draggable="true">
+                <div class="event-color contato"></div>
+                <div class="event-info">
+                    <span class="event-title">Primeiro Contato</span>
+                    <span class="event-subtitle">Ligação ou email inicial</span>
+                </div>
+            </div>
+            <div class="event-template" data-event-type="qualificado" draggable="true">
+                <div class="event-color qualificado"></div>
+                <div class="event-info">
+                    <span class="event-title">Reunião de Qualificação</span>
+                    <span class="event-subtitle">Entender necessidades do lead</span>
+                </div>
+            </div>
+            <div class="event-template" data-event-type="proposta" draggable="true">
+                <div class="event-color proposta"></div>
+                <div class="event-info">
+                    <span class="event-title">Apresentar Proposta</span>
+                    <span class="event-subtitle">Demonstração ou envio de proposta</span>
+                </div>
+            </div>
+            <div class="event-template" data-event-type="negociacao" draggable="true">
+                <div class="event-color negociacao"></div>
+                <div class="event-info">
+                    <span class="event-title">Reunião de Negociação</span>
+                    <span class="event-subtitle">Discussão de termos e condições</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-history">
+            <h3>Histórico Recente</h3>
+            <div class="history-list" id="recentHistoryList">
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-main">
+        <div id="calendar-widget"></div>
+    </div>
+</div>
+

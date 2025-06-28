@@ -1,0 +1,95 @@
+@using GeneralLabSolutions.Domain.Extensions.Helpers
+@using VelzonModerna.ViewModels
+@model DonutEstadosPedidosViewModel
+
+<div class="col-xxl-4 col-xl-4">
+    <div class="card card-height-100">
+        <div class="card-header border-bottom-dashed align-items-center d-flex">
+            <h4 class="card-title mb-0 flex-grow-1">Pedidos por Status</h4>
+
+        </div><!-- end cardheader -->
+        <div class="card-body">
+            <div id="portfolio_donut_chart" data-colors='["--vz-primary", "--vz-info", "--vz-warning", "--vz-success"]' class="apex-charts" dir="ltr"></div>
+
+            <ul class="list-group list-group-flush border-dashed mb-0">
+                <li class="list-group-item px-0">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 avatar-xs">
+                            <span class="avatar-title bg-light p-1 rounded-circle">
+                                <img src="~/assets/images/svg/crypto-icons/btc.svg" class="img-fluid" alt="">
+                            </span>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <h6 class="mb-1">Valor Em Orçamento</h6>
+                            <p class="fs-12 mb-0 text-muted">
+                                <i class="mdi mdi-circle fs-10 align-middle text-primary me-1"></i>QNT
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <h6 class="mb-1"> R$ @Html.DisplayFor(model => model.ValorOrcamento)</h6>
+                            <p class="text-success fs-12 mb-0">@Html.DisplayFor(model => model.QuantidadeOrcamento)</p>
+                        </div>
+                    </div>
+                </li><!-- end -->
+                <li class="list-group-item px-0">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 avatar-xs">
+                            <span class="avatar-title bg-light p-1 rounded-circle">
+                                <img src="~/assets/images/svg/crypto-icons/eth.svg" class="img-fluid" alt="">
+                            </span>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <h6 class="mb-1">Valor em Processamento</h6>
+                            <p class="fs-12 mb-0 text-muted">
+                                <i class="mdi mdi-circle fs-10 align-middle text-info me-1"></i>QNT
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <h6 class="mb-1">R$ @Html.DisplayFor(model => model.ValorEmProcessamento)</h6>
+                            <p class="text-sucess fs-12 mb-0">@Html.DisplayFor(model => model.QuantidadeEmProcessamento)</p>
+                        </div>
+                    </div>
+                </li><!-- end -->
+                <li class="list-group-item px-0">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 avatar-xs">
+                            <span class="avatar-title bg-light p-1 rounded-circle">
+                                <img src="~/assets/images/svg/crypto-icons/ltc.svg" class="img-fluid" alt="">
+                            </span>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <h6 class="mb-1">Valor em Entregues</h6>
+                            <p class="fs-12 mb-0 text-muted">
+                                <i class="mdi mdi-circle fs-10 align-middle text-warning me-1"></i>QNT
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <h6 class="mb-1">R$ @Html.DisplayFor(model => model.ValorEntregue)</h6>
+                            <p class="text-success fs-12 mb-0">@Html.DisplayFor(model => model.QuantidadeEntregue)</p>
+                        </div>
+                    </div>
+                </li><!-- end -->
+                <li class="list-group-item px-0 pb-0">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 avatar-xs">
+                            <span class="avatar-title bg-light p-1 rounded-circle">
+                                <img src="~/assets/images/svg/crypto-icons/dash.svg" class="img-fluid" alt="">
+                            </span>
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <h6 class="mb-1">Valor em Canelados</h6>
+                            <p class="fs-12 mb-0 text-muted">
+                                <i class="mdi mdi-circle fs-10 align-middle text-success me-1"></i>QNT
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 text-end">
+                            <h6 class="mb-1">R$ @Html.DisplayFor(model => model.ValorCancelado)</h6>
+                            <p class="text-success fs-12 mb-0">@Html.DisplayFor(model => model.QuantidadeCancelado)</p>
+                        </div>
+                    </div>
+                </li><!-- end -->
+            </ul><!-- end -->
+        </div><!-- end card body -->
+    </div><!-- end card -->
+</div><!-- end col -->
+

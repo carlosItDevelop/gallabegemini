@@ -1,0 +1,1063 @@
+﻿@{
+    ViewBag.Title = "Orçamento";
+    ViewBag.pTitle = "Lista de Orçamentos";
+    ViewBag.pageTitle = "Orçamento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+@section styles
+{
+    @{
+        await Html.PartialAsync("partialcooperchip/_cssindex");
+    }
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+
+        .offcanvas-end {
+            width: 33.333333%;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        @@media (max-width: 992px) {
+            .offcanvas-end {
+                width: 75%;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .offcanvas-end {
+                width: 100%;
+            }
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-em-elaboracao {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: #0d6efd;
+        }
+
+        .status-aguardando-analise {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-analise-concluida {
+            background-color: rgba(25, 135, 84, 0.2);
+            color: #198754;
+        }
+
+        .status-convertido {
+            background-color: rgba(111, 66, 193, 0.2);
+            color: #6f42c1;
+        }
+
+        .status-cancelado {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 2px;
+            transition: all 0.2s;
+        }
+
+            .action-btn:hover {
+                transform: scale(1.1);
+            }
+
+        .budget-detail-modal .modal-dialog {
+            max-width: 90%;
+        }
+
+        .history-item {
+            border-left: 3px solid #6c757d;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+            .history-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .history-item::before {
+                content: '';
+                position: absolute;
+                left: -8px;
+                top: 5px;
+                width: 13px;
+                height: 13px;
+                border-radius: 50%;
+                background-color: #6c757d;
+            }
+
+        .history-item-success::before {
+            background-color: #198754;
+        }
+
+        .history-item-warning::before {
+            background-color: #ffc107;
+        }
+
+        .history-item-danger::before {
+            background-color: #dc3545;
+        }
+
+        .history-item-info::before {
+            background-color: #0dcaf0;
+        }
+    </style>
+}
+
+<vc:summary></vc:summary>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="container-fluid py-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="display-6 fw-bold">
+                            <i class="bi bi-file-earmark-text me-2"></i> Orçamentos
+                        </h1>
+                        <button class="btn btn-primary" id="newBudgetBtn">
+                            <i class="bi bi-plus-lg me-1"></i> Novo Orçamento
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="card border-secondary mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="searchClient" class="form-label">Cliente</label>
+                                    <input type="text" class="form-control" id="searchClient" placeholder="Buscar por cliente...">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="searchSeller" class="form-label">Vendedor</label>
+                                    <select class="form-select" id="searchSeller">
+                                        <option value="">Todos</option>
+                                        <option>João Silva</option>
+                                        <option>Maria Souza</option>
+                                        <option>Carlos Oliveira</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="searchStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="searchStatus">
+                                        <option value="">Todos</option>
+                                        <option>Em Elaboração</option>
+                                        <option>Aguardando Análise</option>
+                                        <option>Análise Concluída</option>
+                                        <option>Convertido em Pedido</option>
+                                        <option>Cancelado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="searchDate" class="form-label">Período</label>
+                                    <input type="date" class="form-control" id="searchDate">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-outline-secondary w-100" id="searchBtn">
+                                        <i class="bi bi-search me-1"></i> Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budgets Table -->
+                    <div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+   
+                                    <table id="budgetsTable" class="table table-hover table-striped" style="width:100%">
+
+                                        <thead>
+                                        <tr>
+
+                                            <th scope="col" style="width: 10px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                                </div>
+                                            </th>
+
+                                            <th>Número</th>
+                                            <th>Cliente</th>
+                                            <th>Vendedor</th>
+                                            <th>Criação</th>
+                                            <th>Validade</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                </div>
+                                            </th>
+
+                                            <td>ORC-2023-001</td>
+                                            <td>Empresa ABC Ltda</td>
+                                            <td>João Silva</td>
+                                            <td>15/10/2023</td>
+                                            <td>30/10/2023</td>
+                                            <td><span class="status-badge status-convertido">Convertido em Pedido</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info action-btn view-btn" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning action-btn edit-btn" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn duplicate-btn" title="Duplicar">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                </div>
+                                            </th>
+
+                                            <td>ORC-2023-002</td>
+                                            <td>Comércio XYZ S/A</td>
+                                            <td>Maria Souza</td>
+                                            <td>18/10/2023</td>
+                                            <td>02/11/2023</td>
+                                            <td><span class="status-badge status-aguardando-analise">Aguardando Análise</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info action-btn view-btn" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning action-btn edit-btn" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn duplicate-btn" title="Duplicar">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success action-btn convert-btn" title="Converter em Pedido">
+                                                    <i class="bi bi-cart-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger action-btn cancel-btn" title="Cancelar">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                </div>
+                                            </th>
+
+                                            <td>ORC-2023-003</td>
+                                            <td>Indústria 123 ME</td>
+                                            <td>Carlos Oliveira</td>
+                                            <td>20/10/2023</td>
+                                            <td>05/11/2023</td>
+                                            <td><span class="status-badge status-em-elaboracao">Em Elaboração</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info action-btn view-btn" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning action-btn edit-btn" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn duplicate-btn" title="Duplicar">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success action-btn convert-btn" title="Converter em Pedido">
+                                                    <i class="bi bi-cart-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger action-btn cancel-btn" title="Cancelar">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                </div>
+                                            </th>
+
+                                            <td>ORC-2023-004</td>
+                                            <td>Serviços QWE EIRELI</td>
+                                            <td>João Silva</td>
+                                            <td>22/10/2023</td>
+                                            <td>07/11/2023</td>
+                                            <td><span class="status-badge status-analise-concluida">Análise Concluída</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info action-btn view-btn" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning action-btn edit-btn" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn duplicate-btn" title="Duplicar">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success action-btn convert-btn" title="Converter em Pedido">
+                                                    <i class="bi bi-cart-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger action-btn cancel-btn" title="Cancelar">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <th scope="row">
+                                                <div class="form-check">
+                                                    <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                </div>
+                                            </th>
+
+                                            <td>ORC-2023-005</td>
+                                            <td>Comércio Popular</td>
+                                            <td>Maria Souza</td>
+                                            <td>25/10/2023</td>
+                                            <td>10/11/2023</td>
+                                            <td><span class="status-badge status-cancelado">Cancelado</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info action-btn view-btn" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-primary action-btn duplicate-btn" title="Duplicar">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Budget Offcanvas -->
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="newBudgetOffcanvas" aria-labelledby="newBudgetOffcanvasLabel">
+                    <div class="offcanvas-header border-bottom border-secondary">
+                        <h5 class="offcanvas-title" id="newBudgetOffcanvasLabel">Novo Orçamento</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <form id="newBudgetForm">
+                            <div class="mb-3">
+                                <label for="clientName" class="form-label">Cliente</label>
+                                <select class="form-select" id="clientName" required>
+                                    <option value="" selected disabled>Selecione um cliente</option>
+                                    <option>Empresa ABC Ltda</option>
+                                    <option>Comércio XYZ S/A</option>
+                                    <option>Indústria 123 ME</option>
+                                    <option>Serviços QWE EIRELI</option>
+                                    <option>Comércio Popular</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sellerName" class="form-label">Vendedor</label>
+                                <select class="form-select" id="sellerName" required>
+                                    <option value="" selected disabled>Selecione um vendedor</option>
+                                    <option>João Silva</option>
+                                    <option>Maria Souza</option>
+                                    <option>Carlos Oliveira</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="validUntil" class="form-label">Validade (dias)</label>
+                                <select class="form-select" id="validUntil" required>
+                                    <option value="7">7 dias</option>
+                                    <option value="10" selected>10 dias</option>
+                                    <option value="15">15 dias</option>
+                                    <option value="30">30 dias</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="budgetNotes" class="form-label">Observações</label>
+                                <textarea class="form-control" id="budgetNotes" rows="3"></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i> Salvar Orçamento
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">
+                                    <i class="bi bi-x-lg me-1"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Budget Detail Modal -->
+                <div class="modal fade budget-detail-modal" id="budgetDetailModal" tabindex="-1" aria-labelledby="budgetDetailModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title" id="budgetDetailModalLabel">Detalhes do Orçamento ORC-2023-002</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="card border-secondary mb-3">
+                                            <div class="card-header bg-dark border-secondary">
+                                                <h6 class="mb-0"><i class="bi bi-building me-2"></i>Dados do Cliente</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="mb-1"><strong>Nome:</strong> Comércio XYZ S/A</p>
+                                                <p class="mb-1"><strong>CNPJ:</strong> 12.345.678/0001-99</p>
+                                                <p class="mb-1"><strong>Endereço:</strong> Rua Exemplo, 123 - Centro - São Paulo/SP</p>
+                                                <p class="mb-1"><strong>Contato:</strong> (11) 99999-9999</p>
+                                                <p class="mb-0"><strong>Email:</strong> contato@comercioxyz.com.br</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-secondary mb-3">
+                                            <div class="card-header bg-dark border-secondary">
+                                                <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i>Dados do Orçamento</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-1"><strong>Vendedor:</strong> Maria Souza</p>
+                                                        <p class="mb-1"><strong>Data Criação:</strong> 18/10/2023</p>
+                                                        <p class="mb-1"><strong>Data Validade:</strong> 02/11/2023</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-1"><strong>Status:</strong> <span class="status-badge status-aguardando-analise">Aguardando Análise</span></p>
+                                                        <p class="mb-1"><strong>Total:</strong> R$ 12.450,00</p>
+                                                        <p class="mb-0"><strong>Desconto:</strong> 5%</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0"><i class="bi bi-cart me-2"></i>Itens do Orçamento</h6>
+                                        <button class="btn btn-sm btn-primary" id="addItemBtn">
+                                            <i class="bi bi-plus-lg me-1"></i> Adicionar Item
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="itemsTable" style="width:100%">
+                                                <thead>
+                                                    <tr>
+
+                                                        <th scope="col" style="width: 10px;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                                            </div>
+                                                        </th>
+
+                                                        <th>Produto</th>
+                                                        <th>Categoria</th>
+                                                        <th>Fornecedor</th>
+                                                        <th>Quantidade</th>
+                                                        <th>Valor Unitário</th>
+                                                        <th>Total</th>
+                                                        <th>Status</th>
+                                                        <th>Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+
+                                                        <th scope="row">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                            </div>
+                                                        </th>
+
+                                                        <td>Notebook Dell Inspiron 15</td>
+                                                        <td>Informática</td>
+                                                        <td>Dell Brasil</td>
+                                                        <td>2</td>
+                                                        <td>R$ 3.500,00</td>
+                                                        <td>R$ 7.000,00</td>
+                                                        <td><span class="badge bg-secondary">Pendente</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-warning action-btn edit-item-btn" title="Editar">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger action-btn remove-item-btn" title="Remover">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <th scope="row">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                            </div>
+                                                        </th>
+
+                                                        <td>Monitor LG 24" Full HD</td>
+                                                        <td>Informática</td>
+                                                        <td>LG Eletronics</td>
+                                                        <td>3</td>
+                                                        <td>R$ 850,00</td>
+                                                        <td>R$ 2.550,00</td>
+                                                        <td><span class="badge bg-secondary">Pendente</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-warning action-btn edit-item-btn" title="Editar">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger action-btn remove-item-btn" title="Remover">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <th scope="row">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                            </div>
+                                                        </th>
+
+                                                        <td>Impressora HP LaserJet</td>
+                                                        <td>Informática</td>
+                                                        <td>HP Brasil</td>
+                                                        <td>1</td>
+                                                        <td>R$ 1.200,00</td>
+                                                        <td>R$ 1.200,00</td>
+                                                        <td><span class="badge bg-secondary">Pendente</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-warning action-btn edit-item-btn" title="Editar">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger action-btn remove-item-btn" title="Remover">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <th scope="row">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                                            </div>
+                                                        </th>
+
+                                                        <td>Teclado e Mouse sem fio Logitech</td>
+                                                        <td>Informática</td>
+                                                        <td>Logitech</td>
+                                                        <td>2</td>
+                                                        <td>R$ 350,00</td>
+                                                        <td>R$ 700,00</td>
+                                                        <td><span class="badge bg-secondary">Pendente</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-warning action-btn edit-item-btn" title="Editar">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger action-btn remove-item-btn" title="Remover">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="card border-secondary">
+                                            <div class="card-header bg-dark border-secondary">
+                                                <h6 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Observações</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>Cliente solicitou entrega até o dia 30/10/2023. Possível desconto adicional se fechar o pedido esta semana.</p>
+                                                <textarea class="form-control mt-2" rows="3" placeholder="Adicionar observações..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-secondary">
+                                            <div class="card-header bg-dark border-secondary">
+                                                <h6 class="mb-0"><i class="bi bi-calculator me-2"></i>Resumo Financeiro</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span>Subtotal:</span>
+                                                    <span>R$ 11.450,00</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span>Desconto (5%):</span>
+                                                    <span>- R$ 572,50</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span>Frete:</span>
+                                                    <span>R$ 250,00</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between fw-bold fs-5 border-top border-secondary pt-2">
+                                                    <span>Total:</span>
+                                                    <span>R$ 11.127,50</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card border-secondary">
+                                    <div class="card-header bg-dark border-secondary">
+                                        <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Histórico</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="history-item history-item-success">
+                                            <div class="d-flex justify-content-between">
+                                                <strong>Orçamento criado</strong>
+                                                <small class="text-muted">18/10/2023 09:15</small>
+                                            </div>
+                                            <p class="mb-0">Por: Maria Souza</p>
+                                        </div>
+                                        <div class="history-item history-item-info">
+                                            <div class="d-flex justify-content-between">
+                                                <strong>Primeiro item adicionado</strong>
+                                                <small class="text-muted">18/10/2023 09:30</small>
+                                            </div>
+                                            <p class="mb-0">Notebook Dell Inspiron 15 - 2 unidades</p>
+                                        </div>
+                                        <div class="history-item history-item-info">
+                                            <div class="d-flex justify-content-between">
+                                                <strong>Itens adicionados</strong>
+                                                <small class="text-muted">18/10/2023 10:45</small>
+                                            </div>
+                                            <p class="mb-0">Monitor LG 24" Full HD - 3 unidades, Impressora HP LaserJet - 1 unidade</p>
+                                        </div>
+                                        <div class="history-item history-item-warning">
+                                            <div class="d-flex justify-content-between">
+                                                <strong>Enviado para análise</strong>
+                                                <small class="text-muted">18/10/2023 14:20</small>
+                                            </div>
+                                            <p class="mb-0">Status alterado para "Aguardando Análise"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-success" id="sendToAnalysisBtn">
+                                    <i class="bi bi-send me-1"></i> Enviar para Análise de Compra
+                                </button>
+                                <button type="button" class="btn btn-danger" id="cancelBudgetBtn">
+                                    <i class="bi bi-x-circle me-1"></i> Cancelar Orçamento
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-lg me-1"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Item Modal -->
+                <div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title" id="itemModalLabel">Adicionar Item</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="itemForm">
+                                    <div class="mb-3">
+                                        <label for="productName" class="form-label">Produto</label>
+                                        <select class="form-select" id="productName" required>
+                                            <option value="" selected disabled>Selecione um produto</option>
+                                            <option>Notebook Dell Inspiron 15</option>
+                                            <option>Monitor LG 24" Full HD</option>
+                                            <option>Impressora HP LaserJet</option>
+                                            <option>Teclado e Mouse sem fio Logitech</option>
+                                            <option>HD Externo Seagate 1TB</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="productCategory" class="form-label">Categoria</label>
+                                        <input type="text" class="form-control" id="productCategory" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="supplier" class="form-label">Fornecedor</label>
+                                        <select class="form-select" id="supplier" required>
+                                            <option value="" selected disabled>Selecione um fornecedor</option>
+                                            <option>Dell Brasil</option>
+                                            <option>LG Eletronics</option>
+                                            <option>HP Brasil</option>
+                                            <option>Logitech</option>
+                                            <option>Seagate</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="quantity" class="form-label">Quantidade</label>
+                                        <input type="number" class="form-control" id="quantity" min="1" value="1" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="unitPrice" class="form-label">Valor Unitário</label>
+                                        <input type="text" class="form-control" id="unitPrice" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-primary" id="saveItemBtn">
+                                    <i class="bi bi-save me-1"></i> Salvar
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-lg me-1"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#budgetsTable').DataTable({
+                "lengthMenu": [5, 8, 10, 25, 50],
+                "pageLength": 5,
+                "language": {
+                    "decimal":        "",
+                    "emptyTable":     "Nenhum registro encontrado",
+                    "info":           "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "infoEmpty":      "Mostrando 0 até 0 de 0 registros",
+                    "infoFiltered":   "(filtrado de _MAX_ registros no total)",
+                    "infoPostFix":    "",
+                    "thousands":      ".",
+                    "lengthMenu":     "Mostrar _MENU_ registros",
+                    "loadingRecords": "Carregando...",
+                    "processing":     "Processando...",
+                    "search":         "Buscar:",
+                    "zeroRecords":    "Nenhum registro correspondente encontrado",
+                    "paginate": {
+                        "first":      "Primeiro",
+                        "last":       "Último",
+                        "next":       "Próximo",
+                        "previous":   "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending":  ": ativar para classificar a coluna em ordem crescente",
+                        "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                    }
+                }
+            });
+
+            // Initialize items table
+            $('#itemsTable').DataTable({
+                "language": {
+                    "decimal":        "",
+                    "emptyTable":     "Nenhum registro encontrado",
+                    "info":           "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "infoEmpty":      "Mostrando 0 até 0 de 0 registros",
+                    "infoFiltered":   "(filtrado de _MAX_ registros no total)",
+                    "infoPostFix":    "",
+                    "thousands":      ".",
+                    "lengthMenu":     "Mostrar _MENU_ registros",
+                    "loadingRecords": "Carregando...",
+                    "processing":     "Processando...",
+                    "search":         "Buscar:",
+                    "zeroRecords":    "Nenhum registro correspondente encontrado",
+                    "paginate": {
+                        "first":      "Primeiro",
+                        "last":       "Último",
+                        "next":       "Próximo",
+                        "previous":   "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending":  ": ativar para classificar a coluna em ordem crescente",
+                        "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                    }
+                },
+                responsive: true,
+                searching: false,
+                paging: false,
+                info: false
+            });
+
+            // New Budget Offcanvas
+            $('#newBudgetBtn').click(function() {
+                var newBudgetOffcanvas = new bootstrap.Offcanvas(document.getElementById('newBudgetOffcanvas'));
+                newBudgetOffcanvas.show();
+            });
+
+            // Form submission for new budget
+            $('#newBudgetForm').submit(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: 'Orçamento criado com sucesso.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('newBudgetOffcanvas'));
+                    offcanvas.hide();
+                    $('#newBudgetForm')[0].reset();
+
+                    // In a real app, you would refresh the table or add the new budget
+                });
+            });
+
+            // View Budget buttons
+            $('.view-btn').click(function() {
+                var budgetDetailModal = new bootstrap.Modal(document.getElementById('budgetDetailModal'));
+                budgetDetailModal.show();
+            });
+
+            // Edit Budget buttons
+            $('.edit-btn').click(function() {
+                // In a real app, this would open the edit mode
+                Swal.fire({
+                    title: 'Editar Orçamento',
+                    text: 'Você será redirecionado para a edição do orçamento.',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            });
+
+            // Duplicate Budget buttons
+            $('.duplicate-btn').click(function() {
+                Swal.fire({
+                    title: 'Duplicar Orçamento',
+                    text: 'Tem certeza que deseja duplicar este orçamento?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, duplicar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Sucesso!',
+                            'Orçamento duplicado com sucesso.',
+                            'success'
+                        );
+                    }
+                });
+            });
+
+            // Convert to Order buttons
+            $('.convert-btn').click(function() {
+                Swal.fire({
+                    title: 'Converter em Pedido',
+                    text: 'Tem certeza que deseja converter este Orçamento em Pedido de Compra?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, converter',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Sucesso!',
+                            'Orçamento convertido em Pedido de Compra.',
+                            'success'
+                        );
+                    }
+                });
+            });
+
+            // Cancel Budget buttons
+            $('.cancel-btn').click(function() {
+                Swal.fire({
+                    title: 'Cancelar Orçamento',
+                    text: 'Tem certeza que deseja cancelar este orçamento? Esta ação não pode ser desfeita.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Manter orçamento',
+                    confirmButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Cancelado!',
+                            'O orçamento foi cancelado.',
+                            'success'
+                        );
+                    }
+                });
+            });
+
+            // Add Item button in Budget Detail
+            $('#addItemBtn').click(function() {
+                $('#itemModalLabel').text('Adicionar Item');
+                $('#itemForm')[0].reset();
+                $('#productCategory').val('');
+
+                var itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+                itemModal.show();
+            });
+
+            // Edit Item buttons
+            $('.edit-item-btn').click(function() {
+                $('#itemModalLabel').text('Editar Item');
+
+                // In a real app, you would populate the form with the item data
+                $('#productName').val('Notebook Dell Inspiron 15');
+                $('#productCategory').val('Informática');
+                $('#supplier').val('Dell Brasil');
+                $('#quantity').val('2');
+                $('#unitPrice').val('3.500,00');
+
+                var itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+                itemModal.show();
+            });
+
+            // Remove Item buttons
+            $('.remove-item-btn').click(function() {
+                Swal.fire({
+                    title: 'Remover Item',
+                    text: 'Tem certeza que deseja remover este item do orçamento?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, remover',
+                    cancelButtonText: 'Manter item',
+                    confirmButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Removido!',
+                            'O item foi removido do orçamento.',
+                            'success'
+                        );
+                    }
+                });
+            });
+
+            // Save Item button
+            $('#saveItemBtn').click(function() {
+                // Validate form
+                if ($('#itemForm')[0].checkValidity()) {
+                    Swal.fire({
+                        title: 'Sucesso!',
+                        text: 'Item salvo com sucesso.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        var itemModal = bootstrap.Modal.getInstance(document.getElementById('itemModal'));
+                        itemModal.hide();
+
+                        // In a real app, you would add/update the item in the table
+                    });
+                } else {
+                    $('#itemForm')[0].reportValidity();
+                }
+            });
+
+            // Send to Analysis button
+            $('#sendToAnalysisBtn').click(function() {
+                Swal.fire({
+                    title: 'Enviar para Análise',
+                    text: 'Tem certeza que deseja enviar este orçamento para análise de compra?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, enviar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Enviado!',
+                            'O orçamento foi enviado para análise de compra.',
+                            'success'
+                        );
+                    }
+                });
+            });
+
+            // Cancel Budget button in detail modal
+            $('#cancelBudgetBtn').click(function() {
+                Swal.fire({
+                    title: 'Cancelar Orçamento',
+                    text: 'Tem certeza que deseja cancelar este orçamento? Esta ação não pode ser desfeita.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Manter orçamento',
+                    confirmButtonColor: '#dc3545'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            'Cancelado!',
+                            'O orçamento foi cancelado.',
+                            'success'
+                        ).then(() => {
+                            var budgetDetailModal = bootstrap.Modal.getInstance(document.getElementById('budgetDetailModal'));
+                            budgetDetailModal.hide();
+                        });
+                    }
+                });
+            });
+
+            // Product selection change
+            $('#productName').change(function() {
+                // In a real app, you would fetch the category from your database
+                var product = $(this).val();
+                var category = '';
+
+                if (product === 'Notebook Dell Inspiron 15' ||
+                    product === 'Monitor LG 24" Full HD' ||
+                    product === 'Impressora HP LaserJet' ||
+                    product === 'Teclado e Mouse sem fio Logitech') {
+                    category = 'Informática';
+                } else if (product === 'HD Externo Seagate 1TB') {
+                    category = 'Armazenamento';
+                }
+
+                $('#productCategory').val(category);
+            });
+        });
+    </script>
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+    <script src="~/assets/js/app.js"></script>
+
+    }

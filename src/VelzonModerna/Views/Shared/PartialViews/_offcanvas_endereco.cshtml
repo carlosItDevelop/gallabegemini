@@ -1,0 +1,82 @@
+﻿<!-- ========== Offcanvas Endereço ========== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEndereco" aria-labelledby="offcanvasEnderecoLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="offcanvasEnderecoLabel">Endereço</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="enderecoOffcanvasForm" novalidate>
+            @* Novo ID para o formulário *@
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" id="endereco_Id" name="Id" value="00000000-0000-0000-0000-000000000000" />
+            <input type="hidden" id="endereco_PessoaId" name="PessoaId" value="@Model.PessoaId" />
+
+            <div class="mb-3">
+                <label for="endereco_TipoDeEndereco" class="form-label">Tipo de Endereço</label>
+                <select class="form-select" id="endereco_TipoDeEndereco" name="TipoDeEndereco" required>
+                    <option value="">-- Selecione --</option>
+                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Entities.Endereco.TipoDeEnderecoEnum>())
+                    {
+                        <option value="@tipo.Value">@tipo.Text</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Por favor, selecione o tipo do endereço.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_PaisCodigoIso" class="form-label">País (Código ISO)</label>
+                <input type="text" class="form-control" id="endereco_PaisCodigoIso" name="PaisCodigoIso" required placeholder="Ex: BR, US, PT" maxlength="2">
+                <div class="invalid-feedback">Informe o código ISO do país (2 letras).</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_LinhaEndereco1" class="form-label">Endereço Linha 1</label>
+                <input type="text" class="form-control" id="endereco_LinhaEndereco1" name="LinhaEndereco1" required placeholder="Rua, Número, Bairro/Distrito">
+                <div class="invalid-feedback">Informe a linha principal do endereço.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_LinhaEndereco2" class="form-label">Endereço Linha 2 (Opcional)</label>
+                <input type="text" class="form-control" id="endereco_LinhaEndereco2" name="LinhaEndereco2" placeholder="Complemento, Apartamento, Bloco">
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_Cidade" class="form-label">Cidade / Localidade</label>
+                <input type="text" class="form-control" id="endereco_Cidade" name="Cidade" required placeholder="Nome da cidade">
+                <div class="invalid-feedback">Informe a cidade.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_EstadoOuProvincia" class="form-label">Estado / Província / Região (Opcional)</label>
+                <input type="text" class="form-control" id="endereco_EstadoOuProvincia" name="EstadoOuProvincia" placeholder="UF, Estado, etc.">
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_CodigoPostal" class="form-label">CEP / Código Postal / ZIP Code</label>
+                <input type="text" class="form-control" id="endereco_CodigoPostal" name="CodigoPostal" required placeholder="00000-000 ou similar">
+                <div class="invalid-feedback">Informe o código postal.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="endereco_InformacoesAdicionais" class="form-label">Informações Adicionais (Opcional)</label>
+                <textarea class="form-control" id="endereco_InformacoesAdicionais" name="InformacoesAdicionais" rows="3" placeholder="Ponto de referência, instruções de entrega..."></textarea>
+            </div>
+
+            <div id="offcanvasEnderecoFormErrors" class="text-danger mt-2 mb-3"></div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success" id="btnSalvarEndereco">
+                    <i class="ri-save-line align-bottom me-1"></i> Salvar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluirEndereco" style="display: none;">
+                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir
+                </button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line align-bottom me-1"></i> Fechar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- ========== End Offcanvas Endereço ========== -->

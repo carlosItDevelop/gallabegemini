@@ -1,0 +1,172 @@
+﻿@using System.Globalization
+@using GeneralLabSolutions.CoreShared.DTOs.DtosConsolidados
+@using GeneralLabSolutions.Domain.Enums
+@model ClienteConsolidadoDto
+
+@{
+    ViewBag.Title = "Consolidado";
+    ViewBag.pTitle = "Consolidado de Cliente / Pedidos";
+    ViewBag.pageTitle = "Consolidado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <partial name="partialcooperchip/_cssindex" />
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title mb-0">
+                    Consolidado do Cliente: <strong><span class="badge bg-primary">@Model.Nome</span></strong>
+                </h1>
+            </div>
+            <div class="card-body">
+
+                <!--  ### INÍCIO DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX ### -->
+
+                 <vc:cliente-consolidado cliente-id="Model.ClienteId" />
+
+                <!-- ### FIM DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX ### -->
+
+                <hr />
+
+                <h2>Histórico de Pedidos</h2>
+                @* Seu código da tabela de histórico de pedidos continua aqui... *@
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Data do Pedido</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th>Ações</th> <!-- Nova coluna de ações -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pedido in Model.HistoricoDePedidos)
+                        {
+
+                            string? statusClass = "info";
+
+                            if (pedido.Status.Equals("Orcamento"))
+                            {
+                                statusClass = "secondary";
+                            } else if (pedido.Status.Equals("EmProcessamento"))
+                            {
+                                statusClass = "warning";
+                            } else if (pedido.Status.Equals("Pago"))
+                            {
+                                statusClass = "success";
+                            } else if (pedido.Status.Equals("Enviado"))
+                            {
+                                statusClass = "primary";
+                            } else if (pedido.Status.Equals("Entregue"))
+                            {
+                                statusClass = "success";
+                            }
+
+                            <tr>
+                                <td>@pedido.DataPedido.ToShortDateString()</td>
+                                <td>@pedido.ValorTotal.ToString("C2", CultureInfo.CurrentCulture)</td>
+                                <td>
+                                    <span class="badge bg-@statusClass">
+                                        @pedido.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasPedido"
+                                            onclick="carregarItensPedido('@pedido.Id')">
+                                        Ver Itens
+                                    </button>
+                                </td>
+
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Seu Offcanvas aqui, abaixo... *@
+<div class="offcanvas offcanvas-end" style="width: 50%;" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" id="offcanvasPedido" aria-labelledby="offcanvasPedidoLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasPedidoLabel">Itens do Pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- Aqui será carregado o conteúdo dos itens do pedido -->
+        <div id="itensPedidoConteudo">
+            <!-- Os itens serão carregados aqui via AJAX -->
+        </div>
+    </div>
+
+</div>
+@* Fim do Offcanvas... *@
+
+@section scripts {
+    <partial name="partialcooperchip/_scripts_datatables" />
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 5,
+            "language": {
+                "decimal":        "",
+                "emptyTable":     "Nenhum registro encontrado",
+                "info":           "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty":      "Mostrando 0 até 0 de 0 registros",
+                "infoFiltered":   "(filtrado de _MAX_ registros no total)",
+                "infoPostFix":    "",
+                "thousands":      ".",
+                "lengthMenu":     "Mostrar _MENU_ registros",
+                "loadingRecords": "Carregando...",
+                "processing":     "Processando...",
+                "search":         "Buscar:",
+                "zeroRecords":    "Nenhum registro correspondente encontrado",
+                "paginate": {
+                    "first":      "Primeiro",
+                    "last":       "Último",
+                    "next":       "Próximo",
+                    "previous":   "Anterior"
+                },
+                "aria": {
+                    "sortAscending":  ": ativar para classificar a coluna em ordem crescente",
+                    "sortDescending": ": ativar para classificar a coluna em ordem decrescente"
+                }
+            }
+        });
+    </script>
+    <script>
+        function carregarItensPedido(pedidoId) {
+            $.ajax({
+                url: '/ConsolidadoCliente/ObterItensPedido',
+                type: 'GET',
+                data: { pedidoId: pedidoId },
+                success: function (data) {
+                    console.log(data);
+                    // Aqui você insere os itens do pedido no OffCanvas
+                    $('#itensPedidoConteudo').html(data);
+                },
+                error: function () {
+                    alert('Erro ao carregar os itens do pedido.');
+                }
+            });
+        }
+    </script>
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    @{        
+        await Html.RenderPartialAsync("PartialViews/_animacao_consolidado_cliente");
+    }
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

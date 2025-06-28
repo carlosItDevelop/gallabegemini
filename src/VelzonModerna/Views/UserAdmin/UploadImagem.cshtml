@@ -1,0 +1,175 @@
+﻿@model VelzonModerna.ViewModels.UploadImagemViewModel
+
+@{
+    ViewBag.Title = "Alterar Foto do Perfil";
+    ViewBag.pTitle = $"Alterar Foto: {Model.NomeUsuario}";
+    ViewBag.pageTitle = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <!-- dropzone css -->
+    <link rel="stylesheet" href="~/assets/libs/dropzone/dropzone.css" type="text/css" />
+    <!-- Filepond css -->
+    <link rel="stylesheet" href="~/assets/libs/filepond/filepond.min.css" type="text/css" />
+    <link rel="stylesheet" href="~/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
+}
+
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Usuários</a></li>
+        <li class="breadcrumb-item"><a asp-action="Detalhes" asp-route-id="@Model.UserId">Detalhes (@Model.NomeUsuario)</a></li>
+        <li class="breadcrumb-item active">Alterar Foto</li>
+    </ol>
+}
+
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Upload da Nova Imagem de Perfil</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Selecione uma nova imagem para o perfil de <strong>@Model.NomeUsuario</strong>.
+                    A imagem deve ser do tipo PNG e ter no máximo 300x300 pixels.
+                </p>
+                <form asp-action="UploadImagem" asp-controller="UserAdmin" asp-route-userId="" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="UserId" /> @* Este UserId será usado pelo viewModel na action POST *@
+                    <input type="hidden" asp-for="NomeUsuario" />
+                    <input type="hidden" asp-for="ImagemAtualUrl" />
+
+
+                    <vc:summary></vc:summary>
+
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-md-6 text-center">
+                            <h6>Imagem Atual</h6>
+                            <img id="imagemPreviewAtual" src="@Model.ImagemAtualUrl" alt="Foto Perfil Atual"
+                                 class="img-thumbnail rounded-circle avatar-xl mb-3"
+                                 onerror="this.onerror=null; this.src='/cooperchip/images/img-padrao.jpg';" /> @* Fallback JS *@
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label asp-for="Imagem" class="form-label">Selecione a Nova Imagem (PNG, max 300x300)</label>
+                        <input asp-for="Imagem" type="file" class="form-control" accept="image/png" id="novaImagemInput">
+                        <span asp-validation-for="Imagem" class="text-danger"></span>
+                    </div>
+
+                    @* Preview da Nova Imagem Selecionada (Opcional, com JavaScript) *@
+                    <div class="row justify-content-center mb-3" id="previewNovaImagemContainer" style="display: none;">
+                        <div class="col-md-6 text-center">
+                            <h6>Preview da Nova Imagem</h6>
+                            <img id="novaImagemPreview" src="#" alt="Preview da Nova Imagem"
+                                 class="img-thumbnail rounded-circle avatar-xl" />
+                        </div>
+                    </div>
+
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">
+                            <i class="ri-upload-2-line align-bottom me-1"></i> Enviar Nova Imagem
+                        </button>
+                        <a asp-action="Detalhes" asp-route-id="@Model.UserId" class="btn btn-secondary waves-effect waves-light">
+                            <i class="ri-close-line align-bottom me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Instruções</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>A imagem deve estar no formato <strong>PNG</strong>.</li>
+                    <li>As dimensões máximas são <strong>300x300 pixels</strong>.</li>
+                    <li>O tamanho máximo do arquivo é de aproximadamente 1MB (depende da configuração do servidor).</li>
+                    <li>Após o upload, a nova imagem substituirá a atual.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- dropzone min js -->
+    <script src="~/assets/libs/dropzone/dropzone-min.js"></script>
+    <!-- filepond js -->
+    <script src="~/assets/libs/filepond/filepond.min.js"></script>
+    <script src="~/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js"></script>
+    <script src="~/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js"></script>
+    <script src="~/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js"></script>
+    <script src="~/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js"></script>
+
+@* <script src="~/assets/js/pages/form-file-upload.init.js"></script> *@ @* Velzon tem um init para filepond, pode ser útil *@
+
+    <script>
+        // Simples preview de imagem para o input file padrão
+        document.getElementById('novaImagemInput').addEventListener('change', function (event) {
+            var previewContainer = document.getElementById('previewNovaImagemContainer');
+            var previewImage = document.getElementById('novaImagemPreview');
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                previewImage.src = reader.result;
+                previewContainer.style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.src = "";
+                previewContainer.style.display = 'none';
+            }
+        });
+
+        // Se você decidir usar FilePond para um upload mais robusto:
+        /*
+        FilePond.registerPlugin(
+            FilePondPluginImagePreview,
+            FilePondPluginFileValidateSize,
+            FilePondPluginImageExifOrientation,
+            FilePondPluginFileEncode
+        );
+
+        const inputElement = document.querySelector('input[type="file"][asp-for="Imagem"]');
+        if (inputElement) {
+            FilePond.create(inputElement, {
+                labelIdle: `Arraste e solte sua imagem PNG ou <span class="filepond--label-action">Procure</span>`,
+                imagePreviewHeight: 170,
+                imageCropAspectRatio: '1:1',
+                imageResizeTargetWidth: 300,
+                imageResizeTargetHeight: 300,
+                stylePanelLayout: 'compact circle',
+                styleLoadIndicatorPosition: 'center bottom',
+                styleProgressIndicatorPosition: 'right bottom',
+                styleButtonRemoveItemPosition: 'left bottom',
+                styleButtonProcessItemPosition: 'right bottom',
+                acceptedFileTypes: ['image/png'],
+                labelFileTypeNotAllowed: 'Tipo de arquivo inválido',
+                fileValidateTypeLabelExpectedTypes: 'Esperado {allButLastType} ou {lastType}',
+                maxFileSize: '1MB', // Defina o tamanho máximo do arquivo
+                labelMaxFileSizeExceeded: 'Arquivo muito grande',
+                labelMaxFileSize: 'Tamanho máximo do arquivo é {filesize}',
+            });
+        }
+        */
+    </script>
+
+    <script src="~/assets/js/app.js"></script>
+}

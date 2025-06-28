@@ -1,0 +1,199 @@
+﻿@using System.Globalization
+@using GeneralLabSolutions.CoreShared.DTOs.DtosConsolidados
+@using GeneralLabSolutions.Domain.Enums
+@model FornecedorConsolidadoDto
+
+@{
+    ViewBag.Title = "Consolidado de Fornecedor";
+    ViewBag.pTitle = "Consolidado de Fornecedor / Produtos";
+    ViewBag.pageTitle = "Consolidado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@* Se precisar de CSS específico para estes cards, adicione aqui ou no _cssindex *@
+@* @section styles {
+    <partial name="partialcooperchip/_cssindex" />
+} *@
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title mb-0">
+                    Consolidado do Fornecedor: <strong><span class="badge bg-primary">@Model.Nome</span></strong>
+                </h1>
+            </div>
+            <div class="card-body">
+
+                @* ### INÍCIO DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX PARA FORNECEDOR ### *@
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card crm-widget shadow-none mb-4">
+                            <div class="card-body p-0">
+                                <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1 row-cols-1 g-0">
+                                    @* Ajustado para 3 colunas em telas grandes/médias, 1 em pequenas *@
+
+                                    @* Tile 1: Total de Produtos *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Total de Produtos</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-archive-line display-6 text-muted"></i> @* Ícone para produtos/arquivo *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0"><span class="counter-value" data-target="@Model.TotalDeProdutos">@Model.TotalDeProdutos</span></h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 2: Valor Total Gerado *@
+                                    <div class="col border-end">
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Valor Total Gerado</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-money-dollar-box-line display-6 text-muted"></i> @* Ícone para valor/dinheiro *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    <h2 class="mb-0">
+                                                        <span class="counter-value" data-target="@Model.ValorTotalGerado.ToString("N2", CultureInfo.InvariantCulture).Replace(",", "")">
+                                                            @Model.ValorTotalGerado.ToString("C", new CultureInfo("pt-BR"))
+                                                        </span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Tile 3: Taxa de Devolução *@
+                                    <div class="col">
+                                        @* Último tile *@
+                                        <div class="py-4 px-3 text-center">
+                                            <h5 class="text-muted text-uppercase fs-13">Taxa de Devolução</h5>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-reply-all-line display-6 text-muted"></i> @* Ícone para devolução/retorno *@
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 text-start">
+                                                    @* Para percentual, a animação do contador pode ser direta se o data-target for só o número *@
+                                                    <h2 class="mb-0">
+                                                        <span class="counter-value" data-target="@(Model.TaxaDevolucao * 100)">
+                                                            @Model.TaxaDevolucao.ToString("P2", new CultureInfo("pt-BR"))
+                                                        </span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* ### FIM DA NOVA SEÇÃO DE MÉTRICAS ESTILO TILE BOX PARA FORNECEDOR ### *@
+
+                <hr />
+
+                <h2>Produtos Mais Vendidos</h2>
+                @if (Model.TotalDeProdutos > 0)
+                {
+                    <partial name="_ItensProdutoPartial" model="Model" />
+                } else
+                {
+                    <partial name="_FornecedorSemResumoPartial" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 5
+        });
+    </script>
+
+    @* Adicionar o mesmo script de animação de contador que usamos para o ClienteConsolidado *@
+    <script>
+        function GFG_Fun(target, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                // Tratamento para números com casas decimais (como percentuais)
+                let isPercent = target.innerHTML.includes('%');
+                let isCurrency = target.innerHTML.includes('R$') || target.innerHTML.includes('$');
+                let current;
+
+                if (isPercent) {
+                    // Para percentuais, podemos querer manter as casas decimais na animação
+                    current = (progress * (end - start) + start);
+                    target.innerHTML = current.toFixed(2).replace('.', ',') + '%'; // Formato PT-BR para percentual
+                } else if (isCurrency) {
+                    current = Math.floor(progress * (end - start) + start);
+                    let prefix = target.innerHTML.includes('R$') ? 'R$ ' : '$';
+                    // Simples formatação de milhar para o contador de moeda (pode precisar de ajustes para precisão decimal)
+                    let numStr = current.toString();
+                    // Se quiser animar centavos, a lógica aqui precisaria ser mais complexa
+                    // Por ora, vamos focar na parte inteira para o contador
+                    target.innerHTML = prefix + numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
+                else {
+                    current = Math.floor(progress * (end - start) + start);
+                    target.innerHTML = current;
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                     // Ao final da animação, garantir a formatação final correta
+                    if (isPercent) {
+                        target.innerHTML = end.toFixed(2).replace('.', ',') + '%';
+                    } else if (isCurrency) {
+                        // Re-aplicar a formatação completa do modelo no final
+                        // Isso é um pouco mais complexo de fazer genericamente aqui
+                        // O ideal é que o data-target já tenha o valor numérico puro
+                        // e o innerHTML inicial tenha a formatação desejada
+                        // Para este exemplo, vamos manter o valor animado.
+                        // No seu código, o @Model.ValorTotalGerado.ToString("C") já está fora do span.
+                    } else {
+                        target.innerHTML = end;
+                    }
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var Clcounter = document.querySelectorAll(".counter-value");
+            Clcounter.forEach(function (element) {
+                var rawTarget = element.getAttribute("data-target");
+                var targetValue;
+
+                if (element.innerHTML.includes('%')) {
+                    targetValue = parseFloat(rawTarget); // data-target já está como número (ex: 0.00 para 0%)
+                } else if (element.innerHTML.includes('R$') || element.innerHTML.includes('$')) {
+                    targetValue = parseFloat(rawTarget); // data-target já está como número (ex: 871954.58)
+                } else {
+                    targetValue = parseInt(rawTarget, 10);
+                }
+
+                var startValue = 0;
+                var duration = 1000;
+
+                GFG_Fun(element, startValue, targetValue, duration);
+            });
+        });
+    </script>
+
+    @* Se o app.js global já não incluir, adicione: *@
+    @* <script src="~/assets/js/app.js"></script> *@
+}

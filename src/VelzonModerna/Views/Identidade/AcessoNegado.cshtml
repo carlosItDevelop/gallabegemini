@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "Acesso Negado";
+    Layout = null;
+}
+<!doctype html>
+<html lang="pt-br">
+<head>
+    @Html.Partial("~/Views/Shared/_title_meta.cshtml")
+    @Html.Partial("~/Views/Shared/_head_css.cshtml")
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+    <div class="text-center">
+        <h1 class="display-4 text-danger mb-3">🚫 Acesso Negado</h1>
+        <p class="lead">
+            <h3>Você não tem permissão para acessar esta área.</h3>
+        </p>
+        <a asp-action="Login" asp-controller="Identidade" class="btn btn-primary">
+            Fazer Login com Outra Conta
+        </a>
+    </div>
+
+    @Html.Partial("~/Views/Shared/_vendor_scripts.cshtml")
+</body>
+</html>

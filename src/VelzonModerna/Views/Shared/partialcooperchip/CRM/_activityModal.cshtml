@@ -1,0 +1,57 @@
+﻿@* ✅ ESTRUTURA BOOTSTRAP 5 CORRIGIDA *@
+<div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityModalLabel">Agendar Atividade</h5>
+                @* ✅ BOTÃO DE FECHAR PADRÃO *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* O conteúdo do seu formulário permanece o mesmo *@
+                <form id="activityForm">
+                    <input type="hidden" id="activityEventId" name="eventId">
+                    <div class="form-group">
+                        <label for="activityLeadId">Lead Relacionado</label>
+                        <select id="activityLeadId" name="leadId">
+                            <option value="">Selecione um lead (opcional)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="activityType">Tipo de Atividade *</label>
+                            <select id="activityType" name="type" required>
+                                <option value="call">Ligação</option>
+                                <option value="email">Email</option>
+                                <option value="meeting">Reunião</option>
+                                <option value="demo">Demonstração</option>
+                                <option value="follow-up">Follow-up</option>
+                                <option value="task">Tarefa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="activityDateTime">Data e Hora *</label>
+                            <input type="datetime-local" id="activityDateTime" name="datetime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="activityTitle">Título *</label>
+                        <input type="text" id="activityTitle" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="activityDescription">Descrição</label>
+                        <textarea id="activityDescription" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                @* ✅ BOTÃO DE CANCELAR PADRÃO *@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitActivity()">
+                    <i class="fas fa-plus"></i>
+                    Agendar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

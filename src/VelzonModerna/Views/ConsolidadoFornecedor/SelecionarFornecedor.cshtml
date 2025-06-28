@@ -1,0 +1,71 @@
+﻿@model IEnumerable<GeneralLabSolutions.Domain.Entities.Fornecedor>
+@namespace GeneralLabSolutions.Domain.Enums
+
+@{
+    ViewBag.Title = "Selecionar Fornecedor";
+    ViewBag.pTitle = "Consolidado de Fornecedores";
+    ViewBag.pageTitle = "Fornecedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-primary" role="alert">
+    Nesta tela de  <strong>Consolidado de Fornecedores</strong> veremos uma série de  <b>estatísticas</b> para sua tomada de decisão!
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0">
+                    Escolha um Fornecedor para Consolidar
+                </h2>
+            </div>
+            <div class="card-body">
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Documento</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string statusClass = item.StatusDoFornecedor == StatusDoFornecedor.Inativo ? "danger" : "success";
+
+                            <tr>
+                                <td>@item.Nome</td>
+                                <td>@item.Documento</td>
+                                <td>
+                                    <span class="badge bg-@statusClass-subtle text-@statusClass">
+                                        @item.StatusDoFornecedor
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-action="ObterConsolidado"
+                                       asp-controller="ConsolidadoFornecedor"
+                                       asp-route-fornecedorId="@item.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Consolidar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="partialcooperchip/_scripts_datatables" />
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 8
+        });
+    </script>
+}

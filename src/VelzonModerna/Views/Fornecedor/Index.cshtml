@@ -1,0 +1,117 @@
+﻿@using GeneralLabSolutions.Domain.Entities
+@model IEnumerable<Fornecedor>
+
+@{
+    ViewBag.Title = "Lista de Fornecedor";
+    ViewBag.pTitle = "Lista de Fornecedor";
+    ViewBag.pageTitle = "Fornecedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section styles {
+    <partial name="partialcooperchip/_cssindex" />
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <a asp-action="Create" class="btn btn-primary">+ Adicionar Fornecedor</a>
+                </h5>
+            </div>
+            <div class="card-body">
+                <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 10px;">
+                                <div class="form-check">
+                                    <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                </div>
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Nome)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Documento)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.StatusDoFornecedor)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TipoDePessoa)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model) {
+                            <tr>
+                                <th scope="row">
+                                    <div class="form-check">
+                                        <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                    </div>
+                                </th>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Nome)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Documento)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StatusDoFornecedor)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TipoDePessoa)
+                                </td>
+                                <td>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ri-more-fill align-middle"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> Detalhes</a></li>
+                                            <li><a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Editar</a></li>
+                                            <li>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item remove-item-btn">
+                                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Excluir
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a asp-action="ObterConsolidado" asp-controller="ConsolidadoFornecedor" asp-route-fornecedorid="@item.Id" class="dropdown-item remove-item-btn">
+                                                    <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Consolidado
+                                                </a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+
+
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+    <script>
+        $('#example').DataTable({
+            "lengthMenu": [5, 8, 10, 25, 50],
+            "pageLength": 8
+        });
+    </script>
+
+    <script src="~/assets/js/pages/datatables.init.js"></script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

@@ -1,0 +1,19 @@
+﻿<table class="table">
+    <thead style="background-color: #313131;">
+        <tr>
+            <th>Produto</th>
+            <th>Quantidade Vendida</th>
+            <th>Valor Total Vendido</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProdutosMaisVendidos)
+        {
+            <tr>
+                <td>@item.Nome</td>
+                <td>@item.QuantidadeVendida</td>
+                <td class="text-end">@item.ValorTotalVendido.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>

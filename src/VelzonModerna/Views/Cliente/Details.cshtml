@@ -1,0 +1,149 @@
+﻿@using VelzonModerna.ViewModels
+@model ClienteViewModel
+
+
+@{
+    ViewBag.Title = "Detalhes de Cliente";
+    ViewBag.pTitle = "Detalhes de Cliente";
+    ViewBag.pageTitle = "Cadastro";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<!-- Sweet Alert css-->
+<link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+<link href="~/assets/libs/toastify-js/src/toastify.css" rel="stylesheet" />
+}
+
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Lista de Cliente</a></li>
+        <li class="breadcrumb-item active">Detalhes</li>
+    </ol>
+}
+
+<!-- ViewComponent Consolidado de Cliente... -->
+<vc:cliente-consolidado cliente-id="Model.Id" />
+<!-- --------------------------------------- -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1"> <strong>Cliente >> @Model.Nome.ToUpper() </strong></h4>
+            </div><!-- end card header -->
+
+            <div style="padding: 20px;">
+                <div>
+
+                    <partial name="_details_e_delete" model="Model" />
+
+                </div>
+                <hr />
+                <div>
+                    <a asp-action="Edit" class="btn btn-outline-info" asp-route-id="@Model?.Id">Editar</a>
+                    <a asp-action="Index" class="btn btn-outline-success">Listagem</a>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-lg-12">
+            <h5 class="mb-3">Dados Complementares de Cliente</h5>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-pills nav-customs nav-danger mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#border-navs-home" role="tab">Dados bancários</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-profile" role="tab">Telefones do Cliente</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-messages" role="tab">Contatos do Cliente</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-settings" role="tab">Endereços deste Cliente</a>
+                        </li>
+                    </ul><!-- Tab panes -->
+                    <div class="tab-content text-muted">
+                        <div class="tab-pane active" id="border-navs-home" role="tabpanel">
+
+                            <div id="dados-bancarios-list-container">
+                                @* Container para atualização AJAX *@
+                                @await Html.PartialAsync("PartialViews/_DadosBancariosListClientePartial", Model.DadosBancarios, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                            </div>
+
+                        </div>
+
+
+                        <div class="tab-pane" id="border-navs-profile" role="tabpanel">
+
+                            <div id="telefones-list-container">
+                                @* Novo container para a lista de telefones *@
+                                @await Html.PartialAsync("PartialViews/_TelefonesListClientePartial", Model.Telefones, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                            </div>
+
+                        </div>
+                        <div class="tab-pane" id="border-navs-messages" role="tabpanel">
+
+                            <div id="contatos-list-container">
+                                @* Novo container para a lista de contatos *@
+                                @await Html.PartialAsync("PartialViews/_ContatosListClientePartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                            </div>
+
+                        </div>
+                        <div class="tab-pane" id="border-navs-settings" role="tabpanel">
+
+                            <div id="enderecos-list-container">
+                                @* Novo container para a lista de endereços *@
+                                @await Html.PartialAsync("PartialViews/_EnderecosListClientePartial", Model.Enderecos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div><!-- end card-body -->
+            </div>
+        </div><!--end col-->
+
+
+    </div>
+</div>
+
+
+<partial name="PartialViews/_offcanvas_dados_bancarios" />
+
+<partial name="PartialViews/_offcanvas_telefone" />
+<partial name="PartialViews/_offcanvas_contato" />
+<partial name="PartialViews/_offcanvas_endereco" />
+
+
+@section scripts {
+
+    <script src="~/assets/libs/prismjs/prism.js"></script>
+    <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
+    <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+
+
+    <script src="~/assets/js/app.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        await Html.RenderPartialAsync("PartialViews/_animacao_consolidado_cliente");
+
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco");
+    }
+
+}
+

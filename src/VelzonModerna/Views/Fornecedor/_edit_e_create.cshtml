@@ -27,7 +27,7 @@
 @* Linha 2 *@
 <div class="row g-3 mb-3">
 
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="form-floating">
             <input type="email" asp-for="Email" class="form-control" id="Email" placeholder=" ">
             <label asp-for="Email">Email Principal</label>
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="form-floating">
             <select asp-for="StatusDoFornecedor" class="form-select"
                     asp-items="Html.GetEnumSelectList<StatusDoFornecedor>()"
@@ -47,11 +47,7 @@
         </div>
     </div>
 
-</div>
-
-@* Linha 3 *@
-<div class="row g-3 mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="form-floating">
             <select asp-for="TipoDePessoa" asp-items="Html.GetEnumSelectList<TipoDePessoa>()" class="form-select" id="TipoDePessoa" aria-label="Tipo de Pessoa">
                 <option value="">Escolha...</option>
@@ -60,4 +56,5 @@
             <span asp-validation-for="TipoDePessoa" class="text-danger"></span>
         </div>
     </div>
+
 </div>

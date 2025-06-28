@@ -2,6 +2,14 @@
 @using VelzonModerna.ViewModels
 @model FornecedorViewModel
 
+@section Breadcrumb {
+    <ol class="breadcrumb m-0">
+        <li class="breadcrumb-item"><a asp-controller="GalLabs" asp-action="GlDashboard">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Lista de Fornecedor</a></li>
+        <li class="breadcrumb-item active">Editar Fornecedor</li>
+    </ol>
+}
+
 @{
     ViewBag.Title = "Editar Fornecedor";
     ViewBag.pTitle = "Editar Fornecedor";

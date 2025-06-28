@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneralLabSolutions.SharedKernel\GeneralLabSolutions.SharedKernel.csproj" />
+    <ProjectReference Include="..\Domain\GeneralLabSolutions.Domain\GeneralLabSolutions.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,14 @@
-﻿@model GeneralLabSolutions.Domain.Entities.Fornecedor
-
+@using VelzonModerna.ViewModels
+@model FornecedorViewModel
 
 @{
-    ViewData ["Title"] = "Detalhes de Fornecedor";
+    ViewBag.Title = "Detalhes de Fornecedor";
+    ViewBag.pTitle = "Detalhes de Fornecedor";
+    ViewBag.pageTitle = "Fornecedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<partial name="partialcooperchip/_cssindex" />
 
 <div class="row">
     <div class="col-lg-12">
@@ -13,48 +17,22 @@
                 <h4 class="card-title mb-0 flex-grow-1"> <strong>Fornecedor >> @Model.Nome.ToUpper() </strong></h4>
             </div><!-- end card header -->
 
-            <div style="padding: 20px;">
-                <div>
+            <div class="card-body">
+                <div class="live-preview">
+                    <partial name="_details_e_delete" model="Model" />
 
-                    @* <partial name="_details_e_delete" model="Model" /> *@
-                    <dl class="row">
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.Nome)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.Nome)
-                        </dd>
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.Documento)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.Documento)
-                        </dd>
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.StatusDoFornecedor)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.StatusDoFornecedor)
-                        </dd>
-                    </dl>
-
-
+                    <div class="text-end">
+                        <a asp-action="Edit" class="btn btn-primary" asp-route-id="@Model?.Id">Editar</a>
+                        <a asp-action="Index" class="btn btn-light">Voltar à lista</a>
+                    </div>
                 </div>
-                <hr />
-                <div>
-                    <a asp-action="Edit" class="btn btn-outline-info" asp-route-id="@Model?.Id">Editar</a>
-                    <a asp-action="Index" class="btn btn-outline-warning">Listagem</a>
-                </div>
-
             </div>
-
         </div>
     </div>
 </div>
 
 @section scripts {
-    <!-- prismjs plugin -->
-    <script src="~/assets/libs/prismjs/prism.js"></script>
-
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="partialcooperchip/_scripts_datatables" />
     <script src="~/assets/js/app.js"></script>
 }

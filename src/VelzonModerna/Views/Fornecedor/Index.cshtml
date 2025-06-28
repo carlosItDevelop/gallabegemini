@@ -1,5 +1,6 @@
-﻿@using GeneralLabSolutions.Domain.Entities
-@model IEnumerable<Fornecedor>
+﻿@using GeneralLabSolutions.Domain.Enums
+@using VelzonModerna.ViewModels
+@model IEnumerable<FornecedorViewModel>
 
 @{
     ViewBag.Title = "Lista de Fornecedor";
@@ -9,9 +10,9 @@
 }
 
 
-@section styles {
-    <partial name="partialcooperchip/_cssindex" />
-}
+<partial name="partialcooperchip/_cssindex" />
+
+<vc:summary></vc:summary>
 
 
 <div class="row">
@@ -32,40 +33,70 @@
                                 </div>
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Nome)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Documento)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.StatusDoFornecedor)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.TipoDePessoa)
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var item in Model) {
-                            <tr>
-                                <th scope="row">
-                                    <div class="form-check">
-                                        <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
-                                    </div>
+                                     @Html.DisplayNameFor(model => model.Nome)
                                 </th>
+                                <th>
+                                     @Html.DisplayNameFor(model => model.Documento)
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Status do Fornecedor
+                                </th>
+                                <th>
+                                    Tipo de Pessoa
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string? statusClass = "info";
+                            string? tipoPessoaClass = "info";
+
+                            if(item.StatusDoFornecedor == StatusDoFornecedor.Ativo)
+                            {
+                                statusClass = "info";
+                            } else
+                            {
+                                statusClass = "warning";
+                            }
+
+                            if(item.TipoDePessoa == TipoDePessoa.Fisica)
+                            {
+                                tipoPessoaClass = "info";
+                            } else
+                            {
+                                tipoPessoaClass = "warning";
+                            }
+
+                               <tr>
+                                    <th scope="row">
+                                        <div class="form-check">
+                                            <input class="form-check-input fs-15" type="checkbox" name="checkAll" value="option1">
+                                        </div>
+                                    </th>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Nome)
+                                     @Html.DisplayFor(modelItem => item.Nome)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Documento)
+                                     @Html.DisplayFor(modelItem => item.Documento)
                                 </td>
+
                                 <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+
+                                <td><span class="badge bg-@statusClass-subtle text-@statusClass">
                                     @Html.DisplayFor(modelItem => item.StatusDoFornecedor)
-                                </td>
-                                <td>
+                                </span></td>
+
+                                    <td><span class="badge bg-@tipoPessoaClass-subtle text-@tipoPessoaClass">
                                     @Html.DisplayFor(modelItem => item.TipoDePessoa)
-                                </td>
+                                </span></td>
                                 <td>
                                     <div class="dropdown d-inline-block">
                                         <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -99,7 +130,6 @@
 </div>
 
 @section scripts {
-
 
     <partial name="partialcooperchip/_scripts_datatables" />
 

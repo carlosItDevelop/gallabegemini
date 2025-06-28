@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GeneralLabSolutions.Domain.Entities.Base;
+using GeneralLabSolutions.Domain.Enums;
 
 namespace GeneralLabSolutions.Domain.Entities
 {
@@ -46,14 +47,5 @@ namespace GeneralLabSolutions.Domain.Entities
         public void DefinePessoa(Guid pessoaId) => PessoaId = pessoaId;
     }
 
-    public enum TipoDeContaBancaria
-    {
-        Corrente = 1,
-        Poupanca = 2,
-        ContaSalario = 3,
-        ContaConjunta = 4,
-        ContaUniversitaria = 5,
-        ContaEmpresarial = 6,
-        Pagamento = 7 // contas digitais
-    }
+    
 }

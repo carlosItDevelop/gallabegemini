@@ -189,5 +189,14 @@ namespace GeneralLabSolutions.Domain.Enums
         Baixa
     }
 
-
+    public enum TipoDeContaBancaria
+    {
+        Corrente = 1,
+        Poupanca = 2,
+        ContaSalario = 3,
+        ContaConjunta = 4,
+        ContaUniversitaria = 5,
+        ContaEmpresarial = 6,
+        Pagamento = 7 // contas digitais
+    }
 }

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 using GeneralLabSolutions.Domain.Enums;
 
 namespace VelzonModerna.ViewModels
@@ -40,5 +42,17 @@ namespace VelzonModerna.ViewModels
 
         [Display(Name = "Tipo de Contato")]
         public TipoDeContato TipoDeContato { get; set; } = TipoDeContato.Comercial;
+
+        [DisplayName(displayName: "Data Inclusão")]
+        public DateTime? DataInclusao { get; set; }
+
+        [DisplayName(displayName: "Data Última Modificação")]
+        public DateTime? DataUltimaModificacao { get; set; }
+
+        [DisplayName(displayName: "Usuário Inclusão")]
+        public string? UsuarioInclusao { get; set; }
+
+        [DisplayName(displayName: "Usuário Última Modificação")]
+        public string? UsuarioUltimaModificacao { get; set; }
     }
 }

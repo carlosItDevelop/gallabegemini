@@ -1,0 +1,51 @@
+﻿@using VelzonModerna.ViewModels
+@model FornecedorViewModel
+
+<div class="row col-12">
+
+    <div class="col-6">
+
+        <dl>
+
+            <dt>@Html.DisplayNameFor(model => model.Nome)</dt>
+            <dd>@Html.DisplayFor(model => model.Nome)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Documento)</dt>
+            <dd>@Html.DisplayFor(model => model.Documento)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Email)</dt>
+            <dd>@Html.DisplayFor(model => model.Email)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.StatusDoFornecedor)</dt>
+            <dd>@Html.DisplayFor(model => model.StatusDoFornecedor)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.TipoDePessoa)</dt>
+            <dd>@Html.DisplayFor(model => model.TipoDePessoa)</dd>
+
+        </dl>
+
+    </div>
+
+    <div class="col-6">
+
+        <h4>Auditoria de Registros</h4>
+        <hr />
+
+        <dl>
+
+            <dt>@Html.DisplayNameFor(model => model.DataInclusao)</dt>
+            <dd>@Html.DisplayFor(model => model.DataInclusao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.UsuarioInclusao)</dt>
+            <dd>@Html.DisplayFor(model => model.UsuarioInclusao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.DataUltimaModificacao)</dt>
+            <dd>@Html.DisplayFor(model => model.DataUltimaModificacao)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.UsuarioUltimaModificacao)</dt>
+            <dd>@Html.DisplayFor(model => model.UsuarioUltimaModificacao)</dd>
+        </dl>
+
+    </div>
+
+</div>

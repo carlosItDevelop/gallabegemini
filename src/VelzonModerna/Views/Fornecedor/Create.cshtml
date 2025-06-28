@@ -1,32 +1,39 @@
-﻿@model GeneralLabSolutions.Domain.Entities.Fornecedor
+﻿@using VelzonModerna.ViewModels
+@model FornecedorViewModel
 
 @{
-    ViewData["Title"] = "Adicionar Fornecedor";
+    ViewBag.Title = "Adicionar Fornecedor";
+    ViewBag.pTitle = "Adicionar Fornecedor";
+    ViewBag.pageTitle = "Fornecedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<partial name="partialcooperchip/_cssindex" />
 
-<h4>Adicionar Fornecedor</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-@*             <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
-
-                <vc:summary></vc:summary>
-
-                <partial name="_edit_e_create" model="Model" />
-
-            <div class="form-group">
-                <input type="submit" value="Adicionar" class="btn btn-outline-primary" />
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Adicionar Novo Fornecedor</h4>
+            </div><!-- end card header -->
+            <div class="card-body">
+                <div class="live-preview">
+                    <form asp-action="Create">
+                        <vc:summary></vc:summary>
+                        <partial name="_edit_e_create" model="Model" />
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Adicionar</button>
+                            <a asp-action="Index" class="btn btn-light">Voltar à lista</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index" class="btn btn-outline-success">Voltar à lista</a>
-</div>
-
-@section Scripts {
+@section scripts {
     <partial name="_ValidationScriptsPartial" />
+    <partial name="partialcooperchip/_scripts_datatables" />
+    <script src="~/assets/js/app.js"></script>
 }

@@ -1,5 +1,6 @@
 ﻿using GeneralLabSolutions.Domain.Mensageria;
-using GeneralLabSolutions.Domain.Entities; // Para TipoDeContaBancaria
+using GeneralLabSolutions.Domain.Mensageria;
+using GeneralLabSolutions.Domain.Enums;
 
 namespace GeneralLabSolutions.Domain.Application.Events
 {

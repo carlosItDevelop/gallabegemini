@@ -38,6 +38,11 @@ namespace VelzonModerna.ViewModels
 
         public List<EnderecoViewModel> Enderecos { get; set; } = new List<EnderecoViewModel>();
 
+        public DateTime? DataInclusao { get; set; }
+        public string? UsuarioInclusao { get; set; }
+        public DateTime? DataUltimaModificacao { get; set; }
+        public string? UsuarioUltimaModificacao { get; set; }
+
         // Removemos a propriedade Produtos
     }
 }

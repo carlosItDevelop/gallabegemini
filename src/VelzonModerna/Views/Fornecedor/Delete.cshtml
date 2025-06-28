@@ -1,8 +1,14 @@
-﻿@model GeneralLabSolutions.Domain.Entities.Fornecedor
+@using VelzonModerna.ViewModels
+@model FornecedorViewModel
 
 @{
-    ViewData ["Title"] = "Delete";
+    ViewBag.Title = "Excluir Fornecedor";
+    ViewBag.pTitle = "Excluir Fornecedor";
+    ViewBag.pageTitle = "Fornecedor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<partial name="partialcooperchip/_cssindex" />
 
 <div class="row">
     <div class="col-lg-12">
@@ -13,41 +19,18 @@
                 </h4>
             </div><!-- end card header -->
 
-            <div style="padding: 20px;">
-
-
-                <div>
-
-                    @* <partial name="_details_e_delete" model="Model" /> *@
-
-                    <dl class="row">
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.Nome)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.Nome)
-                        </dd>
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.Documento)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.Documento)
-                        </dd>
-                        <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.StatusDoFornecedor)
-                        </dt>
-                        <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.StatusDoFornecedor)
-                        </dd>
-                    </dl>
+            <div class="card-body">
+                <div class="live-preview">
+                    <partial name="_details_e_delete" model="Model" />
 
                     <hr>
                     <form asp-action="Delete">
                         <input type="hidden" asp-for="Id" />
-                        <input type="submit" value="SIM" class="btn btn-outline-danger" />
-                        <a asp-action="Index" class="btn btn-outline-info">Cancelar</a>
+                        <div class="text-end">
+                            <input type="submit" value="SIM" class="btn btn-danger" />
+                            <a asp-action="Index" class="btn btn-light">Cancelar</a>
+                        </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -55,8 +38,7 @@
 </div>
 
 @section scripts {
-    <!-- prismjs plugin -->
-    <script src="~/assets/libs/prismjs/prism.js"></script>
-
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="partialcooperchip/_scripts_datatables" />
     <script src="~/assets/js/app.js"></script>
 }

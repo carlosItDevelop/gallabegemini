@@ -42,7 +42,7 @@
                 <select class="form-select" id="dadosBancarios_TipoDeContaBancaria" name="TipoDeContaBancaria" required>
                     <option value="">-- Selecione --</option>
                     @* Pré-carrega as opções do Enum usando o Helper do C# *@
-                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Entities.TipoDeContaBancaria>())
+                    @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeContaBancaria>())
                     {
                         <option value="@tipo.Value">@tipo.Text</option>
                     }

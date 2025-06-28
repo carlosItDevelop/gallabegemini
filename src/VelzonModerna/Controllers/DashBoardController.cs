@@ -19,31 +19,5 @@ namespace Velzon.Controllers
             return View();
         }
 
-
-
-        [ActionName("Crypto")]
-        public IActionResult Crypto()
-        {
-            return View();
-        }
-
-        [ActionName("Projects")]
-        public IActionResult Projects()
-        {
-            return View();
-        }
-
-        [ActionName("NFT")]
-        public IActionResult NFT()
-        {
-            return View();
-        }
-
-        [ActionName("Job")]
-        public IActionResult Job()
-        {
-            return View();
-        }
-
     }
 }

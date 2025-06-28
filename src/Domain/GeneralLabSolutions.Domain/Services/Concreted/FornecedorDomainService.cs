@@ -10,7 +10,7 @@ using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Mensageria;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
-using GeneralLabSolutions.Domain.Services.Interfaces;
+using GeneralLabSolutions.Domain.Services.Abstractions;
 using GeneralLabSolutions.Domain.Validations;
 
 namespace GeneralLabSolutions.Domain.Services.Concreted
@@ -19,6 +19,8 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
     {
 
         private readonly IFornecedorRepository _fornecedorRepository;
+        private readonly IGenericRepository<Fornecedor, Guid> _query;
+        private readonly IGenericRepository<PedidoDeCompra, Guid> _pedidoDeCompraQuery;
         private readonly IMediatorHandler _mediatorHandler;
 
         /// <summary>
@@ -26,14 +28,19 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         /// </summary>
         /// <param name="fornecedorRepository"></param>
         /// <param name="notificador"></param>
+        /// <param name="query"></param>
         /// <param name="mediatorHandler"></param>
         public FornecedorDomainService(
             IFornecedorRepository fornecedorRepository,
             INotificador notificador,
+            IGenericRepository<Fornecedor, Guid> query,
+            IGenericRepository<PedidoDeCompra, Guid> pedidoDeCompraQuery,
             IMediatorHandler mediatorHandler)
             : base(notificador)
         {
             _fornecedorRepository = fornecedorRepository;
+            _query = query;
+            _pedidoDeCompraQuery = pedidoDeCompraQuery;
             this._mediatorHandler = mediatorHandler;
         }
 
@@ -44,16 +51,13 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         {
             bool isValid = true;
 
-            var fornecedores = await _fornecedorRepository.SearchAsync(c =>
-                c.Documento == model.Documento || c.Email == model.Email);
-
-            if (fornecedores.Any(c => c.Documento == model.Documento))
+            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
             {
                 Notificar("Já existe um Fornecedor com este documento informado.");
                 isValid = false;
             }
 
-            if (fornecedores.Any(c => c.Email == model.Email))
+            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
             {
                 Notificar("Já existe um Fornecedor com este Email. Tente outro!");
                 isValid = false;
@@ -65,7 +69,7 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
                 isValid = false;
             }
 
-            var fornecedorExiste = await _fornecedorRepository.GetByIdAsync(model.Id);
+            var fornecedorExiste = await _query.GetByIdAsync(model.Id);
             if (fornecedorExiste is not null)
             {
                 Notificar("Já existe um Fornecedor cadastrado com este ID.");
@@ -85,6 +89,22 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         {
             bool isValid = true;
 
+            // Verificar se o fornecedor possui produtos associados
+            var produtosAssociados = await _query.SearchAsync(f => f.Id == model.Id && f.Produtos.Any());
+            if (produtosAssociados.Any())
+            {
+                Notificar("O fornecedor possui produtos associados e não pode ser excluído.");
+                isValid = false;
+            }
+
+            // Verificar se o fornecedor possui pedidos de compra associados
+            var pedidosDeCompraAssociados = await _pedidoDeCompraQuery.SearchAsync(pc => pc.FornecedorId == model.Id);
+            if (pedidosDeCompraAssociados.Any())
+            {
+                Notificar("O fornecedor possui pedidos de compra associados e não pode ser excluído.");
+                isValid = false;
+            }
+
             // Todo: E se, ao invés de excluirmos apenas deixá-lo "Inativo"?
             if (!ExecutarValidacao(new FornecedorValidation(), model))
                 isValid = false;
@@ -95,6 +115,22 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         public async Task<bool> ValidarUpdFornecedor(Fornecedor model)
         {
             bool isValid = true;
+
+            // Verificar se o email já está em uso por outro fornecedor
+            var fornecedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
+            if (fornecedorComMesmoEmail.Any())
+            {
+                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
+                isValid = false;
+            }
+
+            // Verificar se o documento já está em uso por outro fornecedor
+            var fornecedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
+            if (fornecedorComMesmoDocumento.Any())
+            {
+                Notificar("Já existe um Fornecedor com este documento informado.");
+                isValid = false;
+            }
 
             if (!ExecutarValidacao(new FornecedorValidation(), model))
                 isValid = false;
@@ -140,6 +176,9 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
             model.AdicionarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
 
+            // Publica o evento *ANTES* de qualquer operação de persistência
+            await _mediatorHandler.PublicarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
+
             // PersistirDados // Já está sendo feito no AppDbContext
         }
 
@@ -149,7 +188,8 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
             if (!await ValidarUpdFornecedor(model))
                 return;
 
-            await _fornecedorRepository.UpdateAsync(model);
+            // Não precisa mais disso, pois a entidade já está sendo rastreada
+            // e as propriedades já foram atualizadas no controller.
 
             model.AdicionarEvento(new FornecedorAtualizadoEvent(
                     model.Id,
@@ -167,66 +207,278 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
         #region: Métodos para ação de agregados (Dados Bancários, Contatos, Endereços, Telefones)
 
-        public Task AdicionarContatoAsync(Guid fornecedorId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "")
+        public async Task AdicionarContatoAsync(Guid fornecedorId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "")
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var novoContato = fornecedor.AdicionarContato(nome, email, telefone, tipoDeContato, emailAlternativo, telefoneAlternativo, observacao);
+                await _fornecedorRepository.AdicionarContatoAsync(fornecedor, novoContato);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao adicionar o contato.");
+            }
         }
 
-        public Task AdicionarDadosBancariosAsync(Guid fornecedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
+        public async Task AdicionarDadosBancariosAsync(Guid fornecedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var novoDb = fornecedor.AdicionarDadosBancarios(banco, agencia, conta, tipoConta);
+                await _fornecedorRepository.AdicionarDadosBancariosAsync(fornecedor, novoDb);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception)
+            {
+                Notificar("Ocorreu um erro inesperado ao adicionar os dados bancários.");
+            }
         }
 
-        public Task AdicionarEnderecoAsync(Guid fornecedorId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null)
+        public async Task AdicionarEnderecoAsync(Guid fornecedorId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var novoEndereco = fornecedor.AdicionarEndereco(paisCodigoIso, linhaEndereco1, cidade, codigoPostal, tipoDeEndereco, linhaEndereco2, estadoOuProvincia, informacoesAdicionais);
+                await _fornecedorRepository.AdicionarEnderecoAsync(fornecedor, novoEndereco);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao adicionar o endereço.");
+            }
         }
 
-        public Task AdicionarTelefoneAsync(Guid fornecedorId, string ddd, string numero, TipoDeTelefone tipoTelefone)
+        public async Task AdicionarTelefoneAsync(Guid fornecedorId, string ddd, string numero, TipoDeTelefone tipoTelefone)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var novoTelefone = fornecedor.AdicionarTelefone(ddd, numero, tipoTelefone);
+                await _fornecedorRepository.AdicionarTelefoneAsync(fornecedor, novoTelefone);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao adicionar o telefone.");
+            }
         }
 
-        public Task AtualizarContatoAsync(Guid fornecedorId, Guid contatoId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "")
+        public async Task AtualizarContatoAsync(Guid fornecedorId, Guid contatoId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "")
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                fornecedor.AtualizarContato(contatoId, nome, email, telefone, tipoDeContato, emailAlternativo, telefoneAlternativo, observacao);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao atualizar o contato.");
+            }
         }
 
-        public Task AtualizarDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
+        public async Task AtualizarDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor == null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                fornecedor.AtualizarDadosBancarios(dadosBancariosId, banco, agencia, conta, tipoConta);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao atualizar os dados bancários.");
+            }
         }
 
-        public Task AtualizarEnderecoAsync(Guid fornecedorId, Guid enderecoId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null)
+        public async Task AtualizarEnderecoAsync(Guid fornecedorId, Guid enderecoId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                fornecedor.AtualizarEndereco(enderecoId, paisCodigoIso, linhaEndereco1, cidade, codigoPostal, tipoDeEndereco, linhaEndereco2, estadoOuProvincia, informacoesAdicionais);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao atualizar o endereço.");
+            }
         }
 
-        public Task AtualizarTelefoneAsync(Guid fornecedorId, Guid telefoneId, string ddd, string numero, TipoDeTelefone tipoTelefone)
+        public async Task AtualizarTelefoneAsync(Guid fornecedorId, Guid telefoneId, string ddd, string numero, TipoDeTelefone tipoTelefone)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                fornecedor.AtualizarTelefone(telefoneId, ddd, numero, tipoTelefone);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao atualizar o telefone.");
+            }
         }
 
 
 
-        public Task RemoverContatoAsync(Guid fornecedorId, Guid contatoId)
+        public async Task RemoverContatoAsync(Guid fornecedorId, Guid contatoId)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var contatoRemovido = fornecedor.RemoverContato(contatoId);
+                await _fornecedorRepository.RemoverContatoAsync(fornecedor, contatoRemovido);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao remover o contato.");
+            }
         }
 
-        public Task RemoverDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId)
+        public async Task RemoverDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var removido = fornecedor.RemoverDadosBancarios(dadosBancariosId);
+                await _fornecedorRepository.RemoverDadosBancariosAsync(fornecedor, removido);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception)
+            {
+                Notificar("Ocorreu um erro inesperado ao remover os dados bancários.");
+            }
         }
 
-        public Task RemoverEnderecoAsync(Guid fornecedorId, Guid enderecoId)
+        public async Task RemoverEnderecoAsync(Guid fornecedorId, Guid enderecoId)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var enderecoRemovido = fornecedor.RemoverEndereco(enderecoId);
+                await _fornecedorRepository.RemoverEnderecoAsync(fornecedor, enderecoRemovido);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao remover o endereço.");
+            }
         }
 
-        public Task RemoverTelefoneAsync(Guid fornecedorId, Guid telefoneId)
+        public async Task RemoverTelefoneAsync(Guid fornecedorId, Guid telefoneId)
         {
-            throw new NotImplementedException();
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null)
+            {
+                Notificar($"Fornecedor com ID {fornecedorId} não encontrado.");
+                return;
+            }
+
+            try
+            {
+                var telefoneRemovido = fornecedor.RemoverTelefone(telefoneId);
+                await _fornecedorRepository.RemoverTelefoneAsync(fornecedor, telefoneRemovido);
+            } catch (InvalidOperationException ex)
+            {
+                Notificar(ex.Message);
+            } catch (Exception ex)
+            {
+                Notificar("Ocorreu um erro inesperado ao remover o telefone.");
+            }
         }
 
 

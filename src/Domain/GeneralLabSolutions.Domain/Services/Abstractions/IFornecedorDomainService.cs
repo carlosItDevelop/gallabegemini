@@ -1,8 +1,7 @@
-﻿// Local do Arquivo: GeneralLabSolutions.Domain/Services/Interfaces/IFornecedorDomainService.cs
-
 using GeneralLabSolutions.Domain.Entities;
+using GeneralLabSolutions.Domain.Enums;
 
-namespace GeneralLabSolutions.Domain.Services.Interfaces
+namespace GeneralLabSolutions.Domain.Services.Abstractions
 {
     public interface IFornecedorDomainService
     {
@@ -14,23 +13,23 @@ namespace GeneralLabSolutions.Domain.Services.Interfaces
         // Operações em entidades filhas do agregado
 
         // --- DADOS BANCÁRIOS ---
-        Task AdicionarDadosBancarios(Guid fornecedorId, DadosBancarios dadosBancarios);
-        Task AtualizarDadosBancarios(Guid fornecedorId, DadosBancarios dadosBancarios);
-        Task RemoverDadosBancarios(Guid fornecedorId, Guid dadosBancariosId);
+        Task AdicionarDadosBancariosAsync(Guid fornecedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta);
+        Task AtualizarDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta);
+        Task RemoverDadosBancariosAsync(Guid fornecedorId, Guid dadosBancariosId);
 
         // --- TELEFONES ---
-        Task AdicionarTelefone(Guid fornecedorId, Telefone telefone);
-        Task AtualizarTelefone(Guid fornecedorId, Telefone telefone);
-        Task RemoverTelefone(Guid fornecedorId, Guid telefoneId);
+        Task AdicionarTelefoneAsync(Guid fornecedorId, string ddd, string numero, TipoDeTelefone tipoTelefone);
+        Task AtualizarTelefoneAsync(Guid fornecedorId, Guid telefoneId, string ddd, string numero, TipoDeTelefone tipoTelefone);
+        Task RemoverTelefoneAsync(Guid fornecedorId, Guid telefoneId);
 
         // --- CONTATOS ---
-        Task AdicionarContato(Guid fornecedorId, Contato contato);
-        Task AtualizarContato(Guid fornecedorId, Contato contato);
-        Task RemoverContato(Guid fornecedorId, Guid contatoId);
+        Task AdicionarContatoAsync(Guid fornecedorId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "");
+        Task AtualizarContatoAsync(Guid fornecedorId, Guid contatoId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlternativo = "", string telefoneAlternativo = "", string observacao = "");
+        Task RemoverContatoAsync(Guid fornecedorId, Guid contatoId);
 
         // --- ENDEREÇOS ---
-        Task AdicionarEndereco(Guid fornecedorId, Endereco endereco);
-        Task AtualizarEndereco(Guid fornecedorId, Endereco endereco);
-        Task RemoverEndereco(Guid fornecedorId, Guid enderecoId);
+        Task AdicionarEnderecoAsync(Guid fornecedorId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null);
+        Task AtualizarEnderecoAsync(Guid fornecedorId, Guid enderecoId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null);
+        Task RemoverEnderecoAsync(Guid fornecedorId, Guid enderecoId);
     }
 }

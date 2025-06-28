@@ -4,7 +4,7 @@ using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
 using GeneralLabSolutions.Domain.Services.Concreted;
-using GeneralLabSolutions.Domain.Services.Interfaces;
+using GeneralLabSolutions.Domain.Services.Abstractions;
 using GeneralLabSolutions.InfraStructure.Data;
 using GeneralLabSolutions.InfraStructure.Repository;
 using GeneralLabSolutions.WebApiCore.Usuario;

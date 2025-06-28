@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GeneralLabSolutions.InfraStructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCatalog : Migration
+    public partial class AddAuditAgainInfra : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -243,7 +243,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     Content = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     UserId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
-                    LeadId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    LeadId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioInclusao = table.Column<string>(type: "varchar(100)", nullable: false),
+                    DataUltimaModificacao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioUltimaModificacao = table.Column<string>(type: "varchar(100)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -418,7 +422,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     Documento = table.Column<string>(type: "varchar(14)", nullable: false),
                     TipoDePessoa = table.Column<string>(type: "varchar(40)", nullable: false),
                     Email = table.Column<string>(type: "varchar(254)", nullable: false),
-                    StatusDoFornecedor = table.Column<string>(type: "varchar(40)", nullable: false)
+                    StatusDoFornecedor = table.Column<string>(type: "varchar(40)", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UsuarioInclusao = table.Column<string>(type: "varchar(120)", nullable: false),
+                    DataUltimaModificacao = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UsuarioUltimaModificacao = table.Column<string>(type: "varchar(120)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -462,7 +470,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     Documento = table.Column<string>(type: "varchar(14)", nullable: false),
                     TipoDePessoa = table.Column<string>(type: "varchar(40)", nullable: false),
                     Email = table.Column<string>(type: "varchar(254)", nullable: false),
-                    StatusDoVendedor = table.Column<string>(type: "varchar(40)", nullable: false)
+                    StatusDoVendedor = table.Column<string>(type: "varchar(40)", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UsuarioInclusao = table.Column<string>(type: "varchar(120)", nullable: false),
+                    DataUltimaModificacao = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UsuarioUltimaModificacao = table.Column<string>(type: "varchar(120)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -510,7 +522,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     FileSize = table.Column<int>(type: "int", nullable: false),
                     MimeType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     UploadedBy = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
-                    CrmTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CrmTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioInclusao = table.Column<string>(type: "varchar(100)", nullable: false),
+                    DataUltimaModificacao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioUltimaModificacao = table.Column<string>(type: "varchar(100)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -530,7 +546,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
-                    CrmTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CrmTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DataInclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioInclusao = table.Column<string>(type: "varchar(100)", nullable: false),
+                    DataUltimaModificacao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UsuarioUltimaModificacao = table.Column<string>(type: "varchar(100)", nullable: false)
                 },
                 constraints: table =>
                 {

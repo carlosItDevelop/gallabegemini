@@ -27,8 +27,13 @@
 
             <div class="card-body">
                 <div class="live-preview">
-                    <div class="row">
+                    <div class="row col-12">
                         <div class="col-md-6">
+
+                            <h4>Dados Pessoais</h4>
+                            <hr />
+
+
                             <dl class="row">
                                 <dt class="col-sm-4">
                                     @Html.DisplayNameFor(model => model.Nome)
@@ -62,6 +67,40 @@
                                 </dd>
                             </dl>
                         </div>
+
+
+                        <div class="col-6">
+
+
+                            <h4>Auditoria de Registros</h4>
+                            <hr />
+
+                            <dl>
+
+                                <dt>@Html.DisplayNameFor(model => model.DataCadastro)</dt>
+                                <dd>@Html.DisplayFor(model => model.DataCadastro)</dd>
+
+                                <dt>@Html.DisplayNameFor(model => model.UsuarioCadastro)</dt>
+                                <dd>@Html.DisplayFor(model => model.UsuarioCadastro)</dd>
+
+                                <dt>@Html.DisplayNameFor(model => model.DataAtualizacao)</dt>
+                                <dd>@Html.DisplayFor(model => model.DataAtualizacao)</dd>
+
+                                <dt>@Html.DisplayNameFor(model => model.UsuarioAtualizacao)</dt>
+                                <dd>@Html.DisplayFor(model => model.UsuarioAtualizacao)</dd>
+                            </dl>
+
+@*                             <h4>Observação</h4>
+                            <hr />
+
+                            <dl>
+                                <dd>@Html.DisplayFor(model => model.Observacao)</dd>
+                            </dl> *@
+
+
+                        </div>
+
+
                     </div>
 
                     @* TODO: Adicionar seções para Dados Bancários, Telefones, Contatos e Endereços aqui, se necessário. *@

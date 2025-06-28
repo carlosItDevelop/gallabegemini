@@ -36,6 +36,30 @@ namespace GeneralLabSolutions.InfraStructure.Mappings
                 .HasEnumConversion()
                 .IsRequired();
 
+            #region: Auditoria
+
+            builder.Property(x => x.DataInclusao)
+                .HasColumnName("DataInclusao")
+                .HasColumnType("datetime")
+                .IsRequired();
+
+            builder.Property(x => x.UsuarioInclusao)
+                .HasColumnType("varchar(120)")
+                .IsRequired();
+
+
+            builder.Property(x => x.DataUltimaModificacao)
+                .HasColumnName("DataUltimaModificacao")
+                .HasColumnType("datetime")
+                .IsRequired();
+
+
+            builder.Property(x => x.UsuarioUltimaModificacao)
+                .HasColumnType("varchar(120)")
+                .IsRequired();
+
+            #endregion
+
 
             builder.HasMany(x => x.Pedidos)
                 .WithOne(x => x.Vendedor)

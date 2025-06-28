@@ -119,7 +119,11 @@ namespace GeneralLabSolutions.InfraStructure.Data
                             email: email
                         )
                         {
-                            StatusDoFornecedor = GetStatusDoFornecedorByWeight(random)
+                            StatusDoFornecedor = GetStatusDoFornecedorByWeight(random),
+                            DataInclusao = DateTime.UtcNow.AddDays(-10),
+                            UsuarioInclusao = "SeedData - Inclusão",
+                            DataUltimaModificacao = DateTime.UtcNow.AddDays(-2),
+                            UsuarioUltimaModificacao = "SeedData - Modificação",
                         };
 
                         context.Fornecedor.Add(fornecedor);

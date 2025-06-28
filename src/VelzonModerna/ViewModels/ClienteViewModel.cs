@@ -90,11 +90,11 @@ namespace VelzonModerna.ViewModels
         [DisplayName(displayName: "Usuário de Atualização")]
         public string? UsuarioAtualizacao { get; set; }
 
-        [DisplayName("Ativo")]
-        public bool Ativo { get; set; }
+        //[DisplayName("Ativo")]
+        //public bool Ativo { get; set; }
 
-        [DisplayName("Excluído")]
-        public bool Excluido { get; set; }
+        //[DisplayName("Excluído")]
+        //public bool Excluido { get; set; }
 
         #endregion: Campos auditáveis
 

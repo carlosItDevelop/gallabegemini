@@ -120,7 +120,11 @@ namespace GeneralLabSolutions.InfraStructure.Data
                             email: Email
                         )
                         {
-                            StatusDoVendedor = GetStatusDoVendedorByWeight(random)
+                            StatusDoVendedor = GetStatusDoVendedorByWeight(random),
+                            DataInclusao = DateTime.UtcNow.AddDays(-10),
+                            UsuarioInclusao = "SeedData - Inclusão",
+                            DataUltimaModificacao = DateTime.UtcNow.AddDays(-2),
+                            UsuarioUltimaModificacao = "SeedData - Modificação",
                         };
 
                         context.Vendedor.Add(vendedor);

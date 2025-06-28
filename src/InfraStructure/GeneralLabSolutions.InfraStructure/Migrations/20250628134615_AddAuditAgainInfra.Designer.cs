@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeneralLabSolutions.InfraStructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250628095631_FornecedorHerdaDeEntityAudit")]
-    partial class FornecedorHerdaDeEntityAudit
+    [Migration("20250628134615_AddAuditAgainInfra")]
+    partial class AddAuditAgainInfra
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -768,10 +768,14 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DataInclusao")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .HasColumnType("datetime")
+                        .HasColumnName("DataInclusao");
 
                     b.Property<DateTime?>("DataUltimaModificacao")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .HasColumnType("datetime")
+                        .HasColumnName("DataUltimaModificacao");
 
                     b.Property<string>("Documento")
                         .IsRequired()
@@ -798,11 +802,11 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
 
                     b.Property<string>("UsuarioInclusao")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(120)");
 
                     b.Property<string>("UsuarioUltimaModificacao")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(120)");
 
                     b.HasKey("Id");
 
@@ -1226,6 +1230,16 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("DataInclusao")
+                        .IsRequired()
+                        .HasColumnType("datetime")
+                        .HasColumnName("DataInclusao");
+
+                    b.Property<DateTime?>("DataUltimaModificacao")
+                        .IsRequired()
+                        .HasColumnType("datetime")
+                        .HasColumnName("DataUltimaModificacao");
+
                     b.Property<string>("Documento")
                         .IsRequired()
                         .HasColumnType("varchar(14)");
@@ -1248,6 +1262,14 @@ namespace GeneralLabSolutions.InfraStructure.Migrations
                     b.Property<string>("TipoDePessoa")
                         .IsRequired()
                         .HasColumnType("varchar(40)");
+
+                    b.Property<string>("UsuarioInclusao")
+                        .IsRequired()
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("UsuarioUltimaModificacao")
+                        .IsRequired()
+                        .HasColumnType("varchar(120)");
 
                     b.HasKey("Id");
 

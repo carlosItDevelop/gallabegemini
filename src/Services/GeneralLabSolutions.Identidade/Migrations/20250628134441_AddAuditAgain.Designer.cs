@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeneralLabSolutions.Identidade.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250616023245_InitialIdentity")]
-    partial class InitialIdentity
+    [Migration("20250628134441_AddAuditAgain")]
+    partial class AddAuditAgain
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

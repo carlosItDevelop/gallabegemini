@@ -26,7 +26,7 @@ public class PedidoDeCompra : EntityAudit, IAggregateRoot
     public IReadOnlyCollection<ItemPedidoDeCompra> Itens => _itens.AsReadOnly();
 
     // Construtor para EF Core
-    protected PedidoDeCompra() { }
+    public PedidoDeCompra() { }
 
     public PedidoDeCompra(Guid fornecedorId, Guid responsavelCompraId, string? numeroPedidoCompra = null)
     {

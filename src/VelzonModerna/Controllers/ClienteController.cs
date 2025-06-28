@@ -20,7 +20,7 @@ using GeneralLabSolutions.WebApiCore.Usuario;
 
 namespace VelzonModerna.Controllers
 {
-    //[Microsoft.AspNetCore.Authorization.Authorize]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class ClienteController : BaseMvcController
     {
         private readonly IAspNetUser _aspnetUser;

@@ -3,10 +3,11 @@ using GeneralLabSolutions.Domain.DomainObjects;
 using GeneralLabSolutions.Domain.Entities.Audit;
 using GeneralLabSolutions.Domain.Entities.Base;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.Domain.Services.Helpers;
 
 namespace GeneralLabSolutions.Domain.Entities
 {
-    public class Cliente : EntityAudit, IAggregateRoot
+    public class Cliente : EntityAudit, IAggregateRoot, IPessoaContainer
     {
         // EF
         public Cliente() { }
@@ -113,17 +114,7 @@ namespace GeneralLabSolutions.Domain.Entities
                 string conta, 
                 TipoDeContaBancaria tipoConta)
         {
-            if (Pessoa is null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            var novo = new DadosBancarios(banco, agencia, conta, tipoConta, PessoaId);
-
-            Pessoa.DadosBancarios.Add(novo);
-
-            AdicionarEvento(new DadosBancariosAdicionadosEvent(
-                Id, novo.Id, banco, agencia, conta, tipoConta));
-
-            return novo;                     // <-- devolve para a camada de aplicação
+            return DadosBancariosDomainHelper.AdicionarDadosBancariosGenerico(this, banco, agencia, conta, tipoConta);
         }
 
 
@@ -137,34 +128,7 @@ namespace GeneralLabSolutions.Domain.Entities
         /// </summary>
         public void AtualizarDadosBancarios(Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Encontrar a conta bancária na coleção da Pessoa
-            var dadosBancariosParaAtualizar = Pessoa.DadosBancarios.FirstOrDefault(db => db.Id == dadosBancariosId);
-
-            if (dadosBancariosParaAtualizar == null)
-            {
-                // Ou poderia lançar uma exceção específica ou adicionar um evento de falha
-                throw new InvalidOperationException($"Dados bancários com ID {dadosBancariosId} não encontrados para este cliente.");
-                // return; // Alternativa silenciosa
-            }
-
-            // Usar os métodos Set da entidade DadosBancarios para atualizar
-            dadosBancariosParaAtualizar.SetBanco(banco);
-            dadosBancariosParaAtualizar.SetAgencia(agencia);
-            dadosBancariosParaAtualizar.SetConta(conta);
-            dadosBancariosParaAtualizar.SetTipoDeContaBancaria(tipoConta);
-
-            // Adicionar evento de domínio para notificar sobre a atualização
-            AdicionarEvento(new DadosBancariosAtualizadosEvent(
-               aggregateId: this.Id,
-               dadosBancariosId: dadosBancariosId,
-               banco: banco,
-               agencia: agencia,
-               conta: conta,
-               tipoDeContaBancaria: tipoConta
-           ));
+            DadosBancariosDomainHelper.AtualizarDadosBancariosGenerico(this, dadosBancariosId, banco, agencia, conta, tipoConta);
         }
 
         #endregion
@@ -177,13 +141,7 @@ namespace GeneralLabSolutions.Domain.Entities
         /// </summary>
         public DadosBancarios RemoverDadosBancarios(Guid dadosBancariosId)
         {
-            var db = Pessoa.DadosBancarios.FirstOrDefault(d => d.Id == dadosBancariosId)
-                     ?? throw new InvalidOperationException("Dados bancários não encontrados.");
-
-            Pessoa.DadosBancarios.Remove(db);
-
-            AdicionarEvento(new DadosBancariosRemovidosEvent(Id, dadosBancariosId));
-            return db;            // devolve o objeto removido
+            return DadosBancariosDomainHelper.RemoverDadosBancariosGenerico(this, dadosBancariosId);
         }
 
 
@@ -198,31 +156,7 @@ namespace GeneralLabSolutions.Domain.Entities
         /// <returns>A entidade Telefone criada.</returns>
         public Telefone AdicionarTelefone(string ddd, string numero, TipoDeTelefone tipoTelefone)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Validações específicas de telefone (ex: formato, unicidade dentro do cliente) poderiam ir aqui
-            // if (Pessoa.Telefones.Any(t => t.DDD == ddd && t.Numero == numero))
-            // {
-            //     throw new InvalidOperationException("Este telefone já está cadastrado para o cliente.");
-            // }
-
-            // Cria a nova entidade Telefone usando o PessoaId do Cliente
-            var novoTelefone = new Telefone(ddd, numero, tipoTelefone, this.PessoaId);
-
-            // Adiciona à coleção na entidade Pessoa
-            Pessoa.Telefones.Add(novoTelefone);
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new TelefoneAdicionadoEvent(
-                aggregateId: this.Id,
-                telefoneId: novoTelefone.Id,
-                ddd: ddd,
-                numero: numero,
-                tipoDeTelefone: tipoTelefone
-            ));
-
-            return novoTelefone; // Retorna a entidade criada
+            return TelefoneDomainHelper.AdicionarTelefoneGenerico(this, ddd, numero, tipoTelefone);
         }
 
         /// <summary>
@@ -230,36 +164,7 @@ namespace GeneralLabSolutions.Domain.Entities
         /// </summary>
         public void AtualizarTelefone(Guid telefoneId, string ddd, string numero, TipoDeTelefone tipoTelefone)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Encontra o telefone na coleção da Pessoa
-            var telefoneParaAtualizar = Pessoa.Telefones.FirstOrDefault(t => t.Id == telefoneId);
-
-            if (telefoneParaAtualizar == null)
-            {
-                throw new InvalidOperationException($"Telefone com ID {telefoneId} não encontrado para este cliente.");
-            }
-
-            // Validação de unicidade (se necessário), excluindo o próprio telefone sendo atualizado
-            // if (Pessoa.Telefones.Any(t => t.Id != telefoneId && t.DDD == ddd && t.Numero == numero))
-            // {
-            //     throw new InvalidOperationException("Já existe outro telefone cadastrado com este número para o cliente.");
-            // }
-
-            // Usa os métodos Set da entidade Telefone
-            telefoneParaAtualizar.SetDDD(ddd);
-            telefoneParaAtualizar.SetNumero(numero);
-            telefoneParaAtualizar.SetTipoDeTelefone(tipoTelefone);
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new TelefoneAtualizadoEvent(
-                aggregateId: this.Id,
-                telefoneId: telefoneId,
-                ddd: ddd,
-                numero: numero,
-                tipoDeTelefone: tipoTelefone
-            ));
+            TelefoneDomainHelper.AtualizarTelefoneGenerico(this, telefoneId, ddd, numero, tipoTelefone);
         }
 
         /// <summary>
@@ -268,27 +173,7 @@ namespace GeneralLabSolutions.Domain.Entities
         /// <returns>A entidade Telefone removida.</returns>
         public Telefone RemoverTelefone(Guid telefoneId)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Encontra o telefone na coleção
-            var telefoneParaRemover = Pessoa.Telefones.FirstOrDefault(t => t.Id == telefoneId);
-
-            if (telefoneParaRemover == null)
-            {
-                throw new InvalidOperationException($"Telefone com ID {telefoneId} não encontrado para este cliente.");
-            }
-
-            // Remove da coleção
-            Pessoa.Telefones.Remove(telefoneParaRemover);
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new TelefoneRemovidoEvent(
-                aggregateId: this.Id,
-                telefoneId: telefoneId
-            ));
-
-            return telefoneParaRemover; // Retorna a entidade removida
+            return TelefoneDomainHelper.RemoverTelefoneGenerico(this, telefoneId);
         }
 
         #endregion
@@ -305,53 +190,14 @@ namespace GeneralLabSolutions.Domain.Entities
             string email,
             string telefone,
             TipoDeContato tipoDeContato,
-            string emailAlternativo = "", // Parâmetros opcionais
+            string emailAlternativo = "",
             string telefoneAlternativo = "",
             string observacao = "")
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Validações específicas de Contato (ex: não permitir contato com mesmo email principal para este cliente)
-            // if (Pessoa.Contatos.Any(c => c.Email.Equals(email, StringComparison.OrdinalIgnoreCase)))
-            // {
-            //     throw new InvalidOperationException($"Já existe um contato com o email '{email}' para este cliente.");
-            // }
-
-            // Cria a nova entidade Contato usando o PessoaId do Cliente
-            var novoContato = new Contato(
-                nome,
-                email,
-                telefone,
-                tipoDeContato,
-                this.PessoaId // FK para Pessoa
-            )
-            {
-                // Define propriedades opcionais
-                EmailAlternativo = emailAlternativo ?? string.Empty,
-                TelefoneAlternativo = telefoneAlternativo ?? string.Empty,
-                Observacao = observacao ?? string.Empty
-            };
-
-            // Adiciona à coleção na entidade Pessoa
-            Pessoa.Contatos.Add(novoContato);
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new ContatoAdicionadoEvent(
-                aggregateId: this.Id,
-                contatoId: novoContato.Id,
-                nome: nome,
-                email: email,
-                telefone: telefone,
-                tipoDeContato: tipoDeContato
-            ));
-
-            return novoContato; // Retorna a entidade criada
+            return ContatoDomainHelper.AdicionarContatoGenerico(
+                this, nome, email, telefone, tipoDeContato, emailAlternativo, telefoneAlternativo, observacao);
         }
 
-        /// <summary>
-        /// Atualiza os dados de um contato existente associado a este Cliente.
-        /// </summary>
         public void AtualizarContato(
             Guid contatoId,
             string nome,
@@ -362,71 +208,13 @@ namespace GeneralLabSolutions.Domain.Entities
             string telefoneAlternativo = "",
             string observacao = "")
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Encontra o contato na coleção da Pessoa
-            var contatoParaAtualizar = Pessoa.Contatos.FirstOrDefault(c => c.Id == contatoId);
-
-            if (contatoParaAtualizar == null)
-            {
-                throw new InvalidOperationException($"Contato com ID {contatoId} não encontrado para este cliente.");
-            }
-
-            // Validação de unicidade de email (excluindo o próprio contato sendo atualizado)
-            // if (Pessoa.Contatos.Any(c => c.Id != contatoId && c.Email.Equals(email, StringComparison.OrdinalIgnoreCase)))
-            // {
-            //     throw new InvalidOperationException($"Já existe outro contato com o email '{email}' para este cliente.");
-            // }
-
-            // Usa os métodos de atualização da entidade Contato
-            contatoParaAtualizar.AtualizarNome(nome);
-            contatoParaAtualizar.AtualizarEmail(email);
-            contatoParaAtualizar.AtualizarTelefone(telefone);
-            contatoParaAtualizar.DefineTipoDeContato(tipoDeContato); // Usa o método Set
-            contatoParaAtualizar.AtualizarEmailAlternativo(emailAlternativo);
-            contatoParaAtualizar.AtualizarTelefoneAlternativo(telefoneAlternativo);
-            contatoParaAtualizar.AtualizarObservacao(observacao);
-
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new ContatoAtualizadoEvent(
-                aggregateId: this.Id,
-                contatoId: contatoId,
-                nome: nome,
-                email: email,
-                telefone: telefone,
-                tipoDeContato: tipoDeContato
-            ));
+            ContatoDomainHelper.AtualizarContatoGenerico(
+                this, contatoId, nome, email, telefone, tipoDeContato, emailAlternativo, telefoneAlternativo, observacao);
         }
 
-        /// <summary>
-        /// Remove um contato associado a este Cliente.
-        /// </summary>
-        /// <returns>A entidade Contato removida.</returns>
         public Contato RemoverContato(Guid contatoId)
         {
-            if (Pessoa is null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Encontra o contato na coleção
-            var contatoParaRemover = Pessoa.Contatos.FirstOrDefault(c => c.Id == contatoId);
-
-            if (contatoParaRemover is null)
-            {
-                throw new InvalidOperationException($"Contato com ID {contatoId} não encontrado para este cliente.");
-            }
-
-            // Remove da coleção
-            Pessoa.Contatos.Remove(contatoParaRemover);
-
-            // Adiciona o evento de domínio
-            AdicionarEvento(new ContatoRemovidoEvent(
-                aggregateId: this.Id,
-                contatoId: contatoId
-            ));
-
-            return contatoParaRemover; // Retorna a entidade removida
+            return ContatoDomainHelper.RemoverContatoGenerico(this, contatoId);
         }
 
         #endregion
@@ -443,50 +231,16 @@ namespace GeneralLabSolutions.Domain.Entities
             string linhaEndereco1,
             string cidade,
             string codigoPostal,
-            Endereco.TipoDeEnderecoEnum tipoDeEndereco, // Usa o enum interno de Endereco
+            Endereco.TipoDeEnderecoEnum tipoDeEndereco,
             string? linhaEndereco2 = null,
             string? estadoOuProvincia = null,
             string? informacoesAdicionais = null)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            // Validações específicas de Endereço (ex: limitar número de endereços por tipo)
-            // if (tipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal && Pessoa.Enderecos.Any(e => e.TipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal))
-            // {
-            //     throw new InvalidOperationException("Já existe um endereço principal definido para este cliente.");
-            // }
-
-            var novoEndereco = new Endereco(
-                this.PessoaId, // FK para Pessoa
-                paisCodigoIso,
-                linhaEndereco1,
-                cidade,
-                codigoPostal,
-                tipoDeEndereco,
-                linhaEndereco2,
-                estadoOuProvincia,
-                informacoesAdicionais
-            );
-
-            Pessoa.Enderecos.Add(novoEndereco);
-
-            AdicionarEvento(new EnderecoAdicionadoEvent(
-                aggregateId: this.Id,
-                enderecoId: novoEndereco.Id,
-                paisCodigoIso: paisCodigoIso,
-                linhaEndereco1: linhaEndereco1,
-                cidade: cidade,
-                codigoPostal: codigoPostal,
-                tipoDeEndereco: tipoDeEndereco
-            ));
-
-            return novoEndereco;
+            return EnderecoDomainHelper.AdicionarEnderecoGenerico(
+                this, paisCodigoIso, linhaEndereco1, cidade, codigoPostal, tipoDeEndereco,
+                linhaEndereco2, estadoOuProvincia, informacoesAdicionais);
         }
 
-        /// <summary>
-        /// Atualiza os dados de um endereço existente associado a este Cliente.
-        /// </summary>
         public void AtualizarEndereco(
             Guid enderecoId,
             string paisCodigoIso,
@@ -498,76 +252,14 @@ namespace GeneralLabSolutions.Domain.Entities
             string? estadoOuProvincia = null,
             string? informacoesAdicionais = null)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            var enderecoParaAtualizar = Pessoa.Enderecos.FirstOrDefault(e => e.Id == enderecoId);
-
-            if (enderecoParaAtualizar == null)
-            {
-                throw new InvalidOperationException($"Endereço com ID {enderecoId} não encontrado para este cliente.");
-            }
-
-            // Validações (ex: se estiver mudando para Principal, verificar se já existe outro)
-            // if (tipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal &&
-            //     enderecoParaAtualizar.TipoDeEndereco != Endereco.TipoDeEnderecoEnum.Principal &&
-            //     Pessoa.Enderecos.Any(e => e.Id != enderecoId && e.TipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal))
-            // {
-            //     throw new InvalidOperationException("Já existe outro endereço principal. Não é possível definir este como principal também.");
-            // }
-
-
-            enderecoParaAtualizar.SetPaisCodigoIso(paisCodigoIso);
-            enderecoParaAtualizar.SetLinhaEndereco1(linhaEndereco1);
-            enderecoParaAtualizar.SetLinhaEndereco2(linhaEndereco2);
-            enderecoParaAtualizar.SetCidade(cidade);
-            enderecoParaAtualizar.SetEstadoOuProvincia(estadoOuProvincia);
-            enderecoParaAtualizar.SetCodigoPostal(codigoPostal);
-            enderecoParaAtualizar.SetTipoDeEndereco(tipoDeEndereco);
-            enderecoParaAtualizar.SetInformacoesAdicionais(informacoesAdicionais);
-
-            AdicionarEvento(new EnderecoAtualizadoEvent(
-                aggregateId: this.Id,
-                enderecoId: enderecoId,
-                paisCodigoIso: paisCodigoIso,
-                linhaEndereco1: linhaEndereco1,
-                cidade: cidade,
-                codigoPostal: codigoPostal,
-                tipoDeEndereco: tipoDeEndereco
-            ));
+            EnderecoDomainHelper.AtualizarEnderecoGenerico(
+                this, enderecoId, paisCodigoIso, linhaEndereco1, cidade, codigoPostal, tipoDeEndereco,
+                linhaEndereco2, estadoOuProvincia, informacoesAdicionais);
         }
 
-        /// <summary>
-        /// Remove um endereço associado a este Cliente.
-        /// </summary>
-        /// <returns>A entidade Endereco removida.</returns>
         public Endereco RemoverEndereco(Guid enderecoId)
         {
-            if (Pessoa == null)
-                throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
-
-            var enderecoParaRemover = Pessoa.Enderecos.FirstOrDefault(e => e.Id == enderecoId);
-
-            if (enderecoParaRemover == null)
-            {
-                throw new InvalidOperationException($"Endereço com ID {enderecoId} não encontrado para este cliente.");
-            }
-
-            // Validação (ex: não permitir remover o único endereço principal se for obrigatório ter um)
-            // if (enderecoParaRemover.TipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal &&
-            //     Pessoa.Enderecos.Count(e => e.TipoDeEndereco == Endereco.TipoDeEnderecoEnum.Principal) <= 1)
-            // {
-            //     throw new InvalidOperationException("Não é possível remover o único endereço principal.");
-            // }
-
-            Pessoa.Enderecos.Remove(enderecoParaRemover);
-
-            AdicionarEvento(new EnderecoRemovidoEvent(
-                aggregateId: this.Id,
-                enderecoId: enderecoId
-            ));
-
-            return enderecoParaRemover;
+            return EnderecoDomainHelper.RemoverEnderecoGenerico(this, enderecoId);
         }
 
         #endregion

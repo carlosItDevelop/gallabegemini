@@ -4,18 +4,23 @@ using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using VelzonModerna.Controllers.Base;
 using VelzonModerna.ViewModels;
 
 namespace VelzonModerna.Controllers
 {
-    public class VendedorController : Controller
+    public class VendedorController : BaseMvcController
     {
         private readonly IVendedorDomainService _vendedorDomainService;
         private readonly IVendedorRepository _vendedorRepository;
         private readonly IMapper _mapper;
         private readonly INotificador _notificador;
 
-        public VendedorController(IVendedorDomainService vendedorDomainService, IVendedorRepository vendedorRepository, IMapper mapper, INotificador notificador)
+        public VendedorController(
+            IVendedorDomainService vendedorDomainService,
+            IVendedorRepository vendedorRepository,
+            IMapper mapper,
+            INotificador notificador) : base(notificador)
         {
             _vendedorDomainService = vendedorDomainService;
             _vendedorRepository = vendedorRepository;
@@ -26,41 +31,39 @@ namespace VelzonModerna.Controllers
         // GET: Vendedor
         public async Task<IActionResult> Index()
         {
-            var vendedores = await _vendedorDomainService.ObterTodosVendedores();
-            return View(_mapper.Map<IEnumerable<VendedorViewModel>>(vendedores));
+            var vendedores = await _vendedorRepository.GetAllAsync();
+            var listaVendedorViewModel = _mapper.Map<IEnumerable<VendedorViewModel>>(vendedores);
+            return View(listaVendedorViewModel);
         }
 
-        // GET: Vendedor/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
         {
-            if (id == null)
+
+            var model = await _vendedorRepository.ObterVendedorCompleto(id); // Carregar o vendedor completo com dados bancários, telefones, contatos e endereços
+            if (model is null)
             {
-                return NotFound();
+                return NotFound("Vendedor não pode ser Nulo.");
             }
 
-            var vendedor = await _vendedorDomainService.ObterVendedorPorId(id.Value);
-            if (vendedor == null)
-            {
-                return NotFound();
-            }
+            var vModel = _mapper.Map<VendedorViewModel>(model);
 
-            return View(_mapper.Map<VendedorViewModel>(vendedor));
+            return View(vModel);
         }
 
-        // GET: Vendedor/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        [HttpGet]
+        public IActionResult Create() => View(new VendedorViewModel());
 
-        // POST: Vendedor/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendedorViewModel vendedorViewModel)
         {
-            if (!ModelState.IsValid) return View(vendedorViewModel);
+            if (!ModelState.IsValid)
+                return View(vendedorViewModel);
 
             var vendedor = _mapper.Map<Vendedor>(vendedorViewModel);
+
             await _vendedorDomainService.AdicionarVendedor(vendedor);
 
             if (!OperacaoValida())
@@ -74,109 +77,103 @@ namespace VelzonModerna.Controllers
                 return View(vendedorViewModel);
             }
 
-            TempData["Success"] = "Vendedor Adicionado com Sucesso!";
+            TempData ["Success"] = "Vendedor Adicionado com Sucesso!";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Vendedor/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
+            var vendedor = await _vendedorRepository.ObterVendedorCompleto(id); // Carregar o vendedor completo com dados bancários, telefones, contatos e endereços
+            if (vendedor is null)
             {
-                return NotFound();
+                return NotFound("Vendedor não encontrado.");
             }
 
-            var vendedor = await _vendedorDomainService.ObterVendedorPorId(id.Value);
-            if (vendedor == null)
-            {
-                return NotFound();
-            }
-            return View(_mapper.Map<VendedorViewModel>(vendedor));
+            var vendedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
+
+            return View(vendedorViewModel);
         }
 
-        // POST: Vendedor/Edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, VendedorViewModel vendedorViewModel)
         {
             if (id != vendedorViewModel.Id)
+                return NotFound("Parâmetro ID não confere com o ID da ViewModel");
+
+            if (!ModelState.IsValid)
+                return View(vendedorViewModel);
+
+            var vendedorCompleto = await _vendedorRepository.ObterVendedorCompleto(id);
+            if (vendedorCompleto is null)
             {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid) return View(vendedorViewModel);
-
-            var vendedor = _mapper.Map<Vendedor>(vendedorViewModel);
-            await _vendedorDomainService.AtualizarVendedor(vendedor);
-
-            if (!OperacaoValida())
-            {
+                NotificarErro("Vendedor não encontrado.");
                 return View(vendedorViewModel);
             }
+
+            // ✅ Copia os dados do ViewModel para a entidade já rastreada pelo contexto
+            _mapper.Map(vendedorViewModel, vendedorCompleto);
+
+            await _vendedorDomainService.AtualizarVendedor(vendedorCompleto);
+
+            if (!OperacaoValida())
+                return View(vendedorViewModel);
 
             if (!await _vendedorRepository.UnitOfWork.CommitAsync())
             {
                 NotificarErro("Ocorreu um erro ao salvar os dados.");
-                return View(vendedorViewModel);
+                var vendedorAtualizado = await _vendedorRepository.ObterVendedorCompleto(id);
+                var viewModelAtualizada = _mapper.Map<VendedorViewModel>(vendedorAtualizado);
+                return View(viewModelAtualizada);     // 👈 devolve ViewModel, não entidade
             }
 
-            TempData["Success"] = "Vendedor Atualizado com Sucesso!";
+            TempData ["Success"] = "Vendedor atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Vendedor/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var vendedor = await _vendedorRepository.GetByIdAsync(id);
+            if (vendedor is null) return NotFound("Vendedor não encontrado.");
 
-            var vendedor = await _vendedorDomainService.ObterVendedorPorId(id.Value);
-            if (vendedor == null)
-            {
-                return NotFound();
-            }
+            var vendedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
 
-            return View(_mapper.Map<VendedorViewModel>(vendedor));
+            return View(vendedorViewModel);
         }
 
-        // POST: Vendedor/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            var vendedor = await _vendedorRepository.GetByIdAsync(id);
+
+            if (vendedor is null) BadRequest("Vendedor não encontrado.");
+
             await _vendedorDomainService.ExcluirVendedor(id);
 
             if (!OperacaoValida())
             {
-                return View(_mapper.Map<VendedorViewModel>(await _vendedorDomainService.ObterVendedorPorId(id)));
+                var vnedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
+                return View(vnedorViewModel); // Retorna para view com o vendedor para exibir erros de validação.
             }
 
             if (!await _vendedorRepository.UnitOfWork.CommitAsync())
             {
                 NotificarErro("Ocorreu um erro ao excluir os dados.");
-                return View(_mapper.Map<VendedorViewModel>(await _vendedorDomainService.ObterVendedorPorId(id)));
+
+                var vendedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
+
+                return View(nameof(Delete), vendedorViewModel);
             }
 
-            TempData["Success"] = "Vendedor Excluído com Sucesso!";
+            TempData ["Success"] = "Vendedor Excluído com Sucesso!";
             return RedirectToAction(nameof(Index));
         }
 
-        protected bool OperacaoValida()
-        {
-            if (!_notificador.TemNotificacao())
-            {
-                return true;
-            }
-
-            _notificador.ObterNotificacoes().ForEach(n => ModelState.AddModelError(string.Empty, n.Mensagem));
-            return false;
-        }
-
-        protected void NotificarErro(string mensagem)
-        {
-            _notificador.Handle(new Notificacao(mensagem));
-        }
     }
 }

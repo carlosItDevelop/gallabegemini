@@ -56,7 +56,6 @@ namespace GeneralLabSolutions.InfraStructure.Repository
                 HasNext = pageIndex < totalPages
             };
 
-
         }
 
         #region: Métodos para Dados Bancários (Mantidos)

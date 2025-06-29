@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Enums;
 
@@ -5,27 +8,110 @@ namespace GeneralLabSolutions.Domain.Services.Abstractions
 {
     public interface IVendedorDomainService
     {
-        Task<Vendedor> AdicionarVendedor(Vendedor vendedor);
-        Task<Vendedor> AtualizarVendedor(Vendedor vendedor);
+        // ---- Validações ---------------------------------------------
+        Task<bool> ValidarAddVendedor(Vendedor model);
+        Task<bool> ValidarUpdVendedor(Vendedor model);
+        Task<bool> ValidarDelVendedor(Vendedor model);
+
+        // ---- Operações principais ------------------------------------
+        Task AdicionarVendedor(Vendedor model);
+        Task AtualizarVendedor(Vendedor model);
         Task ExcluirVendedor(Guid id);
+
+        // ---- Consultas ----------------------------------------------
         Task<Vendedor?> ObterVendedorPorId(Guid id);
         Task<IEnumerable<Vendedor>> ObterTodosVendedores();
 
-        // Métodos para gerenciar agregados
-        Task AdicionarDadosBancarios(Guid vendedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta);
-        Task AtualizarDadosBancarios(Guid vendedorId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta);
-        Task RemoverDadosBancarios(Guid vendedorId, Guid dadosBancariosId);
+        // ---- Dados Bancários ----------------------------------------
+        Task AdicionarDadosBancarios(
+            Guid vendedorId,
+            string banco,
+            string agencia,
+            string conta,
+            TipoDeContaBancaria tipoConta);
 
-        Task AdicionarTelefone(Guid vendedorId, string ddd, string numero, TipoDeTelefone tipoTelefone);
-        Task AtualizarTelefone(Guid vendedorId, Guid telefoneId, string ddd, string numero, TipoDeTelefone tipoTelefone);
-        Task RemoverTelefone(Guid vendedorId, Guid telefoneId);
+        Task AtualizarDadosBancariosAsync(
+            Guid vendedorId,
+            Guid dadosBancariosId,
+            string banco,
+            string agencia,
+            string conta,
+            TipoDeContaBancaria tipoConta);
 
-        Task AdicionarContato(Guid vendedorId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlt = "", string telAlt = "", string obs = "");
-        Task AtualizarContato(Guid vendedorId, Guid contatoId, string nome, string email, string telefone, TipoDeContato tipoDeContato, string emailAlt = "", string telAlt = "", string obs = "");
-        Task RemoverContato(Guid vendedorId, Guid contatoId);
+        Task RemoverDadosBancariosAsync(
+            Guid vendedorId,
+            Guid dadosBancariosId);
 
-        Task AdicionarEndereco(Guid vendedorId, string pais, string linha1, string cidade, string cep, Endereco.TipoDeEnderecoEnum tipo, string? linha2, string? estado, string? info);
-        Task AtualizarEndereco(Guid vendedorId, Guid enderecoId, string paisCodigoIso, string linhaEndereco1, string cidade, string codigoPostal, Endereco.TipoDeEnderecoEnum tipoDeEndereco, string? linhaEndereco2 = null, string? estadoOuProvincia = null, string? informacoesAdicionais = null);
-        Task RemoverEndereco(Guid vendedorId, Guid enderecoId);
+        // ---- Telefones ----------------------------------------------
+        Task AdicionarTelefoneAsync(
+            Guid vendedorId,
+            string ddd,
+            string numero,
+            TipoDeTelefone tipoTelefone);
+
+        Task AtualizarTelefoneAsync(
+            Guid vendedorId,
+            Guid telefoneId,
+            string ddd,
+            string numero,
+            TipoDeTelefone tipoTelefone);
+
+        Task RemoverTelefoneAsync(
+            Guid vendedorId,
+            Guid telefoneId);
+
+        // ---- Contatos -----------------------------------------------
+        Task AdicionarContatoAsync(
+            Guid vendedorId,
+            string nome,
+            string email,
+            string telefone,
+            TipoDeContato tipoDeContato,
+            string emailAlternativo = "",
+            string telefoneAlternativo = "",
+            string observacao = "");
+
+        Task AtualizarContatoAsync(
+            Guid vendedorId,
+            Guid contatoId,
+            string nome,
+            string email,
+            string telefone,
+            TipoDeContato tipoDeContato,
+            string emailAlternativo = "",
+            string telefoneAlternativo = "",
+            string observacao = "");
+
+        Task RemoverContatoAsync(
+            Guid vendedorId,
+            Guid contatoId);
+
+        // ---- Endereços ----------------------------------------------
+        Task AdicionarEnderecoAsync(
+            Guid vendedorId,
+            string paisCodigoIso,
+            string linhaEndereco1,
+            string cidade,
+            string codigoPostal,
+            Endereco.TipoDeEnderecoEnum tipoDeEndereco,
+            string? linhaEndereco2 = null,
+            string? estadoOuProvincia = null,
+            string? informacoesAdicionais = null);
+
+        Task AtualizarEnderecoAsync(
+            Guid vendedorId,
+            Guid enderecoId,
+            string paisCodigoIso,
+            string linhaEndereco1,
+            string cidade,
+            string codigoPostal,
+            Endereco.TipoDeEnderecoEnum tipoDeEndereco,
+            string? linhaEndereco2 = null,
+            string? estadoOuProvincia = null,
+            string? informacoesAdicionais = null);
+
+        Task RemoverEnderecoAsync(
+            Guid vendedorId,
+            Guid enderecoId);
     }
 }

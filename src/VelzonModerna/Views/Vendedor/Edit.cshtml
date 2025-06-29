@@ -10,9 +10,9 @@
 }
 
 @{
-    ViewBag.Title = "Editar Fornecedor";
-    ViewBag.pTitle = "Editar Fornecedor";
-    ViewBag.pageTitle = "Fornecedor";
+    ViewBag.Title = "Editar Vendedor";
+    ViewBag.pTitle = "Editar Vendedor";
+    ViewBag.pageTitle = "Vendedor";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -30,6 +30,9 @@
                     <form asp-action="Edit">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input type="hidden" asp-for="Id" />
+
+                        <vc:summary></vc:summary>
+
 
                         <partial name="_edit_e_create" model="Model" />
 

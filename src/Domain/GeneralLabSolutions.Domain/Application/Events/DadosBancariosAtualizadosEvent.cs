@@ -15,8 +15,8 @@ namespace GeneralLabSolutions.Domain.Application.Events
 
 
         // AggregateId aqui será o Cliente.Id
-        public DadosBancariosAtualizadosEvent(Guid clienteId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoDeContaBancaria)
-            : base(clienteId)
+        public DadosBancariosAtualizadosEvent(Guid aggregateId, Guid dadosBancariosId, string banco, string agencia, string conta, TipoDeContaBancaria tipoDeContaBancaria)
+            : base(aggregateId)
         {
             DadosBancariosId = dadosBancariosId;
             Banco = banco;

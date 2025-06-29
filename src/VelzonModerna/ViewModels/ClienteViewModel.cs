@@ -36,7 +36,6 @@ namespace VelzonModerna.ViewModels
         public TipoDePessoa TipoDePessoa { get; set; }
 
 
-        //public virtual Pessoa Pessoa { get; set; }
         public Guid PessoaId { get; set; }
 
 

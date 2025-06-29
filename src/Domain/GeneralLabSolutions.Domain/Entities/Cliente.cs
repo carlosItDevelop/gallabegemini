@@ -158,7 +158,7 @@ namespace GeneralLabSolutions.Domain.Entities
 
             // Adicionar evento de domínio para notificar sobre a atualização
             AdicionarEvento(new DadosBancariosAtualizadosEvent(
-               clienteId: this.Id,
+               aggregateId: this.Id,
                dadosBancariosId: dadosBancariosId,
                banco: banco,
                agencia: agencia,
@@ -406,13 +406,13 @@ namespace GeneralLabSolutions.Domain.Entities
         /// <returns>A entidade Contato removida.</returns>
         public Contato RemoverContato(Guid contatoId)
         {
-            if (Pessoa == null)
+            if (Pessoa is null)
                 throw new InvalidOperationException("A Pessoa associada ao Cliente não foi carregada.");
 
             // Encontra o contato na coleção
             var contatoParaRemover = Pessoa.Contatos.FirstOrDefault(c => c.Id == contatoId);
 
-            if (contatoParaRemover == null)
+            if (contatoParaRemover is null)
             {
                 throw new InvalidOperationException($"Contato com ID {contatoId} não encontrado para este cliente.");
             }

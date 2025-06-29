@@ -207,8 +207,8 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
             // 1. Adiciona o evento
             model.AdicionarEvento(new ClienteDeletadoEvent(model.Id, model.Nome));
 
-            // 2. Publica o evento *ANTES* de qualquer operação de persistência
-            await _mediatorHandler.PublicarEvento(new ClienteDeletadoEvent(model.Id, model.Nome));
+            //// 2. Publica o evento *ANTES* de qualquer operação de persistência
+            //await _mediatorHandler.PublicarEvento(new ClienteDeletadoEvent(model.Id, model.Nome));
 
             // Talvez seja melhor deletar do repositorio e não do genérico
             // e usar Detach, pois não posso instalar o EF aqui; (Exemplo abaixo)

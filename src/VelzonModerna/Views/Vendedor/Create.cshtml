@@ -27,8 +27,11 @@
             <div class="card-body">
                 <div class="live-preview">
                     <form asp-action="Create">
+                        
                         <vc:summary></vc:summary>
+
                         <partial name="_edit_e_create" model="Model" />
+
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary">Adicionar</button>
                             <a asp-action="Index" class="btn btn-light">Voltar à lista</a>

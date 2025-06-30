@@ -8,10 +8,6 @@ namespace GeneralLabSolutions.Domain.Services.Abstractions
 {
     public interface IVendedorDomainService
     {
-        // ---- Validações ---------------------------------------------
-        Task<bool> ValidarAddVendedor(Vendedor model);
-        Task<bool> ValidarUpdVendedor(Vendedor model);
-        Task<bool> ValidarDelVendedor(Vendedor model);
 
         // ---- Operações principais ------------------------------------
         Task AdicionarVendedor(Vendedor model);

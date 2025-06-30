@@ -84,10 +84,5 @@ namespace GeneralLabSolutions.Domain.Services.Abstractions
         #endregion
 
 
-
-        // ToDo: Métodos de Validação (Manter ou revisar conforme a lógica de domínio evolui)
-        Task<bool> ValidarAddCliente(Cliente model);
-        Task<bool> ValidarUpdCliente(Cliente model);
-        Task<bool> ValidarDelCliente(Cliente model);
     }
 }

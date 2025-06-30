@@ -241,37 +241,153 @@ namespace VelzonModerna.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SalvarDadosBancarios(Guid clienteId, DadosBancariosViewModel viewModel)
-        { /* ... código existente ... */
+        public async Task<IActionResult> SalvarDadosBancarios(
+            Guid clienteId,
+            DadosBancariosViewModel viewModel)
+        {
+            // 1. Validação do modelo recebido
             if (!ModelState.IsValid)
-                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList()
+                });
+            }
+
+            // 2. Validação do parâmetro de rota
             if (clienteId == Guid.Empty)
-                return Json(new { success = false, errors = new List<string> { "O ID do Cliente não foi fornecido." } });
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string> { "O ID do Cliente não foi fornecido." }
+                });
+            }
+
+            // 3. Inclusão ou atualização dos dados bancários
             bool isNew = viewModel.Id == Guid.Empty;
+
             if (isNew)
-                await _clienteDomainService.AdicionarDadosBancariosAsync(clienteId, viewModel.Banco, viewModel.Agencia, viewModel.Conta, viewModel.TipoDeContaBancaria);
-            else
-                await _clienteDomainService.AtualizarDadosBancariosAsync(clienteId, viewModel.Id, viewModel.Banco, viewModel.Agencia, viewModel.Conta, viewModel.TipoDeContaBancaria);
+            {
+                await _clienteDomainService.AdicionarDadosBancariosAsync(
+                    clienteId,
+                    viewModel.Banco,
+                    viewModel.Agencia,
+                    viewModel.Conta,
+                    viewModel.TipoDeContaBancaria);
+            } else
+            {
+                await _clienteDomainService.AtualizarDadosBancariosAsync(
+                    clienteId,
+                    viewModel.Id,
+                    viewModel.Banco,
+                    viewModel.Agencia,
+                    viewModel.Conta,
+                    viewModel.TipoDeContaBancaria);
+            }
+
+            // 4. Checagem de notificações de domínio
             if (!OperacaoValida())
-                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = ObterNotificacoes()
+                        .Select(n => n.Mensagem)
+                        .ToList()
+                });
+            }
+
+            // 5. Persistência e tratamento de exceções
             try
-            { if (!await _clienteRepository.UnitOfWork.CommitAsync()) return Json(new { success = false, errors = new List<string> { "Commit retornou falso." } }); } catch (DbUpdateException dbEx) { Console.WriteLine($"DbUpdateException: {dbEx.Message} Inner: {dbEx.InnerException?.Message}"); return Json(new { success = false, errors = new List<string> { "Erro no banco." } }); } catch (Exception ex) { Console.WriteLine($"Exception: {ex.Message}"); return Json(new { success = false, errors = new List<string> { "Erro inesperado." } }); }
+            {
+                if (!await _clienteRepository.UnitOfWork.CommitAsync())
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        errors = new List<string> { "Commit retornou falso." }
+                    });
+                }
+            } catch (DbUpdateException dbEx)
+            {
+                Console.WriteLine(
+                    $"DbUpdateException: {dbEx.Message} " +
+                    $"Inner: {dbEx.InnerException?.Message}");
+
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string> { "Erro no banco." }
+                });
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string> { "Erro inesperado." }
+                });
+            }
+
+            // 6. Resposta final de sucesso
             return Json(new { success = true });
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExcluirDadosBancarios(Guid clienteId, Guid dadosBancariosId)
-        { /* ... código existente ... */
+        public async Task<IActionResult> ExcluirDadosBancarios(
+            Guid clienteId,
+            Guid dadosBancariosId)
+        {
+            // 1. Validação de parâmetros
             if (clienteId == Guid.Empty || dadosBancariosId == Guid.Empty)
-                return Json(new { success = false, errors = new List<string> { "IDs inválidos." } });
-            await _clienteDomainService.RemoverDadosBancariosAsync(clienteId, dadosBancariosId);
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string> { "IDs inválidos." }
+                });
+            }
+
+            // 2. Remoção dos dados bancários
+            await _clienteDomainService.RemoverDadosBancariosAsync(
+                clienteId,
+                dadosBancariosId);
+
+            // 3. Verificação de notificações de domínio
             if (!OperacaoValida())
-                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = ObterNotificacoes()
+                        .Select(n => n.Mensagem)
+                        .ToList()
+                });
+            }
+
+            // 4. Persistência da exclusão
             if (!await _clienteRepository.UnitOfWork.CommitAsync())
-                return Json(new { success = false, errors = new List<string> { "Erro ao excluir." } });
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string> { "Erro ao excluir." }
+                });
+            }
+
+            // 5. Resposta final de sucesso
             return Json(new { success = true });
         }
+
+
         #endregion
 
         #region Actions AJAX para Telefones
@@ -332,92 +448,176 @@ namespace VelzonModerna.Controllers
         }
 
         /// <summary>
-        /// Salva (Adiciona ou Atualiza) o telefone de um cliente. Chamado via AJAX.
+        /// Salva (adiciona ou atualiza) o telefone de um cliente. Chamado via AJAX.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SalvarTelefone(Guid clienteId, TelefoneViewModel viewModel)
+        public async Task<IActionResult> SalvarTelefone(
+            Guid clienteId,
+            TelefoneViewModel viewModel)
         {
+            /* 1. Validação do modelo --------------------------------------------- */
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
-            }
-            if (clienteId == Guid.Empty)
-            {
-                return Json(new { success = false, errors = new List<string> { "O ID do Cliente não foi fornecido." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList()
+                });
             }
 
+            /* 2. Validação do parâmetro clienteId -------------------------------- */
+            if (clienteId == Guid.Empty)
+            {
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+            {
+                "O ID do Cliente não foi fornecido."
+            }
+                });
+            }
+
+            /* 3. Inclusão ou atualização do telefone ----------------------------- */
             bool isNew = viewModel.Id == Guid.Empty;
 
             if (isNew)
             {
                 await _clienteDomainService.AdicionarTelefoneAsync(
-                    clienteId, // ID do Cliente
+                    clienteId,
                     viewModel.DDD,
                     viewModel.Numero,
-                    viewModel.TipoDeTelefone
-                );
+                    viewModel.TipoDeTelefone);
             } else
             {
                 await _clienteDomainService.AtualizarTelefoneAsync(
-                    clienteId,    // ID do Cliente
-                    viewModel.Id, // ID do Telefone a ser atualizado
+                    clienteId,
+                    viewModel.Id,
                     viewModel.DDD,
                     viewModel.Numero,
-                    viewModel.TipoDeTelefone
-                );
+                    viewModel.TipoDeTelefone);
             }
 
+            /* 4. Verificação de notificações de domínio -------------------------- */
             if (!OperacaoValida())
             {
-                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+                return Json(new
+                {
+                    success = false,
+                    errors = ObterNotificacoes()
+                        .Select(n => n.Mensagem)
+                        .ToList()
+                });
             }
 
-            try // Bloco try-catch para CommitAsync
+            /* 5. Persistência e tratamento de exceções --------------------------- */
+            try
             {
                 if (!await _clienteRepository.UnitOfWork.CommitAsync())
                 {
-                    return Json(new { success = false, errors = new List<string> { "Erro ao salvar o telefone no banco de dados (Commit retornou falso)." } });
+                    return Json(new
+                    {
+                        success = false,
+                        errors = new List<string>
+                {
+                    "Erro ao salvar o telefone no banco de dados (Commit retornou falso)."
+                }
+                    });
                 }
             } catch (DbUpdateException dbEx)
             {
-                Console.WriteLine($"DbUpdateException ao salvar telefone: {dbEx.Message} Inner: {dbEx.InnerException?.Message}");
-                return Json(new { success = false, errors = new List<string> { "Erro no banco de dados ao salvar o telefone." } });
+                Console.WriteLine(
+                    $"DbUpdateException ao salvar telefone: {dbEx.Message} " +
+                    $"Inner: {dbEx.InnerException?.Message}");
+
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+            {
+                "Erro no banco de dados ao salvar o telefone."
+            }
+                });
             } catch (Exception ex)
             {
                 Console.WriteLine($"Exception ao salvar telefone: {ex.Message}");
-                return Json(new { success = false, errors = new List<string> { "Ocorreu um erro inesperado ao salvar o telefone." } });
+
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+            {
+                "Ocorreu um erro inesperado ao salvar o telefone."
+            }
+                });
             }
 
+            /* 6. Resposta final de sucesso --------------------------------------- */
             return Json(new { success = true });
         }
+
 
         /// <summary>
         /// Exclui um telefone de um cliente. Chamado via AJAX.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ExcluirTelefone(Guid clienteId, Guid telefoneId)
+        public async Task<IActionResult> ExcluirTelefone(
+            Guid clienteId,
+            Guid telefoneId)
         {
+            /* 1. Validação de parâmetros ----------------------------------------- */
             if (clienteId == Guid.Empty || telefoneId == Guid.Empty)
             {
-                return Json(new { success = false, errors = new List<string> { "IDs inválidos fornecidos para exclusão." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+            {
+                "IDs inválidos fornecidos para exclusão."
+            }
+                });
             }
 
-            await _clienteDomainService.RemoverTelefoneAsync(clienteId, telefoneId);
+            /* 2. Remoção do telefone --------------------------------------------- */
+            await _clienteDomainService.RemoverTelefoneAsync(
+                clienteId,
+                telefoneId);
 
+            /* 3. Verificação de notificações de domínio -------------------------- */
             if (!OperacaoValida())
             {
-                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+                return Json(new
+                {
+                    success = false,
+                    errors = ObterNotificacoes()
+                        .Select(n => n.Mensagem)
+                        .ToList()
+                });
             }
 
+            /* 4. Persistência da exclusão ---------------------------------------- */
             if (!await _clienteRepository.UnitOfWork.CommitAsync())
             {
-                return Json(new { success = false, errors = new List<string> { "Erro ao excluir o telefone no banco de dados." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+            {
+                "Erro ao excluir o telefone no banco de dados."
+            }
+                });
             }
 
+            /* 5. Resposta final de sucesso --------------------------------------- */
             return Json(new { success = true });
         }
+
+
         #endregion
 
         #region Actions AJAX para Contatos
@@ -429,7 +629,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> GetContatosListPartial(Guid clienteId)
         {
             var cliente = await _clienteRepository.ObterClienteComContatos(clienteId); // Ou ObterClienteCompleto
-            if (cliente == null || cliente.Pessoa == null)
+            if (cliente is null || cliente.Pessoa is null)
             {
                 // Retorna uma partial vazia ou com mensagem de erro
                 return PartialView("PartialViews/_ContatosListClientePartial", new List<ContatoViewModel>());
@@ -579,7 +779,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> GetEnderecosListPartial(Guid clienteId)
         {
             var cliente = await _clienteRepository.ObterClienteComEnderecos(clienteId); // Ou ObterClienteCompleto
-            if (cliente == null || cliente.Pessoa == null)
+            if (cliente is null || cliente.Pessoa is null)
             {
                 return PartialView("PartialViews/_EnderecosListClientePartial", new List<EnderecoViewModel>());
             }
@@ -593,16 +793,19 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEnderecoFormData(Guid? enderecoId, Guid clienteId)
         {
-            if (enderecoId == null || enderecoId == Guid.Empty)
+            if (enderecoId is null || enderecoId == Guid.Empty)
             {
                 // Modo Criação
                 if (!await _clienteRepository.TemCliente(clienteId))
                     return NotFound("Cliente não encontrado para adicionar endereço.");
+
                 var clienteParaPessoaId = await _clienteRepository.GetByIdAsync(clienteId);
-                if (clienteParaPessoaId == null)
+
+                if (clienteParaPessoaId is null)
                     return NotFound("Cliente não encontrado ao buscar PessoaId para o endereço.");
 
                 var newViewModel = new EnderecoViewModel { PessoaId = clienteParaPessoaId.PessoaId };
+
                 return Json(newViewModel);
             } else
             {
@@ -610,10 +813,11 @@ namespace VelzonModerna.Controllers
                 var cliente = await _clienteRepository.ObterClienteComEnderecos(clienteId);
                 var endereco = cliente?.Pessoa?.Enderecos.FirstOrDefault(e => e.Id == enderecoId.Value);
 
-                if (endereco == null)
+                if (endereco is null)
                     return NotFound("Endereço não encontrado ou não pertence a este cliente.");
 
                 var viewModel = _mapper.Map<EnderecoViewModel>(endereco);
+
                 return Json(viewModel);
             }
         }

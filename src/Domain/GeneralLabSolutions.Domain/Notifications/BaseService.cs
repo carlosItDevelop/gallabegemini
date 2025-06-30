@@ -27,6 +27,13 @@ namespace GeneralLabSolutions.Domain.Notifications
         }
 
 
+        // NOVO MÉTODO PROTEGIDO ADICIONADO AQUI
+        protected bool TemNotificacao()
+        {
+            return _notificador.TemNotificacao();
+        }
+
+
         protected bool ExecutarValidacao<TVal, T>(TVal validacao, T entidade) where TVal : AbstractValidator<T> where T : EntityBase
         {
             var validator = validacao.Validate(entidade);

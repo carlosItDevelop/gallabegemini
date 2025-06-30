@@ -11,9 +11,9 @@ using Microsoft.EntityFrameworkCore;
 namespace GeneralLabSolutions.InfraStructure.Data
 {
     public class AppDbContext : DbContext, IUnitOfWork
-	{
+    {
 
-		private readonly IMediatorHandler? _mediatorHandler;
+        private readonly IMediatorHandler? _mediatorHandler;
 
         private readonly IAspNetUser _user;
 
@@ -34,23 +34,23 @@ namespace GeneralLabSolutions.InfraStructure.Data
         }
 
         public DbSet<Produto> Produto { get; set; }
-		public DbSet<CategoriaProduto> CategoriaProduto { get; set; }
-		public DbSet<Cliente> Cliente { get; set; }
-		public DbSet<Fornecedor> Fornecedor { get; set; }
+        public DbSet<CategoriaProduto> CategoriaProduto { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<Fornecedor> Fornecedor { get; set; }
         public DbSet<Vendedor> Vendedor { get; set; }
         public DbSet<Pedido> Pedido { get; set; }
-		public DbSet<ItemPedido> ItemPedido { get; set; }
-		public DbSet<Telefone> Telefone { get; set; }
+        public DbSet<ItemPedido> ItemPedido { get; set; }
+        public DbSet<Telefone> Telefone { get; set; }
 
         public DbSet<Endereco> Endereco { get; set; }
 
         public DbSet<Pessoa> Pessoa { get; set; }
-		public DbSet<Contato> Contato { get; set; }
-		public DbSet<Voucher> Voucher { get; set; }
+        public DbSet<Contato> Contato { get; set; }
+        public DbSet<Voucher> Voucher { get; set; }
 
         public DbSet<EstadoDoItem> EstadoDoItem { get; set; }
 
-        public DbSet<StatusDoItem> StatusDoItem { get; set; } 
+        public DbSet<StatusDoItem> StatusDoItem { get; set; }
         public DbSet<StatusDoItemIncompativel> StatusDoItemIncompativel { get; set; }
         public DbSet<HistoricoPedido> HistoricoPedido { get; set; }
         public DbSet<HistoricoItem> HistoricoItem { get; set; }
@@ -80,30 +80,30 @@ namespace GeneralLabSolutions.InfraStructure.Data
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-			modelBuilder.Ignore<ValidationResult>();
-			modelBuilder.Ignore<Event>();
+        {
+            modelBuilder.Ignore<ValidationResult>();
+            modelBuilder.Ignore<Event>();
 
 
             foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(
-				e => e.GetProperties().Where(p => p.ClrType == typeof(string))))
-				property.SetColumnType("varchar(100)");
+                e => e.GetProperties().Where(p => p.ClrType == typeof(string))))
+                property.SetColumnType("varchar(100)");
 
-			foreach (var relationship in modelBuilder.Model.GetEntityTypes()
-				.SelectMany(e => e.GetForeignKeys()))
-				relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(e => e.GetForeignKeys()))
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
 
-			modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-		}
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        }
 
-		public async Task<bool> CommitAsync()
-		{
+        public async Task<bool> CommitAsync()
+        {
             //var sucesso = await base.SaveChangesAsync() > 0;
             var sucesso = await SaveChangesAsync() > 0;
             if (sucesso)
-				await _mediatorHandler.PublicarEventos(this);
-			return sucesso;
-		}
+                await _mediatorHandler.PublicarEventos(this);
+            return sucesso;
+        }
 
 
 

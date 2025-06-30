@@ -10,7 +10,6 @@ using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Mensageria;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
-using GeneralLabSolutions.Domain.Services.Abstractions;
 using GeneralLabSolutions.Domain.Validations;
 
 namespace GeneralLabSolutions.Domain.Services.Concreted
@@ -45,100 +44,7 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         }
 
 
-        #region: Regras de Negócios Agrupadas para evitar várias interrupções: Add
 
-        public async Task<bool> ValidarAddFornecedor(Fornecedor model) 
-        {
-            bool isValid = true;
-
-            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
-            {
-                Notificar("Já existe um Fornecedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
-            {
-                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            if (model.StatusDoFornecedor == StatusDoFornecedor.Inativo)
-            {
-                Notificar("Nenhum fornecedor pode ser Adicionado com o Status de 'Inativo'.");
-                isValid = false;
-            }
-
-            var fornecedorExiste = await _query.GetByIdAsync(model.Id);
-            if (fornecedorExiste is not null)
-            {
-                Notificar("Já existe um Fornecedor cadastrado com este ID.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new FornecedorValidation(), model))
-            {
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-
-        public async Task<bool> ValidarDelFornecedor(Fornecedor model)
-        {
-            bool isValid = true;
-
-            // Verificar se o fornecedor possui produtos associados
-            var produtosAssociados = await _query.SearchAsync(f => f.Id == model.Id && f.Produtos.Any());
-            if (produtosAssociados.Any())
-            {
-                Notificar("O fornecedor possui produtos associados e não pode ser excluído.");
-                isValid = false;
-            }
-
-            // Verificar se o fornecedor possui pedidos de compra associados
-            var pedidosDeCompraAssociados = await _pedidoDeCompraQuery.SearchAsync(pc => pc.FornecedorId == model.Id);
-            if (pedidosDeCompraAssociados.Any())
-            {
-                Notificar("O fornecedor possui pedidos de compra associados e não pode ser excluído.");
-                isValid = false;
-            }
-
-            // Todo: E se, ao invés de excluirmos apenas deixá-lo "Inativo"?
-            if (!ExecutarValidacao(new FornecedorValidation(), model))
-                isValid = false;
-
-            return isValid;
-        }
-
-        public async Task<bool> ValidarUpdFornecedor(Fornecedor model)
-        {
-            bool isValid = true;
-
-            // Verificar se o email já está em uso por outro fornecedor
-            var fornecedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
-            if (fornecedorComMesmoEmail.Any())
-            {
-                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            // Verificar se o documento já está em uso por outro fornecedor
-            var fornecedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
-            if (fornecedorComMesmoDocumento.Any())
-            {
-                Notificar("Já existe um Fornecedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new FornecedorValidation(), model))
-                isValid = false;
-
-            return isValid;
-        }
-
-        #endregion
 
 
 
@@ -483,6 +389,104 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
 
         #endregion
+
+
+
+        #region: Regras de Negócios Agrupadas para evitar várias interrupções: Add
+
+        private async Task<bool> ValidarAddFornecedor(Fornecedor model)
+        {
+            bool isValid = true;
+
+            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
+            {
+                Notificar("Já existe um Fornecedor com este documento informado.");
+                isValid = false;
+            }
+
+            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
+            {
+                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
+                isValid = false;
+            }
+
+            if (model.StatusDoFornecedor == StatusDoFornecedor.Inativo)
+            {
+                Notificar("Nenhum fornecedor pode ser Adicionado com o Status de 'Inativo'.");
+                isValid = false;
+            }
+
+            var fornecedorExiste = await _query.GetByIdAsync(model.Id);
+            if (fornecedorExiste is not null)
+            {
+                Notificar("Já existe um Fornecedor cadastrado com este ID.");
+                isValid = false;
+            }
+
+            if (!ExecutarValidacao(new FornecedorValidation(), model))
+            {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+
+        private async Task<bool> ValidarDelFornecedor(Fornecedor model)
+        {
+            bool isValid = true;
+
+            // Verificar se o fornecedor possui produtos associados
+            var produtosAssociados = await _query.SearchAsync(f => f.Id == model.Id && f.Produtos.Any());
+            if (produtosAssociados.Any())
+            {
+                Notificar("O fornecedor possui produtos associados e não pode ser excluído.");
+                isValid = false;
+            }
+
+            // Verificar se o fornecedor possui pedidos de compra associados
+            var pedidosDeCompraAssociados = await _pedidoDeCompraQuery.SearchAsync(pc => pc.FornecedorId == model.Id);
+            if (pedidosDeCompraAssociados.Any())
+            {
+                Notificar("O fornecedor possui pedidos de compra associados e não pode ser excluído.");
+                isValid = false;
+            }
+
+            // Todo: E se, ao invés de excluirmos apenas deixá-lo "Inativo"?
+            if (!ExecutarValidacao(new FornecedorValidation(), model))
+                isValid = false;
+
+            return isValid;
+        }
+
+        private async Task<bool> ValidarUpdFornecedor(Fornecedor model)
+        {
+            bool isValid = true;
+
+            // Verificar se o email já está em uso por outro fornecedor
+            var fornecedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
+            if (fornecedorComMesmoEmail.Any())
+            {
+                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
+                isValid = false;
+            }
+
+            // Verificar se o documento já está em uso por outro fornecedor
+            var fornecedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
+            if (fornecedorComMesmoDocumento.Any())
+            {
+                Notificar("Já existe um Fornecedor com este documento informado.");
+                isValid = false;
+            }
+
+            if (!ExecutarValidacao(new FornecedorValidation(), model))
+                isValid = false;
+
+            return isValid;
+        }
+
+        #endregion
+
 
     }
 }

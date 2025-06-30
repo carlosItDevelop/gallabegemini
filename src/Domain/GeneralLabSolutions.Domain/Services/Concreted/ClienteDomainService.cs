@@ -41,124 +41,12 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         #endregion
 
 
-        #region: Regras de Negócios Agrupadas para evitar várias interrupções: Add
-        public async Task<bool> ValidarAddCliente(Cliente model)
-        {
-            bool isValid = true;
-
-            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
-            {
-                Notificar("Já existe um Cliente com este documento informado.");
-                isValid = false;
-            }
-
-            // Cliente novo com Email existente != em Update
-            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
-            {
-                Notificar("Já existe um Cliente com este Email. Tente outro!");
-                isValid = false;
-            }
-
-
-            if (model.StatusDoCliente == StatusDoCliente.Inativo)
-            {
-                Notificar("Nenhum cliente pode ser Adicionado com o Status de 'Inativo'.");
-                isValid = false;
-            }
-
-            if (model.TipoDeCliente == TipoDeCliente.Inadimplente)
-            {
-                Notificar("Não se pode adicionar um cliente como 'Inadimplente'.");
-                isValid = false;
-            }
-
-            var clienteExiste = await _query.GetByIdAsync(model.Id);
-            if (clienteExiste is not null)
-            {
-                Notificar("Já existe um Cliente cadastrado com este ID.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new ClienteValidation(), model))
-            {
-                isValid = false;
-            }
-
-            return isValid;
-        }
-        #endregion
-
-        #region: Regras de Negócios: Update
-        public async Task<bool> ValidarUpdCliente(Cliente model)
-        {
-            bool isValid = true;
-
-            // Verificar se o cliente está inadimplente
-            // Todo: E se quisermos alterar o TipoDeCliente para 'Comum', assim que ele quitar a dívida?
-            // Todo: E se ele está Inadimplente, quer dizer que o seu `StatusDoPedido` deve estar "Inativo" ?
-            // Todo: A ideia é; ao alteramos o Tipo do Client para Inadimplente seu Status deve ser alterado para Inativo???
-            // Todo: Estas observações acima devem ser levadas em conta ao executar esta validação... !!!?
-            var clienteAtual = await _query.GetByIdAsync(model.Id);
-            if (clienteAtual != null && clienteAtual.TipoDeCliente == TipoDeCliente.Inadimplente)
-            {
-                Notificar("Este cliente não pode ser atualizado, pois está inadimplente.");
-                isValid = false;
-            }
-
-
-            // Verificar se o email já está em uso por outro cliente
-            var clienteComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
-            if (clienteComMesmoEmail.Any())
-            {
-                Notificar("Já existe um Cliente com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            // Verificar se o documento já está em uso por outro cliente
-            var clienteComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
-            if (clienteComMesmoDocumento.Any())
-            {
-                Notificar("Já existe um Cliente com este documento informado.");
-                isValid = false;
-            }
-
-
-            if (!ExecutarValidacao(new ClienteValidation(), model))
-                isValid = false;
-
-
-            return isValid;
-        }
-        #endregion
-
-        #region: Regras de Negócios: Delete
-        public async Task<bool> ValidarDelCliente(Cliente model)
-        {
-            bool isValid = true;
-
-            // Todo: E se, ao invés de excluirmos apenas deixá-lo "Inativo"?
-            // Todo: Cliente Inativo não pode Comprar... !!?
-            var clienteComPedidos = await _query
-                .SearchAsync(c => c.Id == model.Id && c.Pedidos.Any());
-
-            if (clienteComPedidos.Any())
-            {
-                Notificar("O cliente possui pedidos e não pode ser excluído.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new DeleteClienteValidation(), model)) isValid = false;
-
-            return isValid;
-        }
-        #endregion
-
         #region: Adicionar Cliente
 
         public async Task AddClienteAsync(Cliente model)
         {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarAddCliente(model)) return;
+            // O método público agora chama seu próprio método de validação privado.
+            if (!await ValidarSalvarCliente(model, isUpdate: false)) return;
 
 
             await _clienteRepository.AddAsync(model);
@@ -179,8 +67,8 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
         public async Task UpdateClienteAsync(Cliente model)
         {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarUpdCliente(model)) return;
+            // O método público agora chama seu próprio método de validação privado.
+            if (!await ValidarSalvarCliente(model, isUpdate: true)) return;
 
             //Não precisa mais disso, pois a entidade já está sendo rastreada
             //e as propriedades já foram atualizadas no controller.
@@ -201,8 +89,7 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         public async Task DeleteClienteAsync(Cliente model)
         {
             // Verifica as regras de negócio e validações
-            if (!await ValidarDelCliente(model))
-                return;
+            if (!await ValidarRemocaoCliente(model)) return;
 
             // 1. Adiciona o evento
             model.AdicionarEvento(new ClienteDeletadoEvent(model.Id, model.Nome));
@@ -664,6 +551,88 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
         #endregion
 
+
+
+
+        #region: Métodos de Validação Privados e Otimizados
+
+        /// <summary>
+        /// Valida as regras de negócio para salvar (adicionar ou atualizar) um cliente.
+        /// Otimizado para usar uma única consulta para checar duplicidade.
+        /// </summary>
+        private async Task<bool> ValidarSalvarCliente(Cliente model, bool isUpdate = false)
+        {
+            // 1. Validação de formato e regras básicas (FluentValidation)
+            if (!ExecutarValidacao(new ClienteValidation(), model))
+                return false;
+
+            // 2. Validação de duplicidade (otimizada)
+            // Busca por qualquer outro cliente que tenha o mesmo Documento OU o mesmo Email.
+            var query = _query.SearchAsync(c => (c.Documento == model.Documento || c.Email == model.Email) && c.Id != model.Id);
+            var clienteExistente = await query;
+
+            if (clienteExistente.Any())
+            {
+                if (clienteExistente.Any(c => c.Documento == model.Documento))
+                {
+                    Notificar("Já existe um Cliente com o documento informado.");
+                }
+                if (clienteExistente.Any(c => c.Email == model.Email))
+                {
+                    Notificar("Já existe um Cliente com o E-mail informado.");
+                }
+                return false;
+            }
+
+            // 3. Regras específicas de Adição (Create)
+            if (!isUpdate)
+            {
+                if (model.StatusDoCliente == StatusDoCliente.Inativo)
+                {
+                    Notificar("Nenhum cliente pode ser cadastrado com o status 'Inativo'.");
+                }
+                if (model.TipoDeCliente == TipoDeCliente.Inadimplente)
+                {
+                    Notificar("Nenhum cliente pode ser cadastrado como 'Inadimplente'.");
+                }
+            }
+
+            // 4. Regras específicas de Edição (Update)
+            if (isUpdate)
+            {
+                // Exemplo: se uma regra de update for necessária no futuro, ela entra aqui.
+                // var clienteAtual = await _query.GetByIdAsync(model.Id); // Já temos a entidade 'model'
+                if (model.TipoDeCliente == TipoDeCliente.Inadimplente)
+                {
+                    Notificar("A edição de clientes inadimplentes deve ser feita pela tela de negociação.");
+                }
+            }
+
+            // Se chegou até aqui, todas as notificações foram tratadas
+            return !TemNotificacao();
+        }
+
+        /// <summary>
+        /// Valida as regras de negócio para remover um cliente.
+        /// </summary>
+        private async Task<bool> ValidarRemocaoCliente(Cliente model)
+        {
+            // Implementação do Soft-Delete (sugestão da conversa anterior):
+            // Se a regra de negócio for não excluir, mas sim inativar, a lógica mudaria aqui.
+            // Por enquanto, mantemos a regra original.
+
+            var clienteComPedidos = await _clienteRepository.SearchAsync(c => c.Id == model.Id && c.Pedidos.Any());
+
+            if (clienteComPedidos.Any())
+            {
+                Notificar("O cliente possui pedidos e não pode ser excluído. Considere inativá-lo.");
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion
 
     }
 }

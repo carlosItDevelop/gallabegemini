@@ -28,97 +28,6 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         }
 
 
-        #region: Regras de Negócios Agrupadas para evitar várias interrupções: Add
-        public async Task<bool> ValidarAddVendedor(Vendedor model)
-        {
-            bool isValid = true;
-
-            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
-            {
-                Notificar("Já existe um Vendedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
-            {
-                Notificar("Já existe um Vendedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            if (model.StatusDoVendedor == StatusDoVendedor.Inativo)
-            {
-                Notificar("Nenhum Vendedor pode ser Adicionado com o Status de 'Inativo'.");
-                isValid = false;
-            }
-
-            var vendedorExiste = await _query.GetByIdAsync(model.Id);
-            if (vendedorExiste is not null)
-            {
-                Notificar("Já existe um Vendedor cadastrado com este ID.");
-                isValid = false;
-            }
-            
-            if (!ExecutarValidacao(new VendedorValidation(), model))
-            {
-                isValid = false;
-            }
-
-            return isValid;
-        }
-        #endregion
-
-        #region: Regras de Negócios: Update
-        public async Task<bool> ValidarUpdVendedor(Vendedor model)
-        {
-            bool isValid = true;
-
-            var vendedorAtual = await _query.GetByIdAsync(model.Id);
-            if (vendedorAtual != null && vendedorAtual.StatusDoVendedor == StatusDoVendedor.Inativo )
-            {
-                Notificar("Este vendedor não pode ser atualizado, pois está Inativo.");
-                isValid = false;
-            }
-
-            var vendedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
-            if (vendedorComMesmoEmail.Any())
-            {
-                Notificar("Já existe um Vendedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            var vendedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
-            if (vendedorComMesmoDocumento.Any())
-            {
-                Notificar("Já existe um Vendedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new VendedorValidation(), model))
-                isValid = false;
-
-
-            return isValid;
-        }
-        #endregion
-
-        #region: Regras de Negócios: Delete
-        public async Task<bool> ValidarDelVendedor(Vendedor model)
-        {
-            bool isValid = true;
-
-            var vendedorComPedidos = await _query
-                .SearchAsync(c => c.Id == model.Id && c.Pedidos.Any());
-
-            if (vendedorComPedidos.Any())
-            {
-                Notificar("O vendedor possui pedidos e não pode ser excluído.");
-                isValid = false;
-            }
-
-            return isValid;
-        }
-        #endregion
-
         #region: Regras de Negócios
         public async Task AdicionarVendedor(Vendedor model)
         {
@@ -595,6 +504,96 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         }
 
         #endregion
+
+
+        #region: Regras de Negócios Agrupadas para evitar várias interrupções
+        private async Task<bool> ValidarAddVendedor(Vendedor model)
+        {
+            bool isValid = true;
+
+            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
+            {
+                Notificar("Já existe um Vendedor com este documento informado.");
+                isValid = false;
+            }
+
+            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
+            {
+                Notificar("Já existe um Vendedor com este Email. Tente outro!");
+                isValid = false;
+            }
+
+            if (model.StatusDoVendedor == StatusDoVendedor.Inativo)
+            {
+                Notificar("Nenhum Vendedor pode ser Adicionado com o Status de 'Inativo'.");
+                isValid = false;
+            }
+
+            var vendedorExiste = await _query.GetByIdAsync(model.Id);
+            if (vendedorExiste is not null)
+            {
+                Notificar("Já existe um Vendedor cadastrado com este ID.");
+                isValid = false;
+            }
+
+            if (!ExecutarValidacao(new VendedorValidation(), model))
+            {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        private async Task<bool> ValidarUpdVendedor(Vendedor model)
+        {
+            bool isValid = true;
+
+            var vendedorAtual = await _query.GetByIdAsync(model.Id);
+            if (vendedorAtual != null && vendedorAtual.StatusDoVendedor == StatusDoVendedor.Inativo)
+            {
+                Notificar("Este vendedor não pode ser atualizado, pois está Inativo.");
+                isValid = false;
+            }
+
+            var vendedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
+            if (vendedorComMesmoEmail.Any())
+            {
+                Notificar("Já existe um Vendedor com este Email. Tente outro!");
+                isValid = false;
+            }
+
+            var vendedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
+            if (vendedorComMesmoDocumento.Any())
+            {
+                Notificar("Já existe um Vendedor com este documento informado.");
+                isValid = false;
+            }
+
+            if (!ExecutarValidacao(new VendedorValidation(), model))
+                isValid = false;
+
+
+            return isValid;
+        }
+
+        private async Task<bool> ValidarDelVendedor(Vendedor model)
+        {
+            bool isValid = true;
+
+            var vendedorComPedidos = await _query
+                .SearchAsync(c => c.Id == model.Id && c.Pedidos.Any());
+
+            if (vendedorComPedidos.Any())
+            {
+                Notificar("O vendedor possui pedidos e não pode ser excluído.");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        #endregion
+
 
     }
 }

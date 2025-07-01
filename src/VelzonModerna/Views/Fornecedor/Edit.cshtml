@@ -73,21 +73,23 @@
                 <div class="tab-pane active" id="dados-bancarios" role="tabpanel">
 
                     <div id="dados-bancarios-list-container">
-                        @* Container para atualização AJAX *@
                         @await Html.PartialAsync("PartialViews/_DadosBancariosListFornecedorPartial", Model.DadosBancarios, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                     </div>
 
 
                 </div>
                 <div class="tab-pane" id="telefones" role="tabpanel">
-                    <div id="telefones-list-container"></div>
+
+                    <div id="telefones-list-container">
+                        @await Html.PartialAsync("PartialViews/_TelefonesListFornecedorPartial", Model.Telefones, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                    </div>
+
                 </div>
                 <div class="tab-pane" id="contatos" role="tabpanel">
 
-                        <div id="contatos-list-container">
-                            @* Novo container para a lista de contatos *@
+                    <div id="contatos-list-container">
                         @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
-                        </div>
+                    </div>
 
                 </div>
                 <div class="tab-pane" id="enderecos" role="tabpanel">
@@ -99,7 +101,7 @@
 </div>
 
 <partial name="PartialViews/_offcanvas_dados_bancarios_fornecedor" />
-@* <partial name="PartialViews/_offcanvas_telefone_fornecedor" /> *@
+<partial name="PartialViews/_offcanvas_telefone_fornecedor" />
 <partial name="PartialViews/_offcanvas_contato_fornecedor" />
 @* <partial name="PartialViews/_offcanvas_endereco_fornecedor" /> *@
 
@@ -117,7 +119,7 @@
     @{
 
         await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
-        // await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
         // await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }

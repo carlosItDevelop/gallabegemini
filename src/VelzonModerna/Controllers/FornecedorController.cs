@@ -3,13 +3,7 @@ using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
-using GeneralLabSolutions.Domain.Services.Concreted;
-using GeneralLabSolutions.Domain.Services.Abstractions;
-using GeneralLabSolutions.InfraStructure.Data;
-using GeneralLabSolutions.InfraStructure.Repository;
-using GeneralLabSolutions.WebApiCore.Usuario;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VelzonModerna.Controllers.Base;
 using VelzonModerna.ViewModels;
 
@@ -51,7 +45,7 @@ namespace VelzonModerna.Controllers
         {
             var model = await _fornecedorRepository.GetByIdAsync(id);
 
-            if (model == null)
+            if (model is null)
                 return NotFound();
             var viewModel = _mapper.Map<FornecedorViewModel>(model);
             return View(viewModel);
@@ -152,7 +146,6 @@ namespace VelzonModerna.Controllers
             return RedirectToAction(nameof(Index));
         }
         #endregion
-
 
 
         #region Actions AJAX para Dados Bancários
@@ -298,7 +291,6 @@ namespace VelzonModerna.Controllers
         #endregion
 
 
-
         #region Actions AJAX para Telefones
 
         [HttpGet]
@@ -410,6 +402,125 @@ namespace VelzonModerna.Controllers
 
         #endregion
 
+
+        #region Actions AJAX para Contatos
+
+        [HttpGet]
+        public async Task<IActionResult> GetContatosListPartial(Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+            if (fornecedor is null || fornecedor.Pessoa is null)
+            {
+                return PartialView("PartialViews/_ContatosListFornecedorPartial", new List<ContatoViewModel>());
+            }
+            var viewModels = _mapper.Map<List<ContatoViewModel>>(fornecedor.Pessoa.Contatos);
+            ViewData ["PessoaId"] = fornecedor.PessoaId;
+            return PartialView("PartialViews/_ContatosListFornecedorPartial", viewModels);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContatoFormData(Guid? contatoId, Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            if (fornecedor == null)
+                return NotFound("Fornecedor não encontrado.");
+
+            if (contatoId is null || contatoId == Guid.Empty)
+            {
+                var newViewModel = new ContatoViewModel { PessoaId = fornecedor.PessoaId };
+                return Json(newViewModel);
+            } else
+            {
+                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+                var contato = fornecedorCompleto?.Pessoa?.Contatos.FirstOrDefault(c => c.Id == contatoId.Value);
+
+                if (contato is null)
+                    return NotFound("Contato não encontrado ou não pertence a este fornecedor.");
+
+                var viewModel = _mapper.Map<ContatoViewModel>(contato);
+                return Json(viewModel);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarContato(Guid fornecedorId, ContatoViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            if (fornecedorId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "O ID do Fornecedor não foi fornecido." } });
+            }
+
+            bool isNew = viewModel.Id == Guid.Empty;
+
+            if (isNew)
+            {
+                await _fornecedorDomainService.AdicionarContatoAsync(
+                    fornecedorId,
+                    viewModel.Nome,
+                    viewModel.Email,
+                    viewModel.Telefone,
+                    viewModel.TipoDeContato,
+                    viewModel.EmailAlternativo,
+                    viewModel.TelefoneAlternativo,
+                    viewModel.Observacao);
+            } else
+            {
+                await _fornecedorDomainService.AtualizarContatoAsync(
+                    fornecedorId,
+                    viewModel.Id,
+                    viewModel.Nome,
+                    viewModel.Email,
+                    viewModel.Telefone,
+                    viewModel.TipoDeContato,
+                    viewModel.EmailAlternativo,
+                    viewModel.TelefoneAlternativo,
+                    viewModel.Observacao);
+            }
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao salvar o contato." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirContato(Guid fornecedorId, Guid contatoId)
+        {
+            if (fornecedorId == Guid.Empty || contatoId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "IDs inválidos fornecidos para exclusão." } });
+            }
+
+            await _fornecedorDomainService.RemoverContatoAsync(fornecedorId, contatoId);
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Erro ao excluir o contato." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        #endregion
 
 
         #region Actions AJAX para Endereços

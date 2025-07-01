@@ -86,7 +86,7 @@
 
                         <div id="contatos-list-container">
                             @* Novo container para a lista de contatos *@
-                            @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                        @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                         </div>
 
                 </div>

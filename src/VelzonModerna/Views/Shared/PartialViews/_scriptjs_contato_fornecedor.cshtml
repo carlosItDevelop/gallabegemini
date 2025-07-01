@@ -1,4 +1,21 @@
-﻿<script>
+﻿@* <script>
+    // Função que verifica se o jQuery está carregado.
+    // Se não estiver, espera um curto período e tenta novamente.
+    // Se estiver, executa a nossa função principal de inicialização.
+    function waitForJQuery() {
+        if (window.jQuery) {
+            // jQuery está carregado, podemos executar o nosso código.
+            initializeContatosScript(window.jQuery);
+        } else {
+            setTimeout(waitForJQuery, 50);
+        }
+    }
+
+    // Função principal que contém toda a lógica do jQuery.
+    // Recebe '$' como um argumento para garantir que está a usar o jQuery.
+    function initializeContatosScript($) { *@
+
+<script>
 
     // ========================================================
     // NOVO Bloco JS para Contatos

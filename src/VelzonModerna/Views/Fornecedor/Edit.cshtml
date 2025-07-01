@@ -98,7 +98,6 @@
     </div>
 </div>
 
-@* Incluir os Offcanvas aqui (copiados e adaptados de Cliente) *@
 <partial name="PartialViews/_offcanvas_dados_bancarios_fornecedor" />
 @* <partial name="PartialViews/_offcanvas_telefone_fornecedor" /> *@
 <partial name="PartialViews/_offcanvas_contato_fornecedor" />
@@ -106,18 +105,24 @@
 
 @section Scripts {
 
+
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="partialcooperchip/_scripts_datatables" />
+
+
     <script src="~/assets/libs/prismjs/prism.js"></script>
     <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
     <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
-    <script src="~/assets/js/app.js"></script>
 
     @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
 
         await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
         // await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
         // await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }
+
+    <script src="~/assets/js/app.js"></script>
+
 
 }

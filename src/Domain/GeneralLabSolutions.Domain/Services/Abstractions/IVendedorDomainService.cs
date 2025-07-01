@@ -10,9 +10,9 @@ namespace GeneralLabSolutions.Domain.Services.Abstractions
     {
 
         // ---- Operações principais ------------------------------------
-        Task AdicionarVendedor(Vendedor model);
-        Task AtualizarVendedor(Vendedor model);
-        Task ExcluirVendedor(Guid id);
+        Task AddVendedorAsync(Vendedor model);
+        Task UpdateVendedorAsync(Vendedor model);
+        Task DeleteVendedorAsync(Vendedor model);
 
         // ---- Consultas ----------------------------------------------
         Task<Vendedor?> ObterVendedorPorId(Guid id);

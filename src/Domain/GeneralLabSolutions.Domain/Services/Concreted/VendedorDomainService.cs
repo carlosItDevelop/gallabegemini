@@ -29,12 +29,10 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
 
         #region: Regras de Negócios
-        public async Task AdicionarVendedor(Vendedor model)
+        public async Task AddVendedorAsync(Vendedor model) // Nome padronizado
         {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarAddVendedor(model)) return;
-
-
+            if (!await ValidarSalvarVendedor(model, isUpdate: false))
+                return;
             await _vendedorRepository.AddAsync(model);
 
             model.AdicionarEvento(new VendedorRegistradoEvent(model.Id,
@@ -44,9 +42,9 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
                                                              model.Email));
         }
 
-        public async Task AtualizarVendedor(Vendedor model)
+        public async Task UpdateVendedorAsync(Vendedor model) // Nome padronizado
         {
-            if (!await ValidarUpdVendedor(model)) return;
+            if (!await ValidarSalvarVendedor(model, isUpdate: true)) return;
 
             model.AdicionarEvento(new VendedorAtualizadoEvent(model.Id,
                                                              model.Nome,
@@ -55,17 +53,13 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
                                                              model.Email));
         }
 
-        public async Task ExcluirVendedor(Guid id)
+        public async Task DeleteVendedorAsync(Vendedor model)
         {
-            var model = await _vendedorRepository.GetByIdAsync(id);
-
-
-            if (!await ValidarDelVendedor(model)) return;
-
-            model.AdicionarEvento(new VendedorDeletadoEvent(model.Id));
+            if (!await ValidarRemocaoVendedor(model)) return;
 
             await _vendedorRepository.DeleteAsync(model);
 
+            // Criar o Evento de exclusão
             // PersistirDados // Já está sendo feito no AppDbContext
         }
 
@@ -506,90 +500,38 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
         #endregion
 
 
-        #region: Regras de Negócios Agrupadas para evitar várias interrupções
-        private async Task<bool> ValidarAddVendedor(Vendedor model)
+        #region Validações Privadas
+        private async Task<bool> ValidarSalvarVendedor(Vendedor model, bool isUpdate)
         {
-            bool isValid = true;
-
-            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
-            {
-                Notificar("Já existe um Vendedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
-            {
-                Notificar("Já existe um Vendedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            if (model.StatusDoVendedor == StatusDoVendedor.Inativo)
-            {
-                Notificar("Nenhum Vendedor pode ser Adicionado com o Status de 'Inativo'.");
-                isValid = false;
-            }
-
-            var vendedorExiste = await _query.GetByIdAsync(model.Id);
-            if (vendedorExiste is not null)
-            {
-                Notificar("Já existe um Vendedor cadastrado com este ID.");
-                isValid = false;
-            }
-
             if (!ExecutarValidacao(new VendedorValidation(), model))
+                return false;
+
+            var vendedorExistente = await _query.SearchAsync(c =>
+                (c.Documento == model.Documento || c.Email == model.Email) && c.Id != model.Id);
+
+            if (vendedorExistente.Any())
             {
-                isValid = false;
+                if (vendedorExistente.Any(c => c.Documento == model.Documento))
+                    Notificar("O Documento informado já está em uso por outro vendedor.");
+                if (vendedorExistente.Any(c => c.Email == model.Email))
+                    Notificar("O E-mail informado já está em uso por outro vendedor.");
             }
 
-            return isValid;
+            if (!isUpdate && model.StatusDoVendedor == StatusDoVendedor.Inativo)
+            {
+                Notificar("Nenhum vendedor pode ser cadastrado como 'Inativo'.");
+            }
+
+            return !TemNotificacao();
         }
 
-        private async Task<bool> ValidarUpdVendedor(Vendedor model)
+        private async Task<bool> ValidarRemocaoVendedor(Vendedor model)
         {
-            bool isValid = true;
-
-            var vendedorAtual = await _query.GetByIdAsync(model.Id);
-            if (vendedorAtual != null && vendedorAtual.StatusDoVendedor == StatusDoVendedor.Inativo)
+            if (model.Pedidos.Any())
             {
-                Notificar("Este vendedor não pode ser atualizado, pois está Inativo.");
-                isValid = false;
+                Notificar("O vendedor possui pedidos associados e não pode ser excluído. Considere inativá-lo.");
             }
-
-            var vendedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
-            if (vendedorComMesmoEmail.Any())
-            {
-                Notificar("Já existe um Vendedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            var vendedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
-            if (vendedorComMesmoDocumento.Any())
-            {
-                Notificar("Já existe um Vendedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new VendedorValidation(), model))
-                isValid = false;
-
-
-            return isValid;
-        }
-
-        private async Task<bool> ValidarDelVendedor(Vendedor model)
-        {
-            bool isValid = true;
-
-            var vendedorComPedidos = await _query
-                .SearchAsync(c => c.Id == model.Id && c.Pedidos.Any());
-
-            if (vendedorComPedidos.Any())
-            {
-                Notificar("O vendedor possui pedidos e não pode ser excluído.");
-                isValid = false;
-            }
-
-            return isValid;
+            return !TemNotificacao();
         }
 
         #endregion

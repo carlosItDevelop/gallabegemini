@@ -43,18 +43,13 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
             this._mediatorHandler = mediatorHandler;
         }
 
-
-
-
-
-
         #region: Métodos de Ação de Fornecedor
 
         public async Task AddFornecedorAsync(Fornecedor model)
         {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarAddFornecedor(model))
+            if (!await ValidarSalvarFornecedor(model, isUpdate: false))
                 return;
+            await _fornecedorRepository.AddAsync(model);
 
 
             await _fornecedorRepository.AddAsync(model);
@@ -72,26 +67,9 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
             // PersistirDados // Já está sendo feito no AppDbContext
         }
 
-        public async Task DeleteFornecedorAsync(Fornecedor model)
-        {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarDelFornecedor(model))
-                return;
-
-            await _fornecedorRepository.DeleteAsync(model);
-
-            model.AdicionarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
-
-            // Publica o evento *ANTES* de qualquer operação de persistência
-            await _mediatorHandler.PublicarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
-
-            // PersistirDados // Já está sendo feito no AppDbContext
-        }
-
         public async Task UpdateFornecedorAsync(Fornecedor model)
         {
-            // Verifica as regras de negócio e validações
-            if (!await ValidarUpdFornecedor(model))
+            if (!await ValidarSalvarFornecedor(model, isUpdate: true))
                 return;
 
             // Não precisa mais disso, pois a entidade já está sendo rastreada
@@ -106,6 +84,21 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
                     model.StatusDoFornecedor,
                     model.Email
                 ));
+        }
+
+        public async Task DeleteFornecedorAsync(Fornecedor model)
+        {
+            if (!await ValidarRemocaoFornecedor(model))
+                return;
+
+            await _fornecedorRepository.DeleteAsync(model);
+
+            model.AdicionarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
+
+            // Publica o evento *ANTES* de qualquer operação de persistência
+            await _mediatorHandler.PublicarEvento(new FornecedorDeletadoEvent(model.Id, model.Nome));
+
+            // PersistirDados // Já está sendo feito no AppDbContext
         }
 
         #endregion
@@ -392,99 +385,49 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
 
 
-        #region: Regras de Negócios Agrupadas para evitar várias interrupções: Add
-
-        private async Task<bool> ValidarAddFornecedor(Fornecedor model)
+        #region Validações Privadas
+        private async Task<bool> ValidarSalvarFornecedor(Fornecedor model, bool isUpdate)
         {
-            bool isValid = true;
-
-            if (_query.SearchAsync(c => c.Documento == model.Documento).Result.Any())
-            {
-                Notificar("Já existe um Fornecedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (_query.SearchAsync(c => c.Email == model.Email).Result.Any())
-            {
-                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            if (model.StatusDoFornecedor == StatusDoFornecedor.Inativo)
-            {
-                Notificar("Nenhum fornecedor pode ser Adicionado com o Status de 'Inativo'.");
-                isValid = false;
-            }
-
-            var fornecedorExiste = await _query.GetByIdAsync(model.Id);
-            if (fornecedorExiste is not null)
-            {
-                Notificar("Já existe um Fornecedor cadastrado com este ID.");
-                isValid = false;
-            }
-
             if (!ExecutarValidacao(new FornecedorValidation(), model))
+                return false;
+
+            var fornecedorExistente = await _query.SearchAsync(c =>
+                (c.Documento == model.Documento || c.Email == model.Email) && c.Id != model.Id);
+
+            if (fornecedorExistente.Any())
             {
-                isValid = false;
+                if (fornecedorExistente.Any(c => c.Documento == model.Documento))
+                    Notificar("O Documento informado já está em uso por outro fornecedor.");
+                if (fornecedorExistente.Any(c => c.Email == model.Email))
+                    Notificar("O E-mail informado já está em uso por outro fornecedor.");
             }
 
-            return isValid;
+            if (!isUpdate && model.StatusDoFornecedor == StatusDoFornecedor.Inativo)
+            {
+                Notificar("Nenhum fornecedor pode ser cadastrado como 'Inativo'.");
+            }
+
+            return !TemNotificacao();
         }
 
-
-        private async Task<bool> ValidarDelFornecedor(Fornecedor model)
+        private async Task<bool> ValidarRemocaoFornecedor(Fornecedor model)
         {
-            bool isValid = true;
-
-            // Verificar se o fornecedor possui produtos associados
-            var produtosAssociados = await _query.SearchAsync(f => f.Id == model.Id && f.Produtos.Any());
-            if (produtosAssociados.Any())
+            // Inclui a verificação de produtos que já existia
+            if (model.Produtos.Any())
             {
-                Notificar("O fornecedor possui produtos associados e não pode ser excluído.");
-                isValid = false;
+                Notificar("O fornecedor possui produtos associados e não pode ser excluído. Considere inativá-lo.");
             }
 
-            // Verificar se o fornecedor possui pedidos de compra associados
-            var pedidosDeCompraAssociados = await _pedidoDeCompraQuery.SearchAsync(pc => pc.FornecedorId == model.Id);
-            if (pedidosDeCompraAssociados.Any())
-            {
-                Notificar("O fornecedor possui pedidos de compra associados e não pode ser excluído.");
-                isValid = false;
-            }
+            // A verificação de PedidoDeCompra precisaria que o repositório fosse injetado
+            // ou que a relação estivesse na entidade Fornecedor.
+            //var pedidosDeCompra = await _pedidoDeCompraQuery.SearchAsync(pc => pc.FornecedorId == model.Id);
+            //if (pedidosDeCompra.Any())
+            //{
+            //    Notificar("O fornecedor possui pedidos de compra e não pode ser excluído.");
+            //}
 
-            // Todo: E se, ao invés de excluirmos apenas deixá-lo "Inativo"?
-            if (!ExecutarValidacao(new FornecedorValidation(), model))
-                isValid = false;
-
-            return isValid;
+            return !TemNotificacao();
         }
-
-        private async Task<bool> ValidarUpdFornecedor(Fornecedor model)
-        {
-            bool isValid = true;
-
-            // Verificar se o email já está em uso por outro fornecedor
-            var fornecedorComMesmoEmail = await _query.SearchAsync(c => c.Email == model.Email && c.Id != model.Id);
-            if (fornecedorComMesmoEmail.Any())
-            {
-                Notificar("Já existe um Fornecedor com este Email. Tente outro!");
-                isValid = false;
-            }
-
-            // Verificar se o documento já está em uso por outro fornecedor
-            var fornecedorComMesmoDocumento = await _query.SearchAsync(c => c.Documento == model.Documento && c.Id != model.Id);
-            if (fornecedorComMesmoDocumento.Any())
-            {
-                Notificar("Já existe um Fornecedor com este documento informado.");
-                isValid = false;
-            }
-
-            if (!ExecutarValidacao(new FornecedorValidation(), model))
-                isValid = false;
-
-            return isValid;
-        }
-
         #endregion
 
 

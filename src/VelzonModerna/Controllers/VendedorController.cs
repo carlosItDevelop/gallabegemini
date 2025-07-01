@@ -64,7 +64,7 @@ namespace VelzonModerna.Controllers
 
             var vendedor = _mapper.Map<Vendedor>(vendedorViewModel);
 
-            await _vendedorDomainService.AdicionarVendedor(vendedor);
+            await _vendedorDomainService.AddVendedorAsync(vendedor);
 
             if (!OperacaoValida())
             {
@@ -117,7 +117,7 @@ namespace VelzonModerna.Controllers
             // ✅ Copia os dados do ViewModel para a entidade já rastreada pelo contexto
             _mapper.Map(vendedorViewModel, vendedorCompleto);
 
-            await _vendedorDomainService.AtualizarVendedor(vendedorCompleto);
+            await _vendedorDomainService.UpdateVendedorAsync(vendedorCompleto);
 
             if (!OperacaoValida())
                 return View(vendedorViewModel);
@@ -146,29 +146,36 @@ namespace VelzonModerna.Controllers
             return View(vendedorViewModel);
         }
 
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var vendedor = await _vendedorRepository.GetByIdAsync(id);
 
-            if (vendedor is null) BadRequest("Vendedor não encontrado.");
+            // CORREÇÃO 1: Usar NotFound() para consistência.
+            if (vendedor is null)
+            {
+                return NotFound();
+            }
 
-            await _vendedorDomainService.ExcluirVendedor(id);
+            // O serviço já foi corrigido para receber a entidade.
+            await _vendedorDomainService.DeleteVendedorAsync(vendedor);
 
             if (!OperacaoValida())
             {
-                var vnedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
-                return View(vnedorViewModel); // Retorna para view com o vendedor para exibir erros de validação.
+                // CORREÇÃO 2: Corrigido o typo na variável.
+                var vendedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
+
+                // CORREÇÃO 3: Retornar para a view "Delete" com o modelo para exibir os erros.
+                return View("Delete", vendedorViewModel);
             }
 
             if (!await _vendedorRepository.UnitOfWork.CommitAsync())
             {
-                NotificarErro("Ocorreu um erro ao excluir os dados.");
-
+                NotificarErro("Ocorreu um erro ao excluir os dados do vendedor.");
                 var vendedorViewModel = _mapper.Map<VendedorViewModel>(vendedor);
-
-                return View(nameof(Delete), vendedorViewModel);
+                return View("Delete", vendedorViewModel);
             }
 
             TempData ["Success"] = "Vendedor Excluído com Sucesso!";

@@ -112,10 +112,10 @@
 
 
 
-<partial name="PartialViews/_offcanvas_dados_bancarios" />
-<partial name="PartialViews/_offcanvas_telefone" />
-<partial name="PartialViews/_offcanvas_contato" />
-<partial name="PartialViews/_offcanvas_endereco" />
+<partial name="PartialViews/_offcanvas_dados_bancarios_cliente" />
+<partial name="PartialViews/_offcanvas_telefone_cliente" />
+<partial name="PartialViews/_offcanvas_contato_cliente" />
+<partial name="PartialViews/_offcanvas_endereco_cliente" />
 
 
 
@@ -130,10 +130,10 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
 
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_cliente");
     }
 
 }

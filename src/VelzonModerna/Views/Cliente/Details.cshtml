@@ -118,11 +118,10 @@
 </div>
 
 
-<partial name="PartialViews/_offcanvas_dados_bancarios" />
-
-<partial name="PartialViews/_offcanvas_telefone" />
-<partial name="PartialViews/_offcanvas_contato" />
-<partial name="PartialViews/_offcanvas_endereco" />
+<partial name="PartialViews/_offcanvas_dados_bancarios_cliente" />
+<partial name="PartialViews/_offcanvas_telefone_cliente" />
+<partial name="PartialViews/_offcanvas_contato_cliente" />
+<partial name="PartialViews/_offcanvas_endereco_cliente" />
 
 
 @section scripts {
@@ -131,7 +130,6 @@
     <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
     <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
-
     <script src="~/assets/js/app.js"></script>
 
     @{
@@ -139,10 +137,10 @@
 
         await Html.RenderPartialAsync("PartialViews/_animacao_consolidado_cliente");
 
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_cliente");
     }
 
 }

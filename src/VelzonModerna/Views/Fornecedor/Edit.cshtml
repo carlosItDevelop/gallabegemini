@@ -19,8 +19,9 @@
 
 
 @section Styles {
-    <partial name="partialcooperchip/_cssindex" />
     <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+
 }
 
 
@@ -82,7 +83,12 @@
                     <div id="telefones-list-container"></div>
                 </div>
                 <div class="tab-pane" id="contatos" role="tabpanel">
-                    <div id="contatos-list-container"></div>
+
+                        <div id="contatos-list-container">
+                            @* Novo container para a lista de contatos *@
+                            @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                        </div>
+
                 </div>
                 <div class="tab-pane" id="enderecos" role="tabpanel">
                     <div id="enderecos-list-container"></div>
@@ -95,12 +101,10 @@
 @* Incluir os Offcanvas aqui (copiados e adaptados de Cliente) *@
 <partial name="PartialViews/_offcanvas_dados_bancarios_fornecedor" />
 @* <partial name="PartialViews/_offcanvas_telefone_fornecedor" /> *@
-@* <partial name="PartialViews/_offcanvas_contato_fornecedor" /> *@
+<partial name="PartialViews/_offcanvas_contato_fornecedor" />
 @* <partial name="PartialViews/_offcanvas_endereco_fornecedor" /> *@
 
 @section Scripts {
-
-    <partial name="partialcooperchip/_scripts_datatables" />
 
     <script src="~/assets/libs/prismjs/prism.js"></script>
     <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
@@ -112,7 +116,7 @@
 
         await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
         // await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
-        // await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
         // await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }
 

@@ -155,6 +155,403 @@ namespace VelzonModerna.Controllers
 
 
 
+        #region Actions AJAX para Dados Bancários
+
+        [HttpGet]
+        public async Task<IActionResult> GetDadosBancariosListPartial(Guid fornecedorId)
+        {
+            // 1. Busca o fornecedor completo, incluindo os dados da pessoa e os dados bancários.
+            //    É importante ter um método no repositório que faça o Include necessário.
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            // 2. Se o fornecedor ou a pessoa associada não existir, retorna a partial vazia.
+            if (fornecedor is null || fornecedor.Pessoa is null)
+            {
+                // Retorna a partial específica para fornecedor.
+                return PartialView("PartialViews/_DadosBancariosListFornecedorPartial", new List<DadosBancariosViewModel>());
+            }
+
+            // 3. Mapeia a lista de entidades para uma lista de ViewModels.
+            var viewModels = _mapper.Map<List<DadosBancariosViewModel>>(fornecedor.Pessoa.DadosBancarios);
+
+            // 4. Passa o PessoaId para a partial, que será usado pelo botão "Adicionar Novo".
+            ViewData ["PessoaId"] = fornecedor.PessoaId;
+
+            // 5. Retorna a Partial View com os dados.
+            return PartialView("PartialViews/_DadosBancariosListFornecedorPartial", viewModels);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDadosBancariosFormData(Guid? dadosBancariosId, Guid fornecedorId)
+        {
+            // Valida se o fornecedor principal existe.
+            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            if (fornecedor is null)
+                return NotFound("Fornecedor não encontrado.");
+
+            // Se não há um ID de dados bancários, estamos criando um novo.
+            if (dadosBancariosId is null || dadosBancariosId == Guid.Empty)
+            {
+                // Retorna um ViewModel vazio, mas com o PessoaId do fornecedor já preenchido.
+                var newViewModel = new DadosBancariosViewModel { PessoaId = fornecedor.PessoaId };
+                return Json(newViewModel);
+            } else // Caso contrário, estamos editando um existente.
+            {
+                // Busca os dados bancários específicos.
+                // A melhor forma é buscar através do agregado para garantir o pertencimento.
+                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+                var dadosBancarios = fornecedorCompleto?.Pessoa?.DadosBancarios.FirstOrDefault(d => d.Id == dadosBancariosId.Value);
+
+                if (dadosBancarios is null)
+                    return NotFound("Dados bancários não encontrados ou não pertencem a este fornecedor.");
+
+                var viewModel = _mapper.Map<DadosBancariosViewModel>(dadosBancarios);
+                return Json(viewModel);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarDadosBancarios(Guid fornecedorId, DadosBancariosViewModel viewModel)
+        {
+            // 1. Validação do modelo recebido.
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            // 2. Validação do ID do fornecedor.
+            if (fornecedorId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "O ID do Fornecedor não foi fornecido." } });
+            }
+
+            // 3. Determina se é uma operação de criação ou atualização.
+            bool isNew = viewModel.Id == Guid.Empty;
+
+            if (isNew)
+            {
+                // Chama o serviço de domínio para ADICIONAR.
+                await _fornecedorDomainService.AdicionarDadosBancariosAsync(
+                    fornecedorId,
+                    viewModel.Banco,
+                    viewModel.Agencia,
+                    viewModel.Conta,
+                    viewModel.TipoDeContaBancaria);
+            } else
+            {
+                // Chama o serviço de domínio para ATUALIZAR.
+                await _fornecedorDomainService.AtualizarDadosBancariosAsync(
+                    fornecedorId,
+                    viewModel.Id,
+                    viewModel.Banco,
+                    viewModel.Agencia,
+                    viewModel.Conta,
+                    viewModel.TipoDeContaBancaria);
+            }
+
+            // 4. Verifica se o serviço de domínio encontrou algum erro de regra de negócio.
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            // 5. Tenta persistir as mudanças no banco de dados.
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao salvar os dados no banco." } });
+            }
+
+            // 6. Retorna sucesso.
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirDadosBancarios(Guid fornecedorId, Guid dadosBancariosId)
+        {
+            // 1. Validação dos IDs.
+            if (fornecedorId == Guid.Empty || dadosBancariosId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "IDs inválidos fornecidos para exclusão." } });
+            }
+
+            // 2. Chama o serviço de domínio para REMOVER.
+            await _fornecedorDomainService.RemoverDadosBancariosAsync(fornecedorId, dadosBancariosId);
+
+            // 3. Verifica se o serviço de domínio encontrou algum erro.
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            // 4. Tenta persistir a exclusão no banco de dados.
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Erro ao excluir os dados do banco." } });
+            }
+
+            // 5. Retorna sucesso.
+            return Json(new { success = true });
+        }
+
+        #endregion
+
+
+
+        #region Actions AJAX para Telefones
+
+        [HttpGet]
+        public async Task<IActionResult> GetTelefonesListPartial(Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+            if (fornecedor is null || fornecedor.Pessoa is null)
+            {
+                return PartialView("PartialViews/_TelefonesListFornecedorPartial", new List<TelefoneViewModel>());
+            }
+            var viewModels = _mapper.Map<List<TelefoneViewModel>>(fornecedor.Pessoa.Telefones);
+            ViewData ["PessoaId"] = fornecedor.PessoaId;
+            return PartialView("PartialViews/_TelefonesListFornecedorPartial", viewModels);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTelefoneFormData(Guid? telefoneId, Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            if (fornecedor is null)
+                return NotFound("Fornecedor não encontrado.");
+
+            if (telefoneId is null || telefoneId == Guid.Empty)
+            {
+                var newViewModel = new TelefoneViewModel { PessoaId = fornecedor.PessoaId };
+                return Json(newViewModel);
+            } else
+            {
+                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+                var telefone = fornecedorCompleto?.Pessoa?.Telefones.FirstOrDefault(t => t.Id == telefoneId.Value);
+
+                if (telefone is null)
+                    return NotFound("Telefone não encontrado ou não pertence a este fornecedor.");
+
+                var viewModel = _mapper.Map<TelefoneViewModel>(telefone);
+                return Json(viewModel);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarTelefone(Guid fornecedorId, TelefoneViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            if (fornecedorId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "O ID do Fornecedor não foi fornecido." } });
+            }
+
+            bool isNew = viewModel.Id == Guid.Empty;
+
+            if (isNew)
+            {
+                await _fornecedorDomainService.AdicionarTelefoneAsync(
+                    fornecedorId,
+                    viewModel.DDD,
+                    viewModel.Numero,
+                    viewModel.TipoDeTelefone);
+            } else
+            {
+                await _fornecedorDomainService.AtualizarTelefoneAsync(
+                    fornecedorId,
+                    viewModel.Id,
+                    viewModel.DDD,
+                    viewModel.Numero,
+                    viewModel.TipoDeTelefone);
+            }
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao salvar o telefone." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirTelefone(Guid fornecedorId, Guid telefoneId)
+        {
+            if (fornecedorId == Guid.Empty || telefoneId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "IDs inválidos fornecidos para exclusão." } });
+            }
+
+            await _fornecedorDomainService.RemoverTelefoneAsync(fornecedorId, telefoneId);
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Erro ao excluir o telefone." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        #endregion
+
+
+
+        #region Actions AJAX para Endereços
+
+        [HttpGet]
+        public async Task<IActionResult> GetEnderecosListPartial(Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+            if (fornecedor is null || fornecedor.Pessoa is null)
+            {
+                return PartialView("PartialViews/_EnderecosListFornecedorPartial", new List<EnderecoViewModel>());
+            }
+            var viewModels = _mapper.Map<List<EnderecoViewModel>>(fornecedor.Pessoa.Enderecos);
+
+            ViewData ["PessoaId"] = fornecedor.PessoaId;
+            
+            return PartialView("PartialViews/_EnderecosListFornecedorPartial", viewModels);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEnderecoFormData(Guid? enderecoId, Guid fornecedorId)
+        {
+            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+
+            if (fornecedor is null)
+                return NotFound("Fornecedor não encontrado.");
+
+            if (enderecoId is null || enderecoId == Guid.Empty)
+            {
+                var newViewModel = new EnderecoViewModel { PessoaId = fornecedor.PessoaId };
+                return Json(newViewModel);
+
+            } else
+            {
+                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+                var endereco = fornecedorCompleto?.Pessoa?.Enderecos.FirstOrDefault(e => e.Id == enderecoId.Value);
+
+                if (endereco is null)
+                    return NotFound("Endereço não encontrado ou não pertence a este fornecedor.");
+
+                var viewModel = _mapper.Map<EnderecoViewModel>(endereco);
+
+                return Json(viewModel);
+
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarEndereco(Guid fornecedorId, EnderecoViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList() });
+            }
+
+            if (fornecedorId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "O ID do Fornecedor não foi fornecido." } });
+            }
+
+            bool isNew = viewModel.Id == Guid.Empty;
+
+            if (isNew)
+            {
+                await _fornecedorDomainService.AdicionarEnderecoAsync(
+                    fornecedorId,
+                    viewModel.PaisCodigoIso,
+                    viewModel.LinhaEndereco1,
+                    viewModel.Cidade,
+                    viewModel.CodigoPostal,
+                    viewModel.TipoDeEndereco,
+                    viewModel.LinhaEndereco2,
+                    viewModel.EstadoOuProvincia,
+                    viewModel.InformacoesAdicionais);
+            } else
+            {
+                await _fornecedorDomainService.AtualizarEnderecoAsync(
+                    fornecedorId,
+                    viewModel.Id,
+                    viewModel.PaisCodigoIso,
+                    viewModel.LinhaEndereco1,
+                    viewModel.Cidade,
+                    viewModel.CodigoPostal,
+                    viewModel.TipoDeEndereco,
+                    viewModel.LinhaEndereco2,
+                    viewModel.EstadoOuProvincia,
+                    viewModel.InformacoesAdicionais);
+            }
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao salvar o endereço." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirEndereco(Guid fornecedorId, Guid enderecoId)
+        {
+            if (fornecedorId == Guid.Empty || enderecoId == Guid.Empty)
+            {
+                return Json(new { success = false, errors = new List<string> { "IDs inválidos fornecidos para exclusão." } });
+            }
+
+            await _fornecedorDomainService.RemoverEnderecoAsync(fornecedorId, enderecoId);
+
+            if (!OperacaoValida())
+            {
+                return Json(new { success = false, errors = ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+            }
+
+            if (!await _fornecedorRepository.UnitOfWork.CommitAsync())
+            {
+                return Json(new { success = false, errors = new List<string> { "Erro ao excluir o endereço." } });
+            }
+
+            return Json(new { success = true });
+        }
+
+        #endregion
+
+
+
+
+        #region Métodos Privados Auxiliares (Existente)
+        //private async Task<bool> FornecedorExists(Guid id) => await _fornecedorRepository.TemFornecedor(id);
+
+        private List<Notificacao> ObterNotificacoes() => HttpContext.RequestServices.GetRequiredService<INotificador>().ObterNotificacoes();
+
+        #endregion
+
+
 
     }
 }

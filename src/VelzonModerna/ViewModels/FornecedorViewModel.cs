@@ -27,6 +27,8 @@ namespace VelzonModerna.ViewModels
         // Email e Endereço são propriedades comuns, mas não estão implementadas aqui.
         public string? Email { get; set; }
 
+        public Guid PessoaId { get; set; }
+
         // Já refatorado e pronto
         public List<DadosBancariosViewModel> DadosBancarios { get; set; } = new List<DadosBancariosViewModel>();
 

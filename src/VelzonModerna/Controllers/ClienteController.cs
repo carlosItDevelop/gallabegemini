@@ -179,7 +179,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var cliente = await _clienteRepository.GetByIdAsync(id);
-            if (cliente == null)
+            if (cliente is null)
                 return NotFound();
             var clienteViewModel = _mapper.Map<ClienteViewModel>(cliente);
             return View(clienteViewModel);
@@ -190,7 +190,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var cliente = await _clienteRepository.GetByIdAsync(id);
-            if (cliente == null)
+            if (cliente is null)
                 return NotFound();
             await _clienteDomainService.DeleteClienteAsync(cliente);
             if (!OperacaoValida())
@@ -209,21 +209,26 @@ namespace VelzonModerna.Controllers
         }
         #endregion
 
+
+
         #region: Actions AJAX para Dados Bancários (Existente)
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosListPartial(Guid clienteId)
         { /* ... código existente ... */
             var cliente = await _clienteRepository.ObterClienteComDadosBancarios(clienteId);
-            if (cliente == null || cliente.Pessoa == null)
+
+            if (cliente is null || cliente.Pessoa is null)
                 return PartialView("PartialViews/_DadosBancariosListClientePartial", new List<DadosBancariosViewModel>());
+
             var viewModels = _mapper.Map<List<DadosBancariosViewModel>>(cliente.Pessoa.DadosBancarios);
+
             return PartialView("PartialViews/_DadosBancariosListClientePartial", viewModels);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosFormData(Guid? dadosBancariosId, Guid clienteId)
         { /* ... código existente ... */
-            if (dadosBancariosId == null || dadosBancariosId == Guid.Empty)
+            if (dadosBancariosId is null || dadosBancariosId == Guid.Empty)
             {
                 if (!await _clienteRepository.TemCliente(clienteId))
                     return NotFound();
@@ -232,7 +237,7 @@ namespace VelzonModerna.Controllers
             } else
             {
                 var dadosBancarios = await _clienteRepository.ObterDadosBancariosPorId(dadosBancariosId.Value);
-                if (dadosBancarios == null)
+                if (dadosBancarios is null)
                     return NotFound();
                 var viewModel = _mapper.Map<DadosBancariosViewModel>(dadosBancarios);
                 return Json(viewModel);
@@ -399,7 +404,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> GetTelefonesListPartial(Guid clienteId)
         {
             var cliente = await _clienteRepository.ObterClienteComTelefones(clienteId); // Ou ObterClienteCompleto
-            if (cliente == null || cliente.Pessoa == null)
+            if (cliente is null || cliente.Pessoa is null)
             {
                 return PartialView("PartialViews/_TelefonesListClientePartial", new List<TelefoneViewModel>());
             }
@@ -413,7 +418,7 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTelefoneFormData(Guid? telefoneId, Guid clienteId) // clienteId para caso de criação
         {
-            if (telefoneId == null || telefoneId == Guid.Empty)
+            if (telefoneId is null || telefoneId == Guid.Empty)
             {
                 // ...
                 // Modo Criação
@@ -425,7 +430,7 @@ namespace VelzonModerna.Controllers
                 var clienteParaPessoaId = await _clienteRepository.GetByIdAsync(clienteId);
                 // ******************************
 
-                if (clienteParaPessoaId == null)
+                if (clienteParaPessoaId is null)
                     return NotFound("Cliente não encontrado ao buscar PessoaId.");
 
                 var newViewModel = new TelefoneViewModel { PessoaId = clienteParaPessoaId.PessoaId };
@@ -439,7 +444,7 @@ namespace VelzonModerna.Controllers
                 var cliente = await _clienteRepository.ObterClienteComTelefones(clienteId);
                 var telefone = cliente?.Pessoa?.Telefones.FirstOrDefault(t => t.Id == telefoneId.Value);
 
-                if (telefone == null)
+                if (telefone is null)
                     return NotFound("Telefone não encontrado ou não pertence a este cliente.");
 
                 var viewModel = _mapper.Map<TelefoneViewModel>(telefone);
@@ -476,9 +481,9 @@ namespace VelzonModerna.Controllers
                 {
                     success = false,
                     errors = new List<string>
-            {
-                "O ID do Cliente não foi fornecido."
-            }
+                    {
+                        "O ID do Cliente não foi fornecido."
+                    }
                 });
             }
 
@@ -523,9 +528,9 @@ namespace VelzonModerna.Controllers
                     {
                         success = false,
                         errors = new List<string>
-                {
-                    "Erro ao salvar o telefone no banco de dados (Commit retornou falso)."
-                }
+                        {
+                            "Erro ao salvar o telefone no banco de dados (Commit retornou falso)."
+                        }
                     });
                 }
             } catch (DbUpdateException dbEx)
@@ -538,9 +543,9 @@ namespace VelzonModerna.Controllers
                 {
                     success = false,
                     errors = new List<string>
-            {
-                "Erro no banco de dados ao salvar o telefone."
-            }
+                    {
+                        "Erro no banco de dados ao salvar o telefone."
+                    }
                 });
             } catch (Exception ex)
             {
@@ -550,9 +555,9 @@ namespace VelzonModerna.Controllers
                 {
                     success = false,
                     errors = new List<string>
-            {
-                "Ocorreu um erro inesperado ao salvar o telefone."
-            }
+                    {
+                        "Ocorreu um erro inesperado ao salvar o telefone."
+                    }
                 });
             }
 
@@ -577,9 +582,9 @@ namespace VelzonModerna.Controllers
                 {
                     success = false,
                     errors = new List<string>
-            {
-                "IDs inválidos fornecidos para exclusão."
-            }
+                    {
+                        "IDs inválidos fornecidos para exclusão."
+                    }
                 });
             }
 
@@ -619,6 +624,9 @@ namespace VelzonModerna.Controllers
 
 
         #endregion
+
+
+
 
         #region Actions AJAX para Contatos
 
@@ -769,6 +777,8 @@ namespace VelzonModerna.Controllers
             return Json(new { success = true });
         }
         #endregion
+
+
 
         #region Actions AJAX para Endereços
 
@@ -923,7 +933,11 @@ namespace VelzonModerna.Controllers
 
         #region Métodos Privados Auxiliares (Existente)
         private async Task<bool> ClienteExists(Guid id) => await _clienteRepository.TemCliente(id);
+
         private List<Notificacao> ObterNotificacoes() => HttpContext.RequestServices.GetRequiredService<INotificador>().ObterNotificacoes();
+
         #endregion
+
+
     }
 }

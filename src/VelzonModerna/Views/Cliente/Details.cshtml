@@ -9,10 +9,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section styles {
-<!-- Sweet Alert css-->
-<link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
-<link href="~/assets/libs/toastify-js/src/toastify.css" rel="stylesheet" />
+
+@section Styles {
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/assets/libs/toastify-js/src/toastify.css" rel="stylesheet" />
+    <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
 }
 
 @section Breadcrumb {
@@ -59,53 +60,109 @@
                     <!-- Nav tabs -->
                     <ul class="nav nav-pills nav-customs nav-danger mb-3" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#border-navs-home" role="tab">Dados bancários</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="#dados-bancarios" role="tab">Dados bancários</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-profile" role="tab">Telefones do Cliente</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#telefones" role="tab">Telefones do Cliente</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-messages" role="tab">Contatos do Cliente</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#contatos" role="tab">Contatos do Cliente</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#border-navs-settings" role="tab">Endereços deste Cliente</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#enderecos" role="tab">Endereços deste Cliente</a>
                         </li>
                     </ul><!-- Tab panes -->
                     <div class="tab-content text-muted">
-                        <div class="tab-pane active" id="border-navs-home" role="tabpanel">
+
+
+@*                         <div class="tab-pane active" id="dados-bancarios" role="tabpanel">
 
                             <div id="dados-bancarios-list-container">
-                                @* Container para atualização AJAX *@
                                 @await Html.PartialAsync("PartialViews/_DadosBancariosListClientePartial", Model.DadosBancarios, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                             </div>
 
                         </div>
+ *@
 
+                 <div class="tab-pane active" id="dados-bancarios" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Cliente",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "DadosBancarios",
+                            items = Model.DadosBancarios
+                            })
+                    </div>
+                </div>
 
-                        <div class="tab-pane" id="border-navs-profile" role="tabpanel">
+@*                         <div class="tab-pane" id="border-navs-profile" role="tabpanel">
 
                             <div id="telefones-list-container">
-                                @* Novo container para a lista de telefones *@
                                 @await Html.PartialAsync("PartialViews/_TelefonesListClientePartial", Model.Telefones, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                             </div>
 
-                        </div>
-                        <div class="tab-pane" id="border-navs-messages" role="tabpanel">
+                        </div> *@
+
+                 <div class="tab-pane" id="telefones" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Cliente",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Telefone",
+                            items = Model.Telefones
+                            })
+                    </div>
+                </div>
+
+
+@*                         <div class="tab-pane" id="border-navs-messages" role="tabpanel">
 
                             <div id="contatos-list-container">
-                                @* Novo container para a lista de contatos *@
                                 @await Html.PartialAsync("PartialViews/_ContatosListClientePartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                             </div>
 
-                        </div>
-                        <div class="tab-pane" id="border-navs-settings" role="tabpanel">
+                        </div> *@
+
+
+                 <div class="tab-pane" id="contatos" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Cliente",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Contato",
+                            items = Model.Contatos
+                            })
+                    </div>
+                </div>
+
+
+@*                         <div class="tab-pane" id="border-navs-settings" role="tabpanel">
 
                             <div id="enderecos-list-container">
-                                @* Novo container para a lista de endereços *@
                                 @await Html.PartialAsync("PartialViews/_EnderecosListClientePartial", Model.Enderecos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                             </div>
 
-                        </div>
+                        </div> *@
+
+                 <div class="tab-pane" id="enderecos" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Cliente",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Endereco",
+                            items = Model.Enderecos
+                            })
+                    </div>
+                </div>
+
 
 
                     </div>

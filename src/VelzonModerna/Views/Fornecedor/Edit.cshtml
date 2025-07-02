@@ -20,9 +20,10 @@
 
 @section Styles {
     <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/assets/libs/toastify-js/src/toastify.css" rel="stylesheet" />
     <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
-
 }
+
 
 
 <div class="row">
@@ -70,33 +71,91 @@
             </ul>
             <!-- Tab panes -->
             <div class="tab-content text-muted">
+
+
                 <div class="tab-pane active" id="dados-bancarios" role="tabpanel">
-
                     <div id="dados-bancarios-list-container">
-                        @await Html.PartialAsync("PartialViews/_DadosBancariosListFornecedorPartial", Model.DadosBancarios, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Fornecedor",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "DadosBancarios",
+                            items = Model.DadosBancarios
+                            })
                     </div>
-
-
                 </div>
+
+@* 
                 <div class="tab-pane" id="telefones" role="tabpanel">
 
                     <div id="telefones-list-container">
                         @await Html.PartialAsync("PartialViews/_TelefonesListFornecedorPartial", Model.Telefones, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                     </div>
 
+                </div> *@
+
+
+                <div class="tab-pane" id="telefones" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Fornecedor",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Telefone",
+                            items = Model.Telefones
+                            })
+                    </div>
                 </div>
-                <div class="tab-pane" id="contatos" role="tabpanel">
+
+
+@*                 <div class="tab-pane" id="contatos" role="tabpanel">
 
                     <div id="contatos-list-container">
                         @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                     </div>
 
                 </div>
+
+
                 <div class="tab-pane" id="enderecos" role="tabpanel">
                     <div id="enderecos-list-container">
                         @await Html.PartialAsync("PartialViews/_EnderecosListFornecedorPartial", Model.Enderecos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
                     </div>
                 </div>
+ *@
+
+
+                 <div class="tab-pane" id="contatos" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Fornecedor",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Contato",
+                            items = Model.Contatos
+                            })
+                    </div>
+                </div>
+
+
+                <div class="tab-pane" id="enderecos" role="tabpanel">
+                    <div id="dados-bancarios-list-container">
+                        @await Component.InvokeAsync("AggregateList", 
+                        new {
+                            parentEntityType = "Fornecedor",
+                            parentEntityId = Model.Id,
+                            parentPessoaId = Model.PessoaId,
+                            aggregateType = "Endereco",
+                            items = Model.Enderecos
+                            })
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
     </div>
@@ -109,24 +168,19 @@
 
 @section Scripts {
 
-
-    <partial name="_ValidationScriptsPartial" />
-    <partial name="partialcooperchip/_scripts_datatables" />
-
-
     <script src="~/assets/libs/prismjs/prism.js"></script>
     <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
     <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
+    <script src="~/assets/js/app.js"></script>
+
     @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
 
         await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }
-
-    <script src="~/assets/js/app.js"></script>
-
 
 }

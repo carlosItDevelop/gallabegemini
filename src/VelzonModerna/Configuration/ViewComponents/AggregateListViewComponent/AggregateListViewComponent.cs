@@ -1,33 +1,35 @@
-﻿using GeneralLabSolutions.CoreShared.DTOs.DtosViewComponents;
-using GeneralLabSolutions.InfraStructure.Repository;
-using GeneralLabSolutions.SharedKernel.Enums;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using VelzonModerna.ViewModels;
+using VelzonModerna.ViewModels.ViewComponents; // Não se esqueça de adicionar o using
 
 namespace VelzonModerna.Configuration.ViewComponents.AggregateListViewComponent
 {
-    [ViewComponent(Name = "aggregateList")]
+    [ViewComponent(Name = "AggregateList")]
     public class AggregateListViewComponent : ViewComponent
     {
+        // O construtor pode permanecer vazio por enquanto, ou receber dependências se necessário no futuro.
+        public AggregateListViewComponent() { }
 
-        public AggregateListViewComponent()
+        // O método InvokeAsync agora recebe os parâmetros
+        public IViewComponentResult Invoke(
+            string parentEntityType,
+            Guid parentEntityId,
+            Guid parentPessoaId,
+            string aggregateType,
+            IEnumerable<object> items)
         {
-                
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync(StatusDoPedido status, string titulo, string cssColor, string? icon = null, string? link = null)
-        {
-
-            var model = new CardPedidoViewModel()
+            // Criamos um modelo com todos os dados necessários para a View do componente
+            var model = new AggregateListViewModel
             {
-                Titulo = "",
-                Quantidade = 0,
-                Valor = "0",
-                CssColor = "",
-                Icon = "",
-                Link = ""
+                ParentEntityType = parentEntityType,
+                ParentEntityId = parentEntityId,
+                ParentPessoaId = parentPessoaId,
+                AggregateType = aggregateType,
+                Items = items
             };
 
-            return View(await Task.FromResult(model));
+            // Passamos o modelo para a View do componente
+            return View(model);
         }
     }
 }

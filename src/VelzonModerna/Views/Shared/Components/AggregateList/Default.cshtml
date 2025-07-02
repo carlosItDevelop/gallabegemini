@@ -1,5 +1,119 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using VelzonModerna.ViewModels
+@using GeneralLabSolutions.Domain.Enums
+@model VelzonModerna.ViewModels.ViewComponents.AggregateListViewModel
+
 @{
+    // Define constantes para os nomes dos agregados para evitar "magic strings"
+    const string DADOS_BANCARIOS = "DadosBancarios";
+    const string TELEFONE = "Telefone";
+    const string CONTATO = "Contato";
+    const string ENDERECO = "Endereco";
+
+    // Determina o título e o alvo do offcanvas com base no tipo de agregado
+    var title = System.Text.RegularExpressions.Regex.Replace(Model.AggregateType, "([A-Z])", " $1").Trim();
+    var offcanvasTarget = $"#offcanvas{Model.AggregateType}";
 }
+
+<div class="card mb-3">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">@title</h4>
+        <div class="flex-shrink-0">
+            <button type="button" class="btn btn-primary btn-sm add-aggregate-btn"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="@offcanvasTarget"
+                    data-aggregate-type="@Model.AggregateType"
+                    data-pessoa-id="@Model.ParentPessoaId">
+                <i class="ri-add-line align-bottom me-1"></i> Adicionar Novo
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            @* --- Lógica para renderizar os cabeçalhos corretos --- *@
+                            @switch (Model.AggregateType)
+                            {
+                                case DADOS_BANCARIOS:
+                                    <th>Banco</th>
+                                    <th>Agência</th>
+                                    <th>Conta</th>
+                                    <th>Tipo</th>
+                                    break;
+                                case TELEFONE:
+                                    <th>DDD</th>
+                                    <th>Número</th>
+                                    <th>Tipo</th>
+                                    break;
+                                case CONTATO:
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Tipo</th>
+                                    break;
+                                case ENDERECO:
+                                    <th>Tipo</th>
+                                    <th>Endereço</th>
+                                    <th>Cidade</th>
+                                    <th>País</th>
+                                    break;
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            @* --- Lógica para renderizar as linhas da tabela --- *@
+                            <tr class="clickable-row aggregate-row"
+                                data-id="@item.GetType().GetProperty("Id").GetValue(item)"
+                                data-aggregate-type="@Model.AggregateType"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="@offcanvasTarget"
+                                title="Clique para ver detalhes ou editar">
+
+                                @switch (Model.AggregateType)
+                                {
+                                    case DADOS_BANCARIOS:
+                                        var db = item as DadosBancariosViewModel;
+                                        <td>@db.Banco</td>
+                                        <td>@db.Agencia</td>
+                                        <td>@db.Conta</td>
+                                        <td>@db.TipoDeContaBancaria</td>
+                                        break;
+                                    case TELEFONE:
+                                        var tel = item as TelefoneViewModel;
+                                        <td>@tel.DDD</td>
+                                        <td>@tel.Numero</td>
+                                        <td>@tel.TipoDeTelefone</td>
+                                        break;
+                                    case CONTATO:
+                                        var contato = item as ContatoViewModel;
+                                        <td>@contato.Nome</td>
+                                        <td>@contato.Email</td>
+                                        <td>@contato.Telefone</td>
+                                        <td>@contato.TipoDeContato</td>
+                                        break;
+                                    case ENDERECO:
+                                        var end = item as EnderecoViewModel;
+                                        <td>@end.TipoDeEndereco</td>
+                                        <td>@end.LinhaEndereco1</td>
+                                        <td>@end.Cidade</td>
+                                        <td>@end.PaisCodigoIso</td>
+                                        break;
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } else
+        {
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">Nenhum item cadastrado.</p>
+            </div>
+        }
+    </div>
+</div>

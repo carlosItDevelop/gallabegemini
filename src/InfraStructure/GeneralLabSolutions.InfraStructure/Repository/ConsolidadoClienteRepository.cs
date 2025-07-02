@@ -36,7 +36,7 @@ namespace GeneralLabSolutions.InfraStructure.Repository
         {
             var cliente = await _queryRepository.GetByIdAsync(clienteId);
 
-            if (cliente == null)
+            if (cliente is null)
                 return null;
 
             var pedidosDoCliente = await _pedidoRepository

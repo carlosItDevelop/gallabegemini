@@ -85,7 +85,9 @@
 
                 </div>
                 <div class="tab-pane" id="enderecos" role="tabpanel">
-                    <div id="enderecos-list-container"></div>
+                    <div id="enderecos-list-container">
+                        @await Html.PartialAsync("PartialViews/_EnderecosListFornecedorPartial", Model.Enderecos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,7 +98,7 @@
 <partial name="PartialViews/_offcanvas_dados_bancarios_fornecedor" />
 <partial name="PartialViews/_offcanvas_telefone_fornecedor" />
 <partial name="PartialViews/_offcanvas_contato_fornecedor" />
-@* <partial name="PartialViews/_offcanvas_endereco_fornecedor" /> *@
+<partial name="PartialViews/_offcanvas_endereco_fornecedor" />
 
 @section Scripts {
 
@@ -114,7 +116,7 @@
         await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
         await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
-        // await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }
 
     <script src="~/assets/js/app.js"></script>

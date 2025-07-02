@@ -55,19 +55,16 @@ namespace VelzonModerna.ViewModels
         #region: Campos auditáveis
 
         [DisplayName(displayName: "Data de Cadastro")]
-        public DateTime DataCadastro { get; set; }
-
-        [DisplayName(displayName: "Data de Atualização")]
-        public DateTime? DataAtualizacao { get; set; }
+        public DateTime? DataInclusao { get; set; }
 
         [DisplayName(displayName: "Usuário de Cadastro")]
-        public string? UsuarioCadastro { get; set; }
+        public string? UsuarioInclusao { get; set; }
+
+        [DisplayName(displayName: "Data de Atualização")]
+        public DateTime? DataUltimaModificacao { get; set; }
 
         [DisplayName(displayName: "Usuário de Atualização")]
         public string? UsuarioUltimaModificacao { get; set; }
-
-        [DisplayName(displayName: "Usuário de Atualização")]
-        public string? UsuarioAtualizacao { get; set; }
 
 
         #endregion: Campos auditáveis

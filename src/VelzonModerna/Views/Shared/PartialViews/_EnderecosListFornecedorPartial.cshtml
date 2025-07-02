@@ -1,0 +1,61 @@
+﻿@using GeneralLabSolutions.Domain.Entities
+@model IEnumerable<VelzonModerna.ViewModels.EnderecoViewModel>
+@{
+    var pessoaIdDoFornecedor = ViewData ["PessoaId"] ?? Guid.Empty;
+}
+
+<div class="card mb-3">
+    <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Endereços</h4>
+        <div class="flex-shrink-0">
+            <button type="button" class="btn btn-primary btn-sm add-endereco-btn" @* Nova classe para JS *@
+                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasEndereco" @* Alvo do OffCanvas de Endereco *@
+                    aria-controls="offcanvasEndereco"
+                    data-pessoa-id="@pessoaIdDoFornecedor">
+                @* PessoaId do Fornecedor *@
+                <i class="ri-add-line align-bottom me-1"></i> Adicionar Novo
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Endereço Linha 1</th>
+                            <th>Cidade</th>
+                            <th>CEP/Postal</th>
+                            <th>País</th>
+                            @* Sem coluna de ações, a linha é clicável *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="clickable-row endereco-row" @* Novas classes para JS/CSS *@
+                                data-id="@item.Id" @* ID do Endereco *@
+                                data-pessoa-id="@item.PessoaId"
+                                data-bs-toggle="offcanvas" data-bs-target="#offcanvasEndereco"
+                                aria-controls="offcanvasEndereco"
+                                title="Clique para ver detalhes ou editar">
+                                <td>@Html.DisplayFor(modelItem => item.TipoDeEndereco)</td>
+                                <td>@Html.DisplayFor(modelItem => item.LinhaEndereco1)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Cidade)</td>
+                                <td>@Html.DisplayFor(modelItem => item.CodigoPostal)</td>
+                                <td>@Html.DisplayFor(modelItem => item.PaisCodigoIso)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        } else
+        {
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">Nenhum endereço cadastrado para este fornecedor.</p>
+            </div>
+        }
+    </div><!-- end card-body -->
+</div><!-- end card -->

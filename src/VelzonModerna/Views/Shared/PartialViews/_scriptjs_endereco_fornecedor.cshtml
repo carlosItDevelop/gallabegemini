@@ -1,0 +1,206 @@
+﻿<script>
+
+    // ========================================================
+    // NOVO Bloco JS para Endereços
+    // ========================================================
+    $(document).ready(function () {
+
+        // --- Referências e Variáveis para Endereço ---
+        const offcanvasEnderecoElement = document.getElementById('offcanvasEndereco');
+        const offcanvasEnderecoInstance = offcanvasEnderecoElement ? new bootstrap.Offcanvas(offcanvasEnderecoElement) : null;
+        const formEndereco = $('#enderecoOffcanvasForm');
+        const listEnderecoContainerId = '#enderecos-list-container'; // ID do container da lista de endereços
+        const fornecedorIdEndereco = '@Model.Id'; // ID do Fornecedor principal
+        // Reutiliza showToast (assumindo que está definida globalmente ou no primeiro bloco de script)
+        function showToast(message, type = 'success') {
+            const bg = type === 'success' ? 'linear-gradient(#198754, #157347)' : type === 'error' ? 'linear-gradient(#dc3545, #bb2d3b)' : type === 'warning' ? 'linear-gradient(#f39c12, #e58e09)' : 'linear-gradient(#0d6efd, #0a58ca)';
+            Toastify({ text: message, duration: 3000, gravity: 'top', position: 'right', close: true, style: { background: bg } }).showToast();
+        }
+
+
+        // --- Funções Auxiliares para Endereço ---
+        function resetEnderecoOffcanvasForm() {
+            if (formEndereco.length === 0) return;
+            formEndereco[0].reset();
+            formEndereco.removeClass('was-validated');
+            $('#endereco_Id').val('00000000-0000-0000-0000-000000000000');
+            $('#endereco_PessoaId').val('@Model.PessoaId'); // PessoaId do Fornecedor atual
+            // Limpar spans de erro específicos do formulário de endereço
+            $('#offcanvasEnderecoFormErrors').text(''); // Limpa erros gerais
+            $('#btnExcluirEndereco').hide();
+            $('#offcanvasEnderecoLabel').text('Endereço');
+            $('#btnSalvarEndereco').prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+        }
+
+        function displayEnderecoServerErrors(errors) {
+            $('#offcanvasEnderecoFormErrors').text('');
+            if (Array.isArray(errors)) {
+                if (errors.length > 0) $('#offcanvasEnderecoFormErrors').html(errors.join('<br>'));
+            } else if (typeof errors === 'string') {
+                $('#offcanvasEnderecoFormErrors').text(errors);
+            } else {
+                $('#offcanvasEnderecoFormErrors').text('Ocorreu um erro inesperado.');
+            }
+        }
+
+        function refreshEnderecosList() {
+            if (!fornecedorIdEndereco || fornecedorIdEndereco === '00000000-0000-0000-0000-000000000000') {
+                console.error("FornecedorId inválido para recarregar a lista de endereços.");
+                return;
+            }
+            const url = '@Url.Action("GetEnderecosListPartial", "Fornecedor")?fornecedorId=' + fornecedorIdEndereco;
+
+            $(listEnderecoContainerId).html('<div class="text-center p-3"><div class="spinner-border text-primary"><span>Carregando...</span></div></div>');
+
+            $.ajax({
+                url: url, type: 'GET',
+                success: function (result) { $(listEnderecoContainerId).html(result); },
+                error: function () {
+                    showToast('Erro ao carregar a lista de endereços!', 'error');
+                    $(listEnderecoContainerId).html('<div class="alert alert-danger">Erro ao carregar os endereços.</div>');
+                }
+            });
+        }
+
+        // --- Event Listeners para Endereço ---
+
+        // 1. Abrir Offcanvas para ADICIONAR Endereço
+        $(listEnderecoContainerId).on('click', '.add-endereco-btn', function () {
+            if (!offcanvasEnderecoInstance) return;
+            resetEnderecoOffcanvasForm();
+            const pessoaId = $(this).data('pessoa-id');
+            $('#endereco_PessoaId').val(pessoaId); // PessoaId do Fornecedor
+            $('#offcanvasEnderecoLabel').text('Adicionar Endereço');
+            $('#btnExcluirEndereco').hide();
+        });
+
+
+        // Listener para o evento 'shown.bs.tab' da aba de Endereços
+        // O seletor 'a[data-bs-toggle="tab"][href="#border-navs-settings"]'
+        // corresponde ao link da aba de Endereços na sua Details.cshtml
+        $('a[data-bs-toggle="tab"][href="#border-navs-settings"]').on('shown.bs.tab', function (e) {
+            console.log('Aba de Endereços (#border-navs-settings) foi mostrada.');
+            refreshEnderecosList(); // Chama a função para carregar/atualizar a lista
+        });
+
+        // Verifica se a aba de Endereços já está ativa quando a página carrega
+        // Isso é importante se a aba de Endereços puder ser a aba padrão.
+        if ($('#border-navs-settings').hasClass('active')) {
+            console.log('Aba de Endereços (#border-navs-settings) já está ativa no carregamento da página.');
+            refreshEnderecosList();
+        }
+
+        // 2. Abrir Offcanvas para EDITAR Endereço
+        $(listEnderecoContainerId).on('click', '.endereco-row', function () {
+            if (!offcanvasEnderecoInstance) return;
+            resetEnderecoOffcanvasForm();
+            const enderecoId = $(this).data('id');
+            $('#offcanvasEnderecoLabel').text('Editar Endereço');
+            formEndereco.find('input, select, textarea').prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("GetEnderecoFormData", "Fornecedor")', type: 'GET',
+                data: { enderecoId: enderecoId, fornecedorId: fornecedorIdEndereco },
+                success: function (data) {
+                    if (data) {
+                        $('#endereco_Id').val(data.id);
+                        $('#endereco_PessoaId').val(data.pessoaId);
+                        $('#endereco_TipoDeEndereco').val(data.tipoDeEndereco);
+                        $('#endereco_PaisCodigoIso').val(data.paisCodigoIso);
+                        $('#endereco_LinhaEndereco1').val(data.linhaEndereco1);
+                        $('#endereco_LinhaEndereco2').val(data.linhaEndereco2);
+                        $('#endereco_Cidade').val(data.cidade);
+                        $('#endereco_EstadoOuProvincia').val(data.estadoOuProvincia);
+                        $('#endereco_CodigoPostal').val(data.codigoPostal);
+                        $('#endereco_InformacoesAdicionais').val(data.informacoesAdicionais);
+                        $('#btnExcluirEndereco').show();
+                    } else {
+                        showToast('Endereço não encontrado.', 'error');
+                        offcanvasEnderecoInstance.hide();
+                    }
+                },
+                error: function () { showToast('Erro ao buscar dados do endereço.', 'error'); offcanvasEnderecoInstance.hide(); },
+                complete: function() { formEndereco.find('input, select, textarea').prop('disabled', false); }
+            });
+        });
+
+        // 3. Submeter Formulário (SALVAR Endereço - Add/Edit)
+        formEndereco.on('submit', function (event) {
+            event.preventDefault();
+            if (!offcanvasEnderecoInstance) return;
+            if (this.checkValidity() === false) { event.stopPropagation(); $(this).addClass('was-validated'); return; }
+            $(this).removeClass('was-validated');
+
+            const formDataArray = $(this).serializeArray();
+            formDataArray.push({ name: "FornecedorId", value: fornecedorIdEndereco });
+            const dataToSend = $.param(formDataArray);
+            const url = '@Url.Action("SalvarEndereco", "Fornecedor")';
+            const btnSalvar = $('#btnSalvarEndereco');
+            btnSalvar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Salvando...');
+
+            $.ajax({
+                url: url, type: 'POST', data: dataToSend,
+                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                    if (response.success) {
+                        offcanvasEnderecoInstance.hide();
+                        refreshEnderecosList();
+                        showToast('Endereço salvo com sucesso!', 'success');
+                    } else {
+                        displayEnderecoServerErrors(response.errors);
+                        showToast('Erro ao salvar endereço.', 'error');
+                    }
+                },
+                error: function () { displayEnderecoServerErrors("Erro de comunicação."); showToast('Erro ao salvar endereço.', 'error'); },
+                complete: function() { btnSalvar.prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar'); }
+            });
+        });
+
+        // 4. EXCLUIR Endereço
+        $('#btnExcluirEndereco').on('click', function () {
+            const enderecoId = $('#endereco_Id').val();
+            if (!offcanvasEnderecoInstance) return;
+            if (!enderecoId || enderecoId === '00000000-0000-0000-0000-000000000000') {
+                Swal.fire('Ops!', 'ID inválido para exclusão.', 'error'); return;
+            }
+
+            Swal.fire({
+                title: 'Tem certeza?', text: "Você realmente deseja excluir este endereço?", icon: 'warning',
+                showCancelButton: true, confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar',
+                customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+                buttonsStyling: false
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                const url = '@Url.Action("ExcluirEndereco", "Fornecedor")';
+                const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+                const btnExcluir = $('#btnExcluirEndereco');
+                btnExcluir.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Excluindo...');
+
+                $.ajax({
+                    url: url, type: 'POST',
+                    data: { fornecedorId: fornecedorIdEndereco, enderecoId: enderecoId, __RequestVerificationToken: antiForgeryToken },
+                    success: function (response) {
+                        if (response.success) {
+                            offcanvasEnderecoInstance.hide();
+                            refreshEnderecosList();
+                            Swal.fire('Excluído!', 'O endereço foi removido.', 'success');
+                        } else {
+                            Swal.fire('Erro!', (response.errors ?? ['Erro desconhecido']).join('<br>'), 'error');
+                        }
+                    },
+                    error: function () { Swal.fire('Erro de Comunicação!', 'Não foi possível excluir o endereço.', 'error'); },
+                    complete: function() { btnExcluir.prop('disabled', false).html('<i class="ri-delete-bin-line align-bottom me-1"></i> Excluir'); }
+                });
+            });
+        });
+
+        // Limpar formulário quando Offcanvas de Endereço for fechado
+        if(offcanvasEnderecoElement) {
+            offcanvasEnderecoElement.addEventListener('hidden.bs.offcanvas', event => {
+               resetEnderecoOffcanvasForm();
+            });
+        }
+    });
+    // Fim do bloco JS para Endereços
+</script>

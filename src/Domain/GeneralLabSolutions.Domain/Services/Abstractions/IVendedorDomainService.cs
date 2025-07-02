@@ -19,7 +19,7 @@ namespace GeneralLabSolutions.Domain.Services.Abstractions
         Task<IEnumerable<Vendedor>> ObterTodosVendedores();
 
         // ---- Dados Bancários ----------------------------------------
-        Task AdicionarDadosBancarios(
+        Task AdicionarDadosBancariosAsync(
             Guid vendedorId,
             string banco,
             string agencia,

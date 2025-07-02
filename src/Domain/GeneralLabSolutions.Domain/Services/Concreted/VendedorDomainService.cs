@@ -77,7 +77,7 @@ namespace GeneralLabSolutions.Domain.Services.Concreted
 
         #region: DADOS BANCÁRIOS
 
-        public async Task AdicionarDadosBancarios(Guid vendedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
+        public async Task AdicionarDadosBancariosAsync(Guid vendedorId, string banco, string agencia, string conta, TipoDeContaBancaria tipoConta)
         {
             // 1) Carrega o agregado com Pessoa + DadosBancarios
             var vendedor = await _vendedorRepository.GetByIdAsync(vendedorId);

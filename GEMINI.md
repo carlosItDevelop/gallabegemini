@@ -15,6 +15,9 @@ Esta é uma solução .NET/C# chamada `GeneralLabsSolutions`. Ela inclui múltip
 ## Commit Messages
 - As mensagens de commit devem ser escritas em inglês.
 
+## File Searching
+- Ao procurar por arquivos, utilize a estrutura de namespaces como a principal referência para a localização. Se, mesmo assim, não encontrar o arquivo, você deve me perguntar pela localização.
+
 ## Important Notes
 - Respeite a separação de responsabilidades entre os diferentes projetos (Domain, InfraStructure, Services).
 - Antes de adicionar novas funcionalidades, verifique se os componentes existentes podem ser reutilizados.

@@ -56,7 +56,7 @@ namespace VelzonModerna.Controllers
 
             await _autenticacaoService.RealizarLogin(resposta);
 
-            return RedirectToAction("Index", "Cliente");
+            return RedirectToAction("GlDashboard", "GalLabs");
         }
 
         [HttpGet]
@@ -83,7 +83,7 @@ namespace VelzonModerna.Controllers
             await _autenticacaoService.RealizarLogin(resposta);
 
             if (string.IsNullOrEmpty(returnUrl))
-                return RedirectToAction("Index", "Cliente");
+                return RedirectToAction("GlDashboard", "GalLabs");
 
             return LocalRedirect(returnUrl);
 

@@ -21,8 +21,8 @@ namespace VelzonModerna.Controllers
 
         public FornecedorController(
             INotificador notificador,
-            IMapper mapper, 
-            IFornecedorRepository fornecedorRepository, 
+            IMapper mapper,
+            IFornecedorRepository fornecedorRepository,
             IFornecedorDomainService fornecedorDomainService)
             : base(notificador)
         {
@@ -43,7 +43,7 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            var model = await _fornecedorRepository.GetByIdAsync(id);
+            var model = await _fornecedorRepository.ObterFornecedorCompleto(id);
 
             if (model is null)
                 return NotFound();
@@ -74,7 +74,7 @@ namespace VelzonModerna.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var model = await _fornecedorRepository.GetByIdAsync(id);
+            var model = await _fornecedorRepository.ObterFornecedorCompleto(id);
 
             if (model == null)
                 return NotFound();
@@ -117,7 +117,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var model = await _fornecedorRepository.GetByIdAsync(id);
-            if (model == null)
+            if (model is null)
                 return NotFound();
             var viewModel = _mapper.Map<FornecedorViewModel>(model);
             return View(viewModel);
@@ -128,7 +128,7 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var model = await _fornecedorRepository.GetByIdAsync(id);
-            if (model == null)
+            if (model is null)
                 return NotFound();
             await _fornecedorDomainService.DeleteFornecedorAsync(model);
             if (!OperacaoValida())
@@ -153,32 +153,41 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosListPartial(Guid fornecedorId)
         {
-            // 1. Busca o fornecedor completo, incluindo os dados da pessoa e os dados bancários.
-            //    É importante ter um método no repositório que faça o Include necessário.
-            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
-
-            // 2. Se o fornecedor ou a pessoa associada não existir, retorna a partial vazia.
-            if (fornecedor is null || fornecedor.Pessoa is null)
+            try
             {
-                // Retorna a partial específica para fornecedor.
-                return PartialView("PartialViews/_DadosBancariosListFornecedorPartial", new List<DadosBancariosViewModel>());
+                var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+                // CORREÇÃO: Primeiro, obtemos a lista de entidades de domínio, garantindo que não seja nula.
+                var dadosBancariosEntities = fornecedor?.Pessoa?.DadosBancarios ?? new List<DadosBancarios>();
+
+                // Segundo, mapeamos a lista de entidades para uma lista de ViewModels.
+                var dadosBancariosViewModels = _mapper.Map<List<DadosBancariosViewModel>>(dadosBancariosEntities);
+
+                // Terceiro, passamos a lista de ViewModels para o ViewComponent.
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Fornecedor",
+                    parentEntityId = fornecedorId,
+                    parentPessoaId = fornecedor?.PessoaId ?? Guid.Empty,
+                    aggregateType = "DadosBancarios",
+                    items = dadosBancariosViewModels // Agora a lista tem o tipo correto
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os dados bancários: {ex.Message}");
             }
-
-            // 3. Mapeia a lista de entidades para uma lista de ViewModels.
-            var viewModels = _mapper.Map<List<DadosBancariosViewModel>>(fornecedor.Pessoa.DadosBancarios);
-
-            // 4. Passa o PessoaId para a partial, que será usado pelo botão "Adicionar Novo".
-            ViewData ["PessoaId"] = fornecedor.PessoaId;
-
-            // 5. Retorna a Partial View com os dados.
-            return PartialView("PartialViews/_DadosBancariosListFornecedorPartial", viewModels);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosFormData(Guid? dadosBancariosId, Guid fornecedorId)
         {
             // Valida se o fornecedor principal existe.
-            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
             if (fornecedor is null)
                 return NotFound("Fornecedor não encontrado.");
 
@@ -296,20 +305,37 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTelefonesListPartial(Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
-            if (fornecedor is null || fornecedor.Pessoa is null)
+            try
             {
-                return PartialView("PartialViews/_TelefonesListFornecedorPartial", new List<TelefoneViewModel>());
+                var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+                var telefoneEntities = fornecedor?.Pessoa?.Telefones ?? new List<Telefone>();
+                var telefoneViewModels = _mapper.Map<List<TelefoneViewModel>>(telefoneEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Fornecedor",
+                    parentEntityId = fornecedorId,
+                    parentPessoaId = fornecedor?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Telefone",
+                    items = telefoneViewModels
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os telefones: {ex.Message}");
             }
-            var viewModels = _mapper.Map<List<TelefoneViewModel>>(fornecedor.Pessoa.Telefones);
-            ViewData ["PessoaId"] = fornecedor.PessoaId;
-            return PartialView("PartialViews/_TelefonesListFornecedorPartial", viewModels);
+
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTelefoneFormData(Guid? telefoneId, Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
             if (fornecedor is null)
                 return NotFound("Fornecedor não encontrado.");
 
@@ -408,20 +434,37 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetContatosListPartial(Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
-            if (fornecedor is null || fornecedor.Pessoa is null)
+            try
             {
-                return PartialView("PartialViews/_ContatosListFornecedorPartial", new List<ContatoViewModel>());
+
+                var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+
+                var contatoEntities = fornecedor?.Pessoa?.Contatos ?? new List<Contato>();
+                var contatoViewModels = _mapper.Map<List<ContatoViewModel>>(contatoEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Fornecedor",
+                    parentEntityId = fornecedorId,
+                    parentPessoaId = fornecedor?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Contato",
+                    items = contatoViewModels
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os contatos: {ex.Message}");
             }
-            var viewModels = _mapper.Map<List<ContatoViewModel>>(fornecedor.Pessoa.Contatos);
-            ViewData ["PessoaId"] = fornecedor.PessoaId;
-            return PartialView("PartialViews/_ContatosListFornecedorPartial", viewModels);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetContatoFormData(Guid? contatoId, Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
             if (fornecedor == null)
                 return NotFound("Fornecedor não encontrado.");
 
@@ -528,24 +571,38 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEnderecosListPartial(Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
 
-            if (fornecedor is null || fornecedor.Pessoa is null)
+            try
             {
-                return PartialView("PartialViews/_EnderecosListFornecedorPartial", new List<EnderecoViewModel>());
-            }
-            var viewModels = _mapper.Map<List<EnderecoViewModel>>(fornecedor.Pessoa.Enderecos);
+                var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
 
-            ViewData ["PessoaId"] = fornecedor.PessoaId;
-            
-            return PartialView("PartialViews/_EnderecosListFornecedorPartial", viewModels);
+                var enderecoEntities = fornecedor?.Pessoa?.Enderecos ?? new List<Endereco>();
+                var enderecoViewModels = _mapper.Map<List<EnderecoViewModel>>(enderecoEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Fornecedor",
+                    parentEntityId = fornecedorId,
+                    parentPessoaId = fornecedor?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Endereco",
+                    items = enderecoViewModels
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os endereços: {ex.Message}");
+            }
 
         }
 
         [HttpGet]
         public async Task<IActionResult> GetEnderecoFormData(Guid? enderecoId, Guid fornecedorId)
         {
-            var fornecedor = await _fornecedorRepository.GetByIdAsync(fornecedorId);
+            var fornecedor = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
 
             if (fornecedor is null)
                 return NotFound("Fornecedor não encontrado.");

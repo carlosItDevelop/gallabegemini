@@ -3,19 +3,11 @@ using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Notifications;
 using GeneralLabSolutions.Domain.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VelzonModerna.Controllers.Base;
 using VelzonModerna.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using GeneralLabSolutions.Domain.Enums;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using GeneralLabSolutions.WebApiCore.Identidade;
-using Microsoft.AspNetCore.Identity;
-using GeneralLabSolutions.WebApiCore.Usuario;
 
 
 namespace VelzonModerna.Controllers
@@ -23,8 +15,6 @@ namespace VelzonModerna.Controllers
     [Microsoft.AspNetCore.Authorization.Authorize]
     public class ClienteController : BaseMvcController
     {
-        private readonly IAspNetUser _aspnetUser;
-
         private readonly IMapper _mapper;
         private readonly IClienteRepository _clienteRepository;
         private readonly IClienteDomainService _clienteDomainService;
@@ -34,14 +24,12 @@ namespace VelzonModerna.Controllers
             INotificador notificador,
             IMapper mapper,
             IClienteRepository clienteRepository,
-            IClienteDomainService clienteDomainService,
-            IAspNetUser aspNetUser)
+            IClienteDomainService clienteDomainService)
             : base(notificador)
         {
             _mapper = mapper;
             _clienteRepository = clienteRepository;
             _clienteDomainService = clienteDomainService;
-            _aspnetUser = aspNetUser;
         }
         #endregion
 
@@ -63,50 +51,11 @@ namespace VelzonModerna.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
 
-            var usuarioLogado = _aspnetUser.EstaAutenticado();
-            if (usuarioLogado)
-            {
-                var isAdmin = _aspnetUser.PossuiRole("Admin");
-                var isSuperAdmin = _aspnetUser.PossuiRole("SuperAdmin");
-                var userId = _aspnetUser.ObterUserId();
-                var userEmail = _aspnetUser.ObterUserEmail();
-                var userToken = _aspnetUser.ObterUserToken();
-                var userRefreshToken = _aspnetUser.ObterUserRefreshToken();
-
-                var nomeCompleto = _aspnetUser.ObterNomeCompleto();
-                var apelido = _aspnetUser.ObterApelido();
-                var dataNascimentoUtc = _aspnetUser.ObterDataNascimento();
-
-
-                Console.WriteLine($"\n\t==============================================");
-
-
-                if (dataNascimentoUtc.HasValue)
-                {
-                    var dataNascimentoLocal = dataNascimentoUtc.Value.ToLocalTime();
-                    Console.WriteLine($"\n\tData Nascimento(UTC): {dataNascimentoUtc.Value}\n\tData Nascimento (Local): {dataNascimentoLocal}");
-                    // Para a ViewModel, passar a dataNascimentoLocal
-                } else
-                {
-                    Console.WriteLine("Data Nasc: Não disponível");
-                }
-
-                var imgPath = _aspnetUser.ObterImgProfilePath();
-
-                Console.WriteLine($"\n\n\tUserId: {userId}\n\tEhAdmin: {isAdmin}\n\tEhSuperAdmin: {isSuperAdmin}\n\tAccessToken: {userToken}\n\tRefressToken: {userRefreshToken}\n\tEmail: {userEmail}");
-
-                Console.WriteLine($"\n\t==============================================");
-
-                Console.WriteLine($"\n\tNome Completo: {nomeCompleto}\n\tApelido: {apelido}\n\tImg: {imgPath}");
-
-            }
-
-
             // *** ATUALIZAR: Usar ObterClienteCompleto ou carregar Telefones também ***
             // var cliente = await _clienteRepository.ObterClienteComDadosBancarios(id); // Linha antiga
             var cliente = await _clienteRepository.ObterClienteCompleto(id); // Carrega DadosBancarios e Telefones (e futuros)
 
-            if (cliente == null)
+            if (cliente is null)
                 return NotFound();
             var clienteViewModel = _mapper.Map<ClienteViewModel>(cliente);
             return View(clienteViewModel);
@@ -214,20 +163,36 @@ namespace VelzonModerna.Controllers
         #region: Actions AJAX para Dados Bancários (Existente)
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosListPartial(Guid clienteId)
-        { /* ... código existente ... */
-            var cliente = await _clienteRepository.ObterClienteComDadosBancarios(clienteId);
+        {
+            try
+            {
+                var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+                var dadosBancariosEntities = cliente?.Pessoa?.DadosBancarios ?? new List<DadosBancarios>();
+                var dadosBancariosViewModels = _mapper.Map<List<DadosBancariosViewModel>>(dadosBancariosEntities);
 
-            if (cliente is null || cliente.Pessoa is null)
-                return PartialView("PartialViews/_DadosBancariosListClientePartial", new List<DadosBancariosViewModel>());
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Cliente",
+                    parentEntityId = clienteId,
+                    parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
+                    aggregateType = "DadosBancarios",
+                    items = dadosBancariosViewModels
+                });
 
-            var viewModels = _mapper.Map<List<DadosBancariosViewModel>>(cliente.Pessoa.DadosBancarios);
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os endereços: {ex.Message}");
+            }
 
-            return PartialView("PartialViews/_DadosBancariosListClientePartial", viewModels);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosFormData(Guid? dadosBancariosId, Guid clienteId)
-        { /* ... código existente ... */
+        { 
             if (dadosBancariosId is null || dadosBancariosId == Guid.Empty)
             {
                 if (!await _clienteRepository.TemCliente(clienteId))
@@ -236,7 +201,7 @@ namespace VelzonModerna.Controllers
                 return Json(newViewModel);
             } else
             {
-                var dadosBancarios = await _clienteRepository.ObterDadosBancariosPorId(dadosBancariosId.Value);
+                var dadosBancarios = await _clienteRepository.ObterClienteCompleto(dadosBancariosId.Value);
                 if (dadosBancarios is null)
                     return NotFound();
                 var viewModel = _mapper.Map<DadosBancariosViewModel>(dadosBancarios);
@@ -403,14 +368,31 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTelefonesListPartial(Guid clienteId)
         {
-            var cliente = await _clienteRepository.ObterClienteComTelefones(clienteId); // Ou ObterClienteCompleto
-            if (cliente is null || cliente.Pessoa is null)
+            try
             {
-                return PartialView("PartialViews/_TelefonesListClientePartial", new List<TelefoneViewModel>());
+                var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+                var telefoneEntities = cliente?.Pessoa?.Telefones ?? new List<Telefone>();
+                var telefoneViewModels = _mapper.Map<List<TelefoneViewModel>>(telefoneEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Cliente",
+                    parentEntityId = clienteId,
+                    parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Telefone",
+                    items = telefoneViewModels
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os endereços: {ex.Message}");
             }
-            var viewModels = _mapper.Map<List<TelefoneViewModel>>(cliente.Pessoa.Telefones);
-            return PartialView("PartialViews/_TelefonesListClientePartial", viewModels);
         }
+
 
         /// <summary>
         /// Retorna os dados de um telefone específico (para edição) ou um ViewModel vazio (para adição).
@@ -427,7 +409,7 @@ namespace VelzonModerna.Controllers
 
                 // Para Telefone, precisamos do PessoaId do Cliente para preencher o formulário
                 // *** CORREÇÃO APLICADA AQUI ***
-                var clienteParaPessoaId = await _clienteRepository.GetByIdAsync(clienteId);
+                var clienteParaPessoaId = await _clienteRepository.ObterClienteCompleto(clienteId);
                 // ******************************
 
                 if (clienteParaPessoaId is null)
@@ -636,14 +618,30 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetContatosListPartial(Guid clienteId)
         {
-            var cliente = await _clienteRepository.ObterClienteComContatos(clienteId); // Ou ObterClienteCompleto
-            if (cliente is null || cliente.Pessoa is null)
+            try
             {
-                // Retorna uma partial vazia ou com mensagem de erro
-                return PartialView("PartialViews/_ContatosListClientePartial", new List<ContatoViewModel>());
+                var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+                var contatoEntities = cliente?.Pessoa?.Contatos ?? new List<Contato>();
+                var contatoViewModels = _mapper.Map<List<ContatoViewModel>>(contatoEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Cliente",
+                    parentEntityId = clienteId,
+                    parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Contato",
+                    items = contatoViewModels
+                });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os endereços: {ex.Message}");
             }
-            var viewModels = _mapper.Map<List<ContatoViewModel>>(cliente.Pessoa.Contatos);
-            return PartialView("PartialViews/_ContatosListClientePartial", viewModels);
+
         }
 
         /// <summary>
@@ -652,13 +650,13 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetContatoFormData(Guid? contatoId, Guid clienteId)
         {
-            if (contatoId == null || contatoId == Guid.Empty)
+            if (contatoId is null || contatoId == Guid.Empty)
             {
                 // Modo Criação
                 if (!await _clienteRepository.TemCliente(clienteId))
                     return NotFound("Cliente não encontrado para adicionar contato.");
-                var clienteParaPessoaId = await _clienteRepository.GetByIdAsync(clienteId);
-                if (clienteParaPessoaId == null)
+                var clienteParaPessoaId = await _clienteRepository.ObterClienteCompleto(clienteId);
+                if (clienteParaPessoaId is null)
                     return NotFound("Cliente não encontrado ao buscar PessoaId para o contato.");
 
                 var newViewModel = new ContatoViewModel { PessoaId = clienteParaPessoaId.PessoaId };
@@ -669,7 +667,7 @@ namespace VelzonModerna.Controllers
                 var cliente = await _clienteRepository.ObterClienteComContatos(clienteId);
                 var contato = cliente?.Pessoa?.Contatos.FirstOrDefault(c => c.Id == contatoId.Value);
 
-                if (contato == null)
+                if (contato is null)
                     return NotFound("Contato não encontrado ou não pertence a este cliente.");
 
                 var viewModel = _mapper.Map<ContatoViewModel>(contato);
@@ -788,13 +786,31 @@ namespace VelzonModerna.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEnderecosListPartial(Guid clienteId)
         {
-            var cliente = await _clienteRepository.ObterClienteComEnderecos(clienteId); // Ou ObterClienteCompleto
-            if (cliente is null || cliente.Pessoa is null)
+
+            try
+            { 
+            var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+            var enderecoEntities = cliente?.Pessoa?.Enderecos ?? new List<Endereco>();
+            var enderecoViewModels = _mapper.Map<List<EnderecoViewModel>>(enderecoEntities);
+
+            return ViewComponent("AggregateList", new
             {
-                return PartialView("PartialViews/_EnderecosListClientePartial", new List<EnderecoViewModel>());
+                parentEntityType = "Cliente",
+                parentEntityId = clienteId,
+                parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
+                aggregateType = "Endereco",
+                items = enderecoViewModels
+            });
+
+            } catch (Exception ex)
+            {
+                // Se ocorrer qualquer erro inesperado (ex: no AutoMapper),
+                // ele será capturado e não quebrará a aplicação.
+                // O ideal é logar o erro 'ex' aqui.
+                // Retorna um erro 500 com uma mensagem clara para o AJAX.
+                return StatusCode(500, $"Erro interno ao processar os endereços: {ex.Message}");
             }
-            var viewModels = _mapper.Map<List<EnderecoViewModel>>(cliente.Pessoa.Enderecos);
-            return PartialView("PartialViews/_EnderecosListClientePartial", viewModels);
+
         }
 
         /// <summary>
@@ -809,7 +825,7 @@ namespace VelzonModerna.Controllers
                 if (!await _clienteRepository.TemCliente(clienteId))
                     return NotFound("Cliente não encontrado para adicionar endereço.");
 
-                var clienteParaPessoaId = await _clienteRepository.GetByIdAsync(clienteId);
+                var clienteParaPessoaId = await _clienteRepository.ObterClienteCompleto(clienteId);
 
                 if (clienteParaPessoaId is null)
                     return NotFound("Cliente não encontrado ao buscar PessoaId para o endereço.");

@@ -14,14 +14,14 @@ namespace VelzonModerna.Controllers
     /// E destacar os impactos no projeto.
     /// </summary>
     [Microsoft.AspNetCore.Authorization.Authorize]
-    public class GalLabsController : Controller
+    public class HomeController : Controller
     {
 
         private readonly IPedidoRepositoryDto _pedidoRepository;
         private readonly IPedidoRepositoryDomain _pedidoRepositoryDomain;
 
 
-        public GalLabsController(IPedidoRepositoryDto pedidoRepository, IPedidoRepositoryDomain pedidoRepositoryDomain)
+        public HomeController(IPedidoRepositoryDto pedidoRepository, IPedidoRepositoryDomain pedidoRepositoryDomain)
         {
             _pedidoRepository = pedidoRepository;
             _pedidoRepositoryDomain = pedidoRepositoryDomain;
@@ -197,7 +197,7 @@ namespace VelzonModerna.Controllers
         }
 
 
-        public IActionResult GlDashboard()
+        public IActionResult Index()
         {
             return View();
         }

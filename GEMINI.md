@@ -18,6 +18,9 @@ Esta é uma solução .NET/C# chamada `GeneralLabsSolutions`. Ela inclui múltip
 ## File Searching
 - Ao procurar por arquivos, utilize a estrutura de namespaces como a principal referência para a localização. Se, mesmo assim, não encontrar o arquivo, você deve me perguntar pela localização.
 
+## Indexação da Solução
+- Mantenha a solução sempre indexada. Antes de iniciar a interação com o usuário, monte uma árvore com os nomes dos arquivos de cada pasta da solução, formando um "Mapa da Solução".
+
 ## Important Notes
 - Respeite a separação de responsabilidades entre os diferentes projetos (Domain, InfraStructure, Services).
 - Antes de adicionar novas funcionalidades, verifique se os componentes existentes podem ser reutilizados.

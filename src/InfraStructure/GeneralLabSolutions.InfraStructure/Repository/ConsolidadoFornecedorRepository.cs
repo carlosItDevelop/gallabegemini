@@ -103,7 +103,7 @@ namespace GeneralLabSolutions.InfraStructure.Repository
 
             return itens
                 .GroupBy(i => i.Produto.CategoriaProduto)
-                .Where(g => g.Key != null) // Só categorias não-nulas
+                .Where(g => g.Key is not null) // Só categorias não-nulas
                 .Select(g => new
                 {
                     Categoria = g.Key!,

@@ -1,0 +1,58 @@
+﻿@using VelzonModerna.ViewModels
+@model FornecedorViewModel
+
+<div class="tab-pane active" id="dados-bancarios" role="tabpanel">
+    <div id="dados-bancarios-list-container">
+        @await Component.InvokeAsync("AggregateList", 
+        new {
+            parentEntityType = "Fornecedor",
+            parentEntityId = Model.Id,
+            parentPessoaId = Model.PessoaId,
+            aggregateType = "DadosBancarios",
+            items = Model.DadosBancarios
+            })
+    </div>
+</div>
+
+
+
+<div class="tab-pane" id="telefones" role="tabpanel">
+    <div id="telefones-list-container">
+        @await Component.InvokeAsync("AggregateList", 
+        new {
+            parentEntityType = "Fornecedor",
+            parentEntityId = Model.Id,
+            parentPessoaId = Model.PessoaId,
+            aggregateType = "Telefone",
+            items = Model.Telefones
+            })
+    </div>
+</div>
+
+
+    <div class="tab-pane" id="contatos" role="tabpanel">
+    <div id="contatos-list-container">
+        @await Component.InvokeAsync("AggregateList", 
+        new {
+            parentEntityType = "Fornecedor",
+            parentEntityId = Model.Id,
+            parentPessoaId = Model.PessoaId,
+            aggregateType = "Contato",
+            items = Model.Contatos
+            })
+    </div>
+</div>
+
+
+<div class="tab-pane" id="enderecos" role="tabpanel">
+    <div id="enderecos-list-container">
+        @await Component.InvokeAsync("AggregateList", 
+        new {
+            parentEntityType = "Fornecedor",
+            parentEntityId = Model.Id,
+            parentPessoaId = Model.PessoaId,
+            aggregateType = "Endereco",
+            items = Model.Enderecos
+            })
+    </div>
+</div>

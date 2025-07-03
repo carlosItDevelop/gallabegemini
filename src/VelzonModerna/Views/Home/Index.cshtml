@@ -1,0 +1,226 @@
+﻿@using GeneralLabSolutions.SharedKernel.Enums
+
+@{
+    ViewBag.Title = "Gal Lab Solutions";
+    ViewBag.pTitle = "Gal Lab Solutions";
+    ViewBag.pageTitle = "Dashboards";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <!-- jsvectormap css -->
+    <link href="~/assets/libs/jsvectormap/css/jsvectormap.min.css" rel="stylesheet" type="text/css" />
+
+    <!--Swiper slider css-->
+    <link href="~/assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />
+
+}
+
+
+<div class="row">
+    <div class="col">
+
+        <div class="h-100">
+            <div class="row mb-3 pb-1">
+                <div class="col-12">
+                    <div class="d-flex align-items-lg-center flex-lg-row flex-column">
+                        <div class="flex-grow-1">
+                            <h4 class="fs-16 mb-1">Bem-Vindo, caro usuário!</h4>
+                            <p class="text-muted mb-0">
+                                Confira os Consolidados e Analíticos do seu negócio, aqui.
+                            </p>
+                        </div>
+
+                        <partial name="partialcooperchip/_form_gl_dashboard" />
+
+                    </div><!-- end card header -->
+                </div>
+                <!--end col-->
+            </div>
+            <!--end row-->
+
+            <div class="row">
+
+                <vc:card-resumo-pedido status="@StatusDoPedido.Pago" titulo="Pagos" css-color="success"
+                                       icon="bx bx-shopping-bag text-success" link="/pedido"></vc:card-resumo-pedido>
+
+                <vc:card-resumo-pedido status="@StatusDoPedido.Cancelado" titulo="Cancelados" css-color="danger"
+                                       icon="bx bx-shopping-bag text-danger" link="/pedido"></vc:card-resumo-pedido>
+
+                <vc:card-resumo-pedido status="@StatusDoPedido.EmProcessamento" titulo="Processando" css-color="warning"
+                                       icon="bx bx-shopping-bag text-warning" link="/pedido"></vc:card-resumo-pedido>
+
+                <vc:card-resumo-pedido status="@StatusDoPedido.Orcamento" titulo="Orçamento" css-color="mutted"
+                                       icon="bx bx-wallet text-primary" link="/pedido"></vc:card-resumo-pedido>
+
+            </div> <!-- end row-->
+
+
+            <div class="row">
+
+                <partial name="partialcooperchip/_vendas_no_ano" />
+
+                <partial name="partialcooperchip/_top_vendedores" />
+
+            </div>
+
+            <div class="row">
+                <partial name="partialcooperchip/_vendas_no_periodo_quantidade" />
+                <partial name="partialcooperchip/_vendas_no_periodo_valores" />
+            </div>
+
+            <div class="row">
+
+                <h3> Consolidados de Clientes, Vendedores e Fornecedores </h3>
+                <hr />
+
+                <vc:donut-estados-pedidos></vc:donut-estados-pedidos>
+
+                <partial name="partialcooperchip/_gl_chart_donut" />
+                <partial name="partialcooperchip/_gl_chart_donut" />
+
+            </div>
+
+            <div class="row col-lg-12 col-md-12 col-xm-12">
+
+
+                <div class="card card-height-100">
+                    <div class="card-header align-items-center d-flex">
+                        <h4 class="card-title mb-0 flex-grow-1">Closing Deals</h4>
+                        <div class="flex-shrink-0">
+                            <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+                                <option selected="">Closed Deals</option>
+                                <option value="1">Active Deals</option>
+                                <option value="2">Paused Deals</option>
+                                <option value="3">Canceled Deals</option>
+                            </select>
+                        </div>
+                    </div><!-- end card header -->
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-nowrap align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 30%;">Deal Name</th>
+                                        <th scope="col" style="width: 30%;">Sales Rep</th>
+                                        <th scope="col" style="width: 20%;">Amount</th>
+                                        <th scope="col" style="width: 20%;">Close Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td>Acme Inc Install</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-1.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Donald Risher</a>
+                                        </td>
+                                        <td>$96k</td>
+                                        <td>Today</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Save lots Stores</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-2.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Jansh Brown</a>
+                                        </td>
+                                        <td>$55.7k</td>
+                                        <td>30 Dec 2021</td>
+                                    </tr>
+                                    <tr>
+                                        <td>William PVT</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-7.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Ayaan Hudda</a>
+                                        </td>
+                                        <td>$102k</td>
+                                        <td>25 Nov 2021</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Raitech Soft</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Julia William</a>
+                                        </td>
+                                        <td>$89.5k</td>
+                                        <td>20 Sep 2021</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Absternet LLC</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
+                                        </td>
+                                        <td>$89.5k</td>
+                                        <td>20 Sep 2021</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Absternet LLC</td>
+                                        <td>
+                                            <img src="~/assets/images/users/avatar-4.jpg" alt="" class="avatar-xs rounded-circle me-2">
+                                            <a href="#javascript: void(0);" class="text-body fw-medium">Vitoria Rodrigues</a>
+                                        </td>
+                                        <td>$89.5k</td>
+                                        <td>20 Sep 2021</td>
+                                    </tr>
+
+                                </tbody><!-- end tbody -->
+                            </table><!-- end table -->
+                        </div><!-- end table responsive -->
+                    </div><!-- end card body -->
+                </div><!-- end card -->
+            </div><!-- end col -->
+
+
+
+        </div>
+    </div>
+
+    <partial name="partialcooperchip/_atividades_recentes" />
+
+</div>
+
+
+@section scripts {
+
+    <!-- apexcharts -->
+    <script src="~/assets/libs/apexcharts/apexcharts.min.js"></script>
+
+    <!-- Vector map-->
+    <script src="~/assets/libs/jsvectormap/js/jsvectormap.min.js"></script>
+    <script src="~/assets/libs/jsvectormap/maps/world-merc.js"></script>
+
+    <!--Swiper slider js-->
+    <script src="~/assets/libs/swiper/swiper-bundle.min.js"></script>
+
+    <!-- ###################################### -->
+    <!-- Dashboard init -->
+    <script src="~/assets/js/pages/dashboard-ecommerce.init.js"></script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+
+
+    <!-- Dashboard init -->
+    <script src="~/assets/js/pages/dashboard-analytics.init.js"></script>
+
+    <!-- echarts js -->
+    <script src="~/assets/libs/echarts/echarts.min.js"></script>
+
+    <!-- Widget init -->
+    <script src="~/assets/js/pages/widgets.init.js"></script>
+
+
+    <!-- juntando o jQuery com os meus Scripts que rodam os Gráficos -->
+    <script src="~/cooperchip/js/jquerylocal/jquery-3.6.0.min.js"></script>
+
+
+    <script src="~/cooperchip/js/graficos-glsolutions.js"></script>
+
+    <script src="~/cooperchip/js/grafico-por-periodo-varios-estilos.js"></script>
+
+    <script src="~/cooperchip/js/estados-pedidos-donut-chart.js"></script>
+
+}

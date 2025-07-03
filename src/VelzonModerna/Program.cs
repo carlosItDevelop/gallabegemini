@@ -142,7 +142,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=Cliente}/{action=Index}/{id?}"); // Sua rota padrão
+            pattern: "{controller=GalLabs}/{action=GlDashboard}/{id?}"); // Sua rota padrão
 
         app.Run();
     }

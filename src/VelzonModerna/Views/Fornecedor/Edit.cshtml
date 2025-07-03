@@ -38,10 +38,14 @@
                         <vc:summary></vc:summary>
                         <input type="hidden" asp-for="Id" />
                         <partial name="_edit_e_create" model="Model" />
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary">Atualizar</button>
-                            <a asp-action="Index" class="btn btn-light">Voltar à lista</a>
+
+                        <hr />
+                        <div>
+                            <input type="submit" value="Atualizar" class="btn btn-outline-success" />
+                            <a asp-action="Index" class="btn btn-outline-warning">Voltar à lista</a>
                         </div>
+
+
                     </form>
                 </div>
             </div>
@@ -72,89 +76,7 @@
             <!-- Tab panes -->
             <div class="tab-content text-muted">
 
-
-                <div class="tab-pane active" id="dados-bancarios" role="tabpanel">
-                    <div id="dados-bancarios-list-container">
-                        @await Component.InvokeAsync("AggregateList", 
-                        new {
-                            parentEntityType = "Fornecedor",
-                            parentEntityId = Model.Id,
-                            parentPessoaId = Model.PessoaId,
-                            aggregateType = "DadosBancarios",
-                            items = Model.DadosBancarios
-                            })
-                    </div>
-                </div>
-
-@* 
-                <div class="tab-pane" id="telefones" role="tabpanel">
-
-                    <div id="telefones-list-container">
-                        @await Html.PartialAsync("PartialViews/_TelefonesListFornecedorPartial", Model.Telefones, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
-                    </div>
-
-                </div> *@
-
-
-                <div class="tab-pane" id="telefones" role="tabpanel">
-                    <div id="dados-bancarios-list-container">
-                        @await Component.InvokeAsync("AggregateList", 
-                        new {
-                            parentEntityType = "Fornecedor",
-                            parentEntityId = Model.Id,
-                            parentPessoaId = Model.PessoaId,
-                            aggregateType = "Telefone",
-                            items = Model.Telefones
-                            })
-                    </div>
-                </div>
-
-
-@*                 <div class="tab-pane" id="contatos" role="tabpanel">
-
-                    <div id="contatos-list-container">
-                        @await Html.PartialAsync("PartialViews/_ContatosListFornecedorPartial", Model.Contatos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
-                    </div>
-
-                </div>
-
-
-                <div class="tab-pane" id="enderecos" role="tabpanel">
-                    <div id="enderecos-list-container">
-                        @await Html.PartialAsync("PartialViews/_EnderecosListFornecedorPartial", Model.Enderecos, new ViewDataDictionary(ViewData) { { "PessoaId", Model.PessoaId } })
-                    </div>
-                </div>
- *@
-
-
-                 <div class="tab-pane" id="contatos" role="tabpanel">
-                    <div id="dados-bancarios-list-container">
-                        @await Component.InvokeAsync("AggregateList", 
-                        new {
-                            parentEntityType = "Fornecedor",
-                            parentEntityId = Model.Id,
-                            parentPessoaId = Model.PessoaId,
-                            aggregateType = "Contato",
-                            items = Model.Contatos
-                            })
-                    </div>
-                </div>
-
-
-                <div class="tab-pane" id="enderecos" role="tabpanel">
-                    <div id="dados-bancarios-list-container">
-                        @await Component.InvokeAsync("AggregateList", 
-                        new {
-                            parentEntityType = "Fornecedor",
-                            parentEntityId = Model.Id,
-                            parentPessoaId = Model.PessoaId,
-                            aggregateType = "Endereco",
-                            items = Model.Enderecos
-                            })
-                    </div>
-                </div>
-
-
+                <partial name="_aggregateListFornecedor" model="@Model" />
 
             </div>
         </div>

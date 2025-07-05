@@ -74,7 +74,7 @@
                     </ul><!-- Tab panes -->
                     <div class="tab-content text-muted">
 
-                        <partial name="_aggregateListCliente" model="@Model" />
+                        <partial name="_aggregateListCliente" model="Model" />
 
                     </div>
                 </div><!-- end card-body -->
@@ -86,10 +86,10 @@
 </div>
 
 
-<partial name="PartialViews/_offcanvas_dados_bancarios_cliente" />
-<partial name="PartialViews/_offcanvas_telefone_cliente" />
-<partial name="PartialViews/_offcanvas_contato_cliente" />
-<partial name="PartialViews/_offcanvas_endereco_cliente" />
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Cliente", parentViewModel = Model, aggregateType = "DadosBancarios" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Cliente", parentViewModel = Model, aggregateType = "Telefone" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Cliente", parentViewModel = Model, aggregateType = "Contato" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Cliente", parentViewModel = Model, aggregateType = "Endereco" })
 
 
 @section scripts {
@@ -102,13 +102,9 @@
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
         await Html.RenderPartialAsync("PartialViews/_animacao_consolidado_cliente");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_aggregate_manager", Model);
 
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_cliente");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_cliente");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_cliente");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_cliente");
     }
 
 }

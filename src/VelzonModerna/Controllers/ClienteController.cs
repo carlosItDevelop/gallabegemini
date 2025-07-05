@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Notifications;
@@ -157,6 +158,224 @@ namespace VelzonModerna.Controllers
             return RedirectToAction(nameof(Index));
         }
         #endregion
+
+
+
+        //// ===================================================================================
+        //// === INÍCIO DA REATORAÇÃO: ACTIONS GENÉRICAS PARA AGREGADOS ======================
+        //// ===================================================================================
+
+        //#region Actions Genéricas para Agregados
+
+        ///// <summary>
+        ///// ACTION GENÉRICA 1: Retorna a lista de um agregado específico como uma Partial View.
+        ///// Chamada pelo JavaScript para atualizar as abas.
+        ///// </summary>
+        //[HttpGet]
+        //public async Task<IActionResult> GetAggregateListPartial(Guid parentEntityId, string aggregateType)
+        //{
+        //    var cliente = await _clienteRepository.ObterClienteCompleto(parentEntityId);
+        //    if (cliente?.Pessoa is null)
+        //    {
+        //        // Retorna uma partial de erro amigável
+        //        return PartialView("_ErrorLoadingAggregates");
+        //    }
+
+        //    object items = aggregateType switch
+        //    {
+        //        "DadosBancarios" => _mapper.Map<List<DadosBancariosViewModel>>(cliente.Pessoa.DadosBancarios),
+        //        "Telefone" => _mapper.Map<List<TelefoneViewModel>>(cliente.Pessoa.Telefones),
+        //        "Contato" => _mapper.Map<List<ContatoViewModel>>(cliente.Pessoa.Contatos),
+        //        "Endereco" => _mapper.Map<List<EnderecoViewModel>>(cliente.Pessoa.Enderecos),
+        //        _ => new List<object>()
+        //    };
+
+        //    return ViewComponent("AggregateList", new
+        //    {
+        //        parentEntityType = "Cliente",
+        //        parentEntityId = cliente.Id,
+        //        parentPessoaId = cliente.PessoaId,
+        //        aggregateType = aggregateType,
+        //        items = items
+        //    });
+        //}
+
+        ///// <summary>
+        ///// ACTION GENÉRICA 2: Obtém os dados de um único agregado para preencher o formulário do OffCanvas.
+        ///// </summary>
+        //[HttpGet]
+        //public async Task<IActionResult> GetAggregateFormData(Guid aggregateId, Guid parentId, string aggregateType)
+        //{
+        //    // Para o modo de criação, o aggregateId será Guid.Empty.
+        //    if (aggregateId == Guid.Empty)
+        //    {
+        //        // Para a criação, não precisamos retornar dados, o JS já tem o que precisa.
+        //        return Ok(new { success = true });
+        //    }
+
+        //    // Modo Edição: busca o agregado dentro do cliente.
+        //    var cliente = await _clienteRepository.ObterClienteCompleto(parentId);
+        //    if (cliente?.Pessoa == null)
+        //        return NotFound("Cliente não encontrado.");
+
+        //    object viewModel = aggregateType switch
+        //    {
+        //        "DadosBancarios" => _mapper.Map<DadosBancariosViewModel>(cliente.Pessoa.DadosBancarios.FirstOrDefault(a => a.Id == aggregateId)),
+        //        "Telefone" => _mapper.Map<TelefoneViewModel>(cliente.Pessoa.Telefones.FirstOrDefault(a => a.Id == aggregateId)),
+        //        "Contato" => _mapper.Map<ContatoViewModel>(cliente.Pessoa.Contatos.FirstOrDefault(a => a.Id == aggregateId)),
+        //        "Endereco" => _mapper.Map<EnderecoViewModel>(cliente.Pessoa.Enderecos.FirstOrDefault(a => a.Id == aggregateId)),
+        //        _ => null
+        //    };
+
+        //    if (viewModel == null)
+        //        return NotFound("Agregado não encontrado.");
+
+        //    return Json(viewModel);
+        //}
+
+        ///// <summary>
+        ///// ACTION GENÉRICA 3: Salva (Cria ou Atualiza) um agregado.
+        ///// </summary>
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> SalvarAggregate()
+        //{
+        //    var form = HttpContext.Request.Form;
+        //    string aggregateType = form ["AggregateType"];
+        //    Guid parentEntityId = Guid.Parse(form ["ParentEntityId"]);
+
+        //    // Usamos um switch para chamar o método de serviço correto.
+        //    switch (aggregateType)
+        //    {
+        //        case "DadosBancarios":
+        //            var dbViewModel = await BindAndValidateAsync<DadosBancariosViewModel>(form);
+        //            if (!ModelState.IsValid)
+        //                break;
+
+        //            if (dbViewModel.Id == Guid.Empty)
+        //                await _clienteDomainService.AdicionarDadosBancariosAsync(parentEntityId, dbViewModel.Banco, dbViewModel.Agencia, dbViewModel.Conta, dbViewModel.TipoDeContaBancaria);
+        //            else
+        //                await _clienteDomainService.AtualizarDadosBancariosAsync(parentEntityId, dbViewModel.Id, dbViewModel.Banco, dbViewModel.Agencia, dbViewModel.Conta, dbViewModel.TipoDeContaBancaria);
+        //            break;
+
+        //        case "Telefone":
+        //            var telViewModel = await BindAndValidateAsync<TelefoneViewModel>(form);
+        //            if (!ModelState.IsValid)
+        //                break;
+
+        //            if (telViewModel.Id == Guid.Empty)
+        //                await _clienteDomainService.AdicionarTelefoneAsync(parentEntityId, telViewModel.DDD, telViewModel.Numero, telViewModel.TipoDeTelefone);
+        //            else
+        //                await _clienteDomainService.AtualizarTelefoneAsync(parentEntityId, telViewModel.Id, telViewModel.DDD, telViewModel.Numero, telViewModel.TipoDeTelefone);
+        //            break;
+
+        //        case "Contato":
+        //            var contatoViewModel = await BindAndValidateAsync<ContatoViewModel>(form);
+        //            if (!ModelState.IsValid)
+        //                break;
+
+        //            if (contatoViewModel.Id == Guid.Empty)
+        //                await _clienteDomainService.AdicionarContatoAsync(parentEntityId, contatoViewModel.Nome, contatoViewModel.Email, contatoViewModel.Telefone, contatoViewModel.TipoDeContato, contatoViewModel.EmailAlternativo, contatoViewModel.TelefoneAlternativo, contatoViewModel.Observacao);
+        //            else
+        //                await _clienteDomainService.AtualizarContatoAsync(parentEntityId, contatoViewModel.Id, contatoViewModel.Nome, contatoViewModel.Email, contatoViewModel.Telefone, contatoViewModel.TipoDeContato, contatoViewModel.EmailAlternativo, contatoViewModel.TelefoneAlternativo, contatoViewModel.Observacao);
+        //            break;
+
+        //        case "Endereco":
+        //            var endViewModel = await BindAndValidateAsync<EnderecoViewModel>(form);
+        //            if (!ModelState.IsValid)
+        //                break;
+
+        //            if (endViewModel.Id == Guid.Empty)
+        //                await _clienteDomainService.AdicionarEnderecoAsync(parentEntityId, endViewModel.PaisCodigoIso, endViewModel.LinhaEndereco1, endViewModel.Cidade, endViewModel.CodigoPostal, endViewModel.TipoDeEndereco, endViewModel.LinhaEndereco2, endViewModel.EstadoOuProvincia, endViewModel.InformacoesAdicionais);
+        //            else
+        //                await _clienteDomainService.AtualizarEnderecoAsync(parentEntityId, endViewModel.Id, endViewModel.PaisCodigoIso, endViewModel.LinhaEndereco1, endViewModel.Cidade, endViewModel.CodigoPostal, endViewModel.TipoDeEndereco, endViewModel.LinhaEndereco2, endViewModel.EstadoOuProvincia, endViewModel.InformacoesAdicionais);
+        //            break;
+
+        //        default:
+        //            NotificarErro("Tipo de agregado desconhecido.");
+        //            break;
+        //    }
+
+        //    if (!OperacaoValida())
+        //    {
+        //        return Json(new { success = false, errors = this.ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+        //    }
+
+        //    if (!await _clienteRepository.UnitOfWork.CommitAsync())
+        //    {
+        //        return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao salvar os dados no banco." } });
+        //    }
+
+        //    return Json(new { success = true });
+        //}
+
+        ///// <summary>
+        ///// ACTION GENÉRICA 4: Exclui um agregado.
+        ///// </summary>
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ExcluirAggregate(Guid parentEntityId, Guid aggregateId, string aggregateType)
+        //{
+        //    if (parentEntityId == Guid.Empty || aggregateId == Guid.Empty)
+        //    {
+        //        NotificarErro("IDs inválidos para a exclusão.");
+        //    } else
+        //    {
+        //        switch (aggregateType)
+        //        {
+        //            case "DadosBancarios":
+        //                await _clienteDomainService.RemoverDadosBancariosAsync(parentEntityId, aggregateId);
+        //                break;
+        //            case "Telefone":
+        //                await _clienteDomainService.RemoverTelefoneAsync(parentEntityId, aggregateId);
+        //                break;
+        //            case "Contato":
+        //                await _clienteDomainService.RemoverContatoAsync(parentEntityId, aggregateId);
+        //                break;
+        //            case "Endereco":
+        //                await _clienteDomainService.RemoverEnderecoAsync(parentEntityId, aggregateId);
+        //                break;
+        //            default:
+        //                NotificarErro("Tipo de agregado desconhecido.");
+        //                break;
+        //        }
+        //    }
+
+        //    if (!OperacaoValida())
+        //    {
+        //        return Json(new { success = false, errors = this.ObterNotificacoes().Select(n => n.Mensagem).ToList() });
+        //    }
+
+        //    if (!await _clienteRepository.UnitOfWork.CommitAsync())
+        //    {
+        //        return Json(new { success = false, errors = new List<string> { "Ocorreu um erro ao excluir o registro do banco." } });
+        //    }
+
+        //    return Json(new { success = true });
+        //}
+
+
+        ///// <summary>
+        ///// Método auxiliar para desserializar e validar o formulário dinamicamente.
+        ///// </summary>
+        //private async Task<T> BindAndValidateAsync<T>(IFormCollection form) where T : class
+        //{
+        //    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        //    var json = JsonSerializer.Serialize(form.ToDictionary(k => k.Key, v => v.Value.ToString()), options);
+        //    var viewModel = JsonSerializer.Deserialize<T>(json, options);
+
+        //    if (viewModel == null)
+        //        return null;
+
+        //    // Valida o modelo e adiciona erros ao ModelState se necessário.
+        //    await TryUpdateModelAsync(viewModel, typeof(T), "");
+
+        //    return viewModel;
+        //}
+
+        //#endregion
+
+
 
 
 
@@ -798,19 +1017,19 @@ namespace VelzonModerna.Controllers
         {
 
             try
-            { 
-            var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
-            var enderecoEntities = cliente?.Pessoa?.Enderecos ?? new List<Endereco>();
-            var enderecoViewModels = _mapper.Map<List<EnderecoViewModel>>(enderecoEntities);
-
-            return ViewComponent("AggregateList", new
             {
-                parentEntityType = "Cliente",
-                parentEntityId = clienteId,
-                parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
-                aggregateType = "Endereco",
-                items = enderecoViewModels
-            });
+                var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+                var enderecoEntities = cliente?.Pessoa?.Enderecos ?? new List<Endereco>();
+                var enderecoViewModels = _mapper.Map<List<EnderecoViewModel>>(enderecoEntities);
+
+                return ViewComponent("AggregateList", new
+                {
+                    parentEntityType = "Cliente",
+                    parentEntityId = clienteId,
+                    parentPessoaId = cliente?.PessoaId ?? Guid.Empty,
+                    aggregateType = "Endereco",
+                    items = enderecoViewModels
+                });
 
             } catch (Exception ex)
             {

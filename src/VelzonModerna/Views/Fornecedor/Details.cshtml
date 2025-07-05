@@ -77,12 +77,13 @@
 </div>
 
 
-<partial name="PartialViews/_offcanvas_dados_bancarios_fornecedor" />
-<partial name="PartialViews/_offcanvas_telefone_fornecedor" />
-<partial name="PartialViews/_offcanvas_contato_fornecedor" />
-<partial name="PartialViews/_offcanvas_endereco_fornecedor" />
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Fornecedor", parentViewModel = Model, aggregateType = "DadosBancarios" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Fornecedor", parentViewModel = Model, aggregateType = "Telefone" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Fornecedor", parentViewModel = Model, aggregateType = "Contato" })
+@await Component.InvokeAsync("AggregateForm", new { parentEntityType = "Fornecedor", parentViewModel = Model, aggregateType = "Endereco" })
 
-@section Scripts {
+
+@section scripts {
 
     <script src="~/assets/libs/prismjs/prism.js"></script>
     <script src="~/assets/libs/toastify-js/src/toastify.js"></script>
@@ -92,11 +93,8 @@
 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        await Html.RenderPartialAsync("PartialViews/_scriptjs_aggregate_manager", Model);
 
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_dados_bancarios_fornecedor");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_telefone_fornecedor");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_contato_fornecedor");
-        await Html.RenderPartialAsync("PartialViews/_scriptjs_endereco_fornecedor");
     }
 
 }

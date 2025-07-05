@@ -1,0 +1,45 @@
+﻿@model VelzonModerna.ViewModels.ViewComponents.AggregateFormViewModel
+
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_TipoDeEndereco" class="form-label">Tipo de Endereço</label>
+    <select class="form-select" id="@(Model.AggregateType)_TipoDeEndereco" name="TipoDeEndereco" required>
+        <option value="">-- Selecione --</option>
+        @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Entities.Endereco.TipoDeEnderecoEnum>())
+        {
+            <option value="@tipo.Value">@tipo.Text</option>
+        }
+    </select>
+    <div class="invalid-feedback">Por favor, selecione o tipo do endereço.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_PaisCodigoIso" class="form-label">País (Código ISO)</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_PaisCodigoIso" name="PaisCodigoIso" required placeholder="Ex: BR, US, PT" maxlength="2">
+    <div class="invalid-feedback">Informe o código ISO do país (2 letras).</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_LinhaEndereco1" class="form-label">Endereço Linha 1</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_LinhaEndereco1" name="LinhaEndereco1" required placeholder="Rua, Número, Bairro/Distrito">
+    <div class="invalid-feedback">Informe a linha principal do endereço.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_LinhaEndereco2" class="form-label">Endereço Linha 2 (Opcional)</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_LinhaEndereco2" name="LinhaEndereco2" placeholder="Complemento, Apartamento, Bloco">
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Cidade" class="form-label">Cidade / Localidade</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Cidade" name="Cidade" required placeholder="Nome da cidade">
+    <div class="invalid-feedback">Informe a cidade.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_EstadoOuProvincia" class="form-label">Estado / Província / Região (Opcional)</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_EstadoOuProvincia" name="EstadoOuProvincia" placeholder="UF, Estado, etc.">
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_CodigoPostal" class="form-label">CEP / Código Postal / ZIP Code</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_CodigoPostal" name="CodigoPostal" required placeholder="00000-000 ou similar">
+    <div class="invalid-feedback">Informe o código postal.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_InformacoesAdicionais" class="form-label">Informações Adicionais (Opcional)</label>
+    <textarea class="form-control" id="@(Model.AggregateType)_InformacoesAdicionais" name="InformacoesAdicionais" rows="3" placeholder="Ponto de referência, instruções de entrega..."></textarea>
+</div>

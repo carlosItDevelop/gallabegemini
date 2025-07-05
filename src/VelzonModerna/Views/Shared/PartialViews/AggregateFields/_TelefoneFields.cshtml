@@ -1,0 +1,23 @@
+﻿@model VelzonModerna.ViewModels.ViewComponents.AggregateFormViewModel
+
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_DDD" class="form-label">DDD</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_DDD" name="DDD" required placeholder="Ex: 21" maxlength="3">
+    <div class="invalid-feedback">Por favor, informe o DDD.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Numero" class="form-label">Número</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Numero" name="Numero" required placeholder="Ex: 98765-4321" maxlength="15">
+    <div class="invalid-feedback">Por favor, informe o número.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_TipoDeTelefone" class="form-label">Tipo de Telefone</label>
+    <select class="form-select" id="@(Model.AggregateType)_TipoDeTelefone" name="TipoDeTelefone" required>
+        <option value="">-- Selecione --</option>
+        @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeTelefone>())
+        {
+            <option value="@tipo.Value">@tipo.Text</option>
+        }
+    </select>
+    <div class="invalid-feedback">Por favor, selecione o tipo do telefone.</div>
+</div>

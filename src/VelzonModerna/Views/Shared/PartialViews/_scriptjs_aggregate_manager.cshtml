@@ -1,0 +1,223 @@
+﻿<script>
+    $(function() {
+        console.log("Aggregate Manager Script (v2 - Corrigido) - Carregado e Pronto!");
+
+        // --- VARIÁVEIS GLOBAIS ---
+        const parentEntityType = '@Model.GetType().Name.Replace("ViewModel", "")'; // "Cliente"
+        const parentEntityId = '@Model.Id';
+
+        // --- FUNÇÕES AUXILIARES (sem alterações) ---
+        function showToast(message, type = 'success') {
+            const types = {
+                success: 'linear-gradient(to right, #00b09b, #96c93d)',
+                error: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                warning: 'linear-gradient(to right, #ffc107, #f39c12)'
+            };
+            Toastify({ text: message, duration: 4000, gravity: 'top', position: 'right', close: true, style: { background: types[type] || types.success } }).showToast();
+        }
+
+        function toKebabCase(str) {
+            return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+        }
+
+        function resetOffcanvasForm(aggregateType) {
+            const form = $(`#form${aggregateType}`);
+            if (!form.length) return;
+            form[0].reset();
+            form.removeClass('was-validated');
+            $(`#${aggregateType}_Id`).val('00000000-0000-0000-0000-000000000000');
+            $(`#offcanvasFormErrors_${aggregateType}`).html('');
+            $(`#btnExcluir${aggregateType}`).hide();
+            $(`#offcanvas${aggregateType}Label`).text(aggregateType);
+            $(`#btnSalvar${aggregateType}`).prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar');
+        }
+
+        function displayServerErrors(aggregateType, errors) {
+            const errorContainer = $(`#offcanvasFormErrors_${aggregateType}`);
+            errorContainer.html('');
+            if (Array.isArray(errors) && errors.length > 0) {
+                errorContainer.html(errors.join('<br>'));
+            } else if (typeof errors === 'string') {
+                errorContainer.text(errors);
+            }
+        }
+
+        function refreshAggregateList(aggregateType) {
+            const listContainerId = `#${toKebabCase(aggregateType)}-list-container`;
+            // CORREÇÃO: A Action para buscar a lista é específica, não genérica.
+            const url = `@Url.Action("GetAggregateListPartialPlaceholder", "ControllerPlaceholder")`
+                .replace('ControllerPlaceholder', parentEntityType)
+                .replace('GetAggregateListPartialPlaceholder', `Get${aggregateType}ListPartial`)
+                + `?${parentEntityType.toLowerCase()}Id=${parentEntityId}`;
+
+            $(listContainerId).html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(result) { $(listContainerId).html(result); },
+                error: function() {
+                    showToast(`Erro ao recarregar a lista de ${aggregateType}.`, 'error');
+                    $(listContainerId).html(`<div class="alert alert-danger">Falha ao carregar a lista.</div>`);
+                }
+            });
+        }
+
+        // --- EVENT LISTENERS UNIFICADOS (COM CORREÇÕES) ---
+
+        // 1. ABRIR OFFCANVAS (ADICIONAR OU EDITAR)
+        $(document).on('click', '.add-aggregate-btn, .aggregate-row', function() {
+            const aggregateType = $(this).data('aggregate-type');
+            const aggregateId = $(this).data('id');
+            const isEditMode = !!aggregateId;
+            const offcanvasInstance = new bootstrap.Offcanvas($(`#offcanvas${aggregateType}`)[0]);
+            const form = $(`#form${aggregateType}`);
+
+            resetOffcanvasForm(aggregateType);
+
+            if (isEditMode) {
+                $('#offcanvas' + aggregateType + 'Label').text('Editar ' + aggregateType);
+                form.find('input, select, textarea').prop('disabled', true);
+
+                // ### CORREÇÃO CRÍTICA AQUI ###
+                const url = `@Url.Action("GetAggregateFormDataPlaceholder", "ControllerPlaceholder")`
+                                .replace('ControllerPlaceholder', parentEntityType)
+                                .replace('GetAggregateFormDataPlaceholder', `Get${aggregateType}FormData`);
+
+                const idKey = aggregateType.charAt(0).toLowerCase() + aggregateType.slice(1) + 'Id';
+                const dataObject = {};
+                dataObject[idKey] = aggregateId;
+                dataObject[`${parentEntityType.toLowerCase()}Id`] = parentEntityId;
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    data: dataObject, // Envia os parâmetros com os nomes corretos
+                    success: function(data) {
+                        if (data) {
+                            for (const key in data) {
+                                $(`#${aggregateType}_${key}`).val(data[key]);
+                            }
+                            $(`#btnExcluir${aggregateType}`).show();
+                            offcanvasInstance.show();
+                        } else {
+                            showToast(`${aggregateType} não encontrado.`, 'error');
+                        }
+                    },
+                    error: function() { showToast(`Erro ao buscar dados de ${aggregateType}.`, 'error'); },
+                    complete: function() { form.find('input, select, textarea').prop('disabled', false); }
+                });
+            } else {
+                $('#offcanvas' + aggregateType + 'Label').text('Adicionar ' + aggregateType);
+                offcanvasInstance.show();
+            }
+        });
+
+        // 2. SUBMETER FORMULÁRIO (SALVAR)
+        $(document).on('submit', 'form[id^="form"]', function(event) {
+            event.preventDefault();
+            const form = $(this);
+            const aggregateType = form.attr('id').replace('form', '');
+            const offcanvasInstance = new bootstrap.Offcanvas($(`#offcanvas${aggregateType}`)[0]);
+
+            if (this.checkValidity() === false) {
+                event.stopPropagation();
+                form.addClass('was-validated');
+                return;
+            }
+            form.removeClass('was-validated');
+
+            // ### CORREÇÃO CRÍTICA AQUI ###
+            const url = `@Url.Action("SalvarAggregatePlaceholder", "ControllerPlaceholder")`
+                            .replace('ControllerPlaceholder', parentEntityType)
+                            .replace('SalvarAggregatePlaceholder', `Salvar${aggregateType}`);
+
+            let dataToSend = form.serialize() + `&${parentEntityType.toLowerCase()}Id=${parentEntityId}`;
+
+            const btnSalvar = $(`#btnSalvar${aggregateType}`);
+            btnSalvar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Salvando...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: dataToSend,
+                headers: { "RequestVerificationToken": form.find('input[name="__RequestVerificationToken"]').val() },
+                success: function(response) {
+                    if (response.success) {
+                        offcanvasInstance.hide();
+                        refreshAggregateList(aggregateType);
+                        showToast(`${aggregateType} salvo com sucesso!`, 'success');
+                    } else {
+                        displayServerErrors(aggregateType, response.errors);
+                        showToast(`Erro ao salvar ${aggregateType}.`, 'error');
+                    }
+                },
+                error: function() { displayServerErrors(aggregateType, "Erro de comunicação."); showToast(`Erro ao salvar ${aggregateType}.`, 'error'); },
+                complete: function() { btnSalvar.prop('disabled', false).html('<i class="ri-save-line align-bottom me-1"></i> Salvar'); }
+            });
+        });
+
+        // 3. EXCLUIR
+        $(document).on('click', 'button[id^="btnExcluir"]', function() {
+            const aggregateType = $(this).attr('id').replace('btnExcluir', '');
+            const aggregateId = $(`#${aggregateType}_Id`).val();
+            const offcanvasInstance = new bootstrap.Offcanvas($(`#offcanvas${aggregateType}`)[0]);
+            const btnExcluir = $(this);
+
+            Swal.fire({
+                title: 'Tem certeza?', text: `Esta operação removerá o registro.`, icon: 'warning',
+                showCancelButton: true, confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar',
+                customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+                buttonsStyling: false
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+                btnExcluir.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                // ### CORREÇÃO CRÍTICA AQUI ###
+                const url = `@Url.Action("ExcluirAggregatePlaceholder", "ControllerPlaceholder")`
+                                .replace('ControllerPlaceholder', parentEntityType)
+                                .replace('ExcluirAggregatePlaceholder', `Excluir${aggregateType}`);
+
+                const idKey = aggregateType.charAt(0).toLowerCase() + aggregateType.slice(1) + 'Id';
+                const dataObject = { __RequestVerificationToken: $(`#form${aggregateType}`).find('input[name="__RequestVerificationToken"]').val() };
+                dataObject[idKey] = aggregateId;
+                dataObject[`${parentEntityType.toLowerCase()}Id`] = parentEntityId;
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: dataObject,
+                    success: function(response) {
+                        if (response.success) {
+                            offcanvasInstance.hide();
+                            refreshAggregateList(aggregateType);
+                            Swal.fire('Excluído!', 'Registro removido.', 'success');
+                        } else {
+                            Swal.fire('Erro!', (response.errors ?? ['Erro desconhecido']).join('<br>'), 'error');
+                        }
+                    },
+                    error: function() { Swal.fire('Erro!', 'Não foi possível excluir.', 'error'); },
+                    complete: function() { btnExcluir.prop('disabled', false).html('<i class="ri-delete-bin-line align-bottom me-1"></i> Excluir'); }
+                });
+            });
+        });
+
+        // 4. LIMPEZA E CARREGAMENTO INICIAL (sem alterações)
+        $('div[id^="offcanvas"]').on('hidden.bs.offcanvas', function () {
+            const aggregateType = $(this).attr('id').replace('offcanvas', '');
+            resetOffcanvasForm(aggregateType);
+        });
+
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            const targetPaneId = $(e.target).attr('href');
+            const aggregateType = $(targetPaneId).find('.aggregate-row').first().data('aggregate-type');
+            if(aggregateType) refreshAggregateList(aggregateType);
+        });
+
+        const activeTabId = $('.nav-pills .nav-link.active').attr('href');
+        if(activeTabId) {
+             const initialAggregateType = $(activeTabId).find('.aggregate-row').first().data('aggregate-type');
+             if(initialAggregateType) refreshAggregateList(initialAggregateType);
+        }
+    });
+</script>

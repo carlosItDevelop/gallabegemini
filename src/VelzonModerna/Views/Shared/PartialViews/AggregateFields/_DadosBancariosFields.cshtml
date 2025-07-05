@@ -1,0 +1,28 @@
+﻿@model VelzonModerna.ViewModels.ViewComponents.AggregateFormViewModel
+
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Banco" class="form-label">Banco</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Banco" name="Banco" required placeholder="Nome do Banco">
+    <div class="invalid-feedback">Por favor, informe o nome do banco.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Agencia" class="form-label">Agência</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Agencia" name="Agencia" required placeholder="Número da Agência">
+    <div class="invalid-feedback">Por favor, informe a agência.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Conta" class="form-label">Conta</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Conta" name="Conta" required placeholder="Número da Conta">
+    <div class="invalid-feedback">Por favor, informe a conta.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_TipoDeContaBancaria" class="form-label">Tipo de Conta</label>
+    <select class="form-select" id="@(Model.AggregateType)_TipoDeContaBancaria" name="TipoDeContaBancaria" required>
+        <option value="">-- Selecione --</option>
+        @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeContaBancaria>())
+        {
+            <option value="@tipo.Value">@tipo.Text</option>
+        }
+    </select>
+    <div class="invalid-feedback">Por favor, selecione o tipo da conta.</div>
+</div>

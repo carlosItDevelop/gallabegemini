@@ -1,0 +1,40 @@
+﻿@model VelzonModerna.ViewModels.ViewComponents.AggregateFormViewModel
+
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Nome" class="form-label">Nome do Contato</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Nome" name="Nome" required placeholder="Nome completo do contato">
+    <div class="invalid-feedback">Por favor, informe o nome do contato.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Email" class="form-label">Email Principal</label>
+    <input type="email" class="form-control" id="@(Model.AggregateType)_Email" name="Email" required placeholder="email@dominio.com">
+    <div class="invalid-feedback">Por favor, informe um email válido.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Telefone" class="form-label">Telefone Principal</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_Telefone" name="Telefone" required placeholder="(XX) XXXXX-XXXX">
+    <div class="invalid-feedback">Por favor, informe o telefone principal.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_TipoDeContato" class="form-label">Tipo de Contato</label>
+    <select class="form-select" id="@(Model.AggregateType)_TipoDeContato" name="TipoDeContato" required>
+        <option value="">-- Selecione --</option>
+        @foreach (var tipo in Html.GetEnumSelectList<GeneralLabSolutions.Domain.Enums.TipoDeContato>())
+        {
+            <option value="@tipo.Value">@tipo.Text</option>
+        }
+    </select>
+    <div class="invalid-feedback">Por favor, selecione o tipo do contato.</div>
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_EmailAlternativo" class="form-label">Email Alternativo (Opcional)</label>
+    <input type="email" class="form-control" id="@(Model.AggregateType)_EmailAlternativo" name="EmailAlternativo" placeholder="email.alt@dominio.com">
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_TelefoneAlternativo" class="form-label">Telefone Alternativo (Opcional)</label>
+    <input type="text" class="form-control" id="@(Model.AggregateType)_TelefoneAlternativo" name="TelefoneAlternativo" placeholder="(XX) XXXXX-XXXX">
+</div>
+<div class="mb-3">
+    <label for="@(Model.AggregateType)_Observacao" class="form-label">Observação (Opcional)</label>
+    <textarea class="form-control" id="@(Model.AggregateType)_Observacao" name="Observacao" rows="3" placeholder="Detalhes adicionais sobre o contato"></textarea>
+</div>

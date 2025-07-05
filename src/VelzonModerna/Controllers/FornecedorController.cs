@@ -76,7 +76,7 @@ namespace VelzonModerna.Controllers
         {
             var model = await _fornecedorRepository.ObterFornecedorCompleto(id);
 
-            if (model == null)
+            if (model is null)
                 return NotFound();
             var viewModel = _mapper.Map<FornecedorViewModel>(model);
 

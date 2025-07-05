@@ -1,0 +1,36 @@
+﻿@model VelzonModerna.ViewModels.ViewComponents.AggregateFormViewModel
+
+<!-- ========== Offcanvas Genérico para @Model.AggregateType ========== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas@(Model.AggregateType)" aria-labelledby="offcanvas@(Model.AggregateType)Label">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="offcanvas@(Model.AggregateType)Label">@Model.AggregateType</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="form@(Model.AggregateType)" novalidate>
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" id="@(Model.AggregateType)_Id" name="Id" value="00000000-0000-0000-0000-000000000000" />
+            <input type="hidden" id="@(Model.AggregateType)_PessoaId" name="PessoaId" value="@Model.ParentPessoaId" />
+
+            <!-- Renderiza os campos específicos do agregado -->
+            <partial name="@Model.FieldsPartialViewPath" model="Model" />
+
+            <!-- Área para exibir erros gerais do formulário -->
+            <div id="offcanvasFormErrors_@(Model.AggregateType)" class="text-danger mt-2 mb-3"></div>
+
+            <!-- Botões de Ação Genéricos -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success" id="btnSalvar@(Model.AggregateType)">
+                    <i class="ri-save-line align-bottom me-1"></i> Salvar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluir@(Model.AggregateType)" style="display: none;">
+                    <i class="ri-delete-bin-line align-bottom me-1"></i> Excluir
+                </button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line align-bottom me-1"></i> Fechar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

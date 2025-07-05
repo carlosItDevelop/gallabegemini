@@ -1,8 +1,9 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataStatusDoItem
     {

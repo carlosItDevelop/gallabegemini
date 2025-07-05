@@ -1,5 +1,5 @@
 ﻿using GeneralLabSolutions.Domain.Entities.Base;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 namespace GeneralLabSolutions.Domain.Entities
 {

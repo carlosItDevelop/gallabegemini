@@ -1,6 +1,6 @@
 ﻿using GeneralLabSolutions.CoreShared.DTOs.DtosGraficos;
 using GeneralLabSolutions.CoreShared.DTOs.DtosViewComponents;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 namespace GeneralLabSolutions.CoreShared.Interfaces
 {

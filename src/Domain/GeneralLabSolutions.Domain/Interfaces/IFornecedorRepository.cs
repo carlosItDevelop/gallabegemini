@@ -17,6 +17,13 @@ namespace GeneralLabSolutions.Domain.Interfaces
         // Método principal para carregar o agregado completo
         Task<Fornecedor?> ObterFornecedorCompleto(Guid fornecedorId);
 
+        Task<List<DadosBancarios>> ObterDadosBancariosPorFornecedorId(Guid pessoaId);
+
+        Task<Fornecedor?> ObterFornecedorComDadosBancarios(Guid FornecedorId);
+
+        Task<DadosBancarios?> ObterDadosBancariosPorId(Guid dadosBancariosId);
+
+
         // Métodos para manipulação explícita do estado das entidades filhas
         Task AdicionarDadosBancariosAsync(Fornecedor fornecedor, DadosBancarios novo);
         Task RemoverDadosBancariosAsync(Fornecedor fornecedor, DadosBancarios dadosBancarios);

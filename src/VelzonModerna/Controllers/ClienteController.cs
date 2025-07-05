@@ -192,18 +192,28 @@ namespace VelzonModerna.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetDadosBancariosFormData(Guid? dadosBancariosId, Guid clienteId)
-        { 
+        {
+            // Busca o cliente primeiro para todas as operações, garantindo que ele existe.
+            var cliente = await _clienteRepository.ObterClienteCompleto(clienteId);
+            if (cliente?.Pessoa is null)
+            {
+                return NotFound("Cliente ou dados de Pessoa associados não encontrados.");
+            }
+
             if (dadosBancariosId is null || dadosBancariosId == Guid.Empty)
             {
-                if (!await _clienteRepository.TemCliente(clienteId))
-                    return NotFound();
-                var newViewModel = new DadosBancariosViewModel { PessoaId = clienteId }; // Aqui era clienteId -> PessoaId do Cliente
+                // Modo Criação: Retorna um ViewModel com o PessoaId correto.
+                var newViewModel = new DadosBancariosViewModel { PessoaId = cliente.PessoaId };
                 return Json(newViewModel);
+
             } else
             {
-                var dadosBancarios = await _clienteRepository.ObterClienteCompleto(dadosBancariosId.Value);
+                // Modo Edição: Busca o item específico na coleção já carregada.
+                var dadosBancarios = cliente.Pessoa.DadosBancarios.FirstOrDefault(d => d.Id == dadosBancariosId.Value);
+
                 if (dadosBancarios is null)
-                    return NotFound();
+                    return NotFound("Dados bancários não encontrados ou não pertencem a este cliente.");
+
                 var viewModel = _mapper.Map<DadosBancariosViewModel>(dadosBancarios);
                 return Json(viewModel);
             }

@@ -2,8 +2,8 @@
 using GeneralLabSolutions.CoreShared.DTOs.DtosViewComponents;
 using GeneralLabSolutions.CoreShared.Interfaces;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.SharedKernel.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VelzonModerna.Configuration.ViewComponents.CardResumoPedido

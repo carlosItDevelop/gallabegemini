@@ -50,16 +50,15 @@ namespace GeneralLabSolutions.Domain.Entities
 
         public string? Observacao { get; set; } = string.Empty;
 
-        // Novas propriedades para o cliente
 
         public string TelefonePrincipal { get; private set; }
         // CRM‑21 Nome contato, crm‑23 Telefone contato
-        public string? ContatoRepresentante { get; private set; } = string.Empty; // Nullable string para compatibilidade com o banco de dados
+        public string? ContatoRepresentante { get; private set; } = string.Empty;
 
-        public void SetContatoRepresentante(string contatoRepresentante) 
+        public void SetContatoRepresentante(string contatoRepresentante)
             => ContatoRepresentante = contatoRepresentante;
-        
-        public void SetTelefonePrincipal(string telefonePrincipal) 
+
+        public void SetTelefonePrincipal(string telefonePrincipal)
             => TelefonePrincipal = telefonePrincipal;
 
 
@@ -75,7 +74,7 @@ namespace GeneralLabSolutions.Domain.Entities
         // Status do cliente (e.g., Ativo, Inativo)
         public StatusDoCliente StatusDoCliente { get; set; } = StatusDoCliente.Ativo;
         // Tipo de cliente (e.g., Comum, Especial)
-        public TipoDeCliente TipoDeCliente { get; set; } 
+        public TipoDeCliente TipoDeCliente { get; set; }
             = TipoDeCliente.Comum;
         // Coleção de pedidos realizados pelo cliente
         public virtual ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
@@ -109,9 +108,9 @@ namespace GeneralLabSolutions.Domain.Entities
         /// <summary>
         /// Adiciona uma nova conta bancária associada a este Cliente.
         /// </summary>
-        public DadosBancarios AdicionarDadosBancarios(string banco, 
-                string agencia, 
-                string conta, 
+        public DadosBancarios AdicionarDadosBancarios(string banco,
+                string agencia,
+                string conta,
                 TipoDeContaBancaria tipoConta)
         {
             return DadosBancariosDomainHelper.AdicionarDadosBancariosGenerico(this, banco, agencia, conta, tipoConta);

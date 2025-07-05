@@ -1,13 +1,14 @@
 ﻿// Caminho: GeneralLabSolutions.InfraStructure/Data/SeedDataKanbanTask.cs
 using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataKanbanTask
     {
@@ -83,7 +84,7 @@ namespace GeneralLabSolutions.InfraStructure.Data
                     } while (descricoesUsadas.Contains(descricao));
                     descricoesUsadas.Add(descricao);
 
-                    DateTime? dueDate = _random.Next(0, 3) == 0 ? (DateTime?)null : DateTime.UtcNow.AddDays(_random.Next(1, 45)); // Aumentei a chance de não ter due date e o range
+                    DateTime? dueDate = _random.Next(0, 3) == 0 ? null : DateTime.UtcNow.AddDays(_random.Next(1, 45)); // Aumentei a chance de não ter due date e o range
 
                     var task = new KanbanTask(titulo, descricao, dueDate)
                     {

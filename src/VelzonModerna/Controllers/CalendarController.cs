@@ -1,6 +1,6 @@
 ﻿
 using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.InfraStructure.Data; // Seu DbContext
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.AspNetCore.Authorization; // Se precisar de autorização
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

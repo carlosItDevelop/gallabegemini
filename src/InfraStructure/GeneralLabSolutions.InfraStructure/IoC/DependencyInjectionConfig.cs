@@ -22,7 +22,7 @@ namespace GeneralLabSolutions.InfraStructure.IoC
         {
 
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();               
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
             // Registra o MediatR e escaneia assemblies para handlers
@@ -86,7 +86,7 @@ namespace GeneralLabSolutions.InfraStructure.IoC
 
             services.AddScoped<ILeadDomainService, LeadDomainService>();
             services.AddScoped<ICrmTaskDomainService, CrmTaskDomainService>();
-    
+
             return services;
 
         }

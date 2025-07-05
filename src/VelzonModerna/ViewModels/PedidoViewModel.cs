@@ -1,4 +1,4 @@
-﻿using GeneralLabSolutions.SharedKernel.Enums;
+﻿using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 namespace VelzonModerna.ViewModels
 {

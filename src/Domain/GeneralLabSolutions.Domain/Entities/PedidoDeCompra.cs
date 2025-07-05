@@ -1,7 +1,7 @@
 ﻿using GeneralLabSolutions.Domain.DomainObjects;
 using GeneralLabSolutions.Domain.Entities.Audit;
 using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 public class PedidoDeCompra : EntityAudit, IAggregateRoot
 {

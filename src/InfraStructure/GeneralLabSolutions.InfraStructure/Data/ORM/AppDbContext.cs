@@ -8,7 +8,7 @@ using GeneralLabSolutions.Domain.Mensageria;
 using GeneralLabSolutions.WebApiCore.Usuario;
 using Microsoft.EntityFrameworkCore;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.ORM
 {
     public class AppDbContext : DbContext, IUnitOfWork
     {

@@ -1,10 +1,11 @@
 ﻿using GeneralLabSolutions.Domain.Entities; // Para Endereco e Pessoa
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;    // Para AsNoTracking
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataEndereco
     {

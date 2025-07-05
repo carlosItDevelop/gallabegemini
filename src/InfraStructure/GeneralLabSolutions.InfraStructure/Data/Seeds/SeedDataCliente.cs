@@ -1,12 +1,10 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataCliente
     {
@@ -28,8 +26,8 @@ namespace GeneralLabSolutions.InfraStructure.Data
             var pesos = new Dictionary<StatusDoCliente, int>
             {
                 { StatusDoCliente.Ativo, 30 },
-                { StatusDoCliente.Inativo, 8 }, // Peso atualizado se necessário
-                { StatusDoCliente.Bloqueado, 5 } // Novo status com peso
+                { StatusDoCliente.Inativo, 8 },
+                { StatusDoCliente.Bloqueado, 5 }
             };
             return GetRandomEnumByWeight(pesos, random, StatusDoCliente.Ativo);
         }
@@ -45,7 +43,7 @@ namespace GeneralLabSolutions.InfraStructure.Data
             return GetRandomEnumByWeight(pesos, random, TipoDePessoa.Fisica);
         }
 
-        // NOVA Função para retornar o regime tributário baseado em pesos
+        // Função para retornar o regime tributário baseado em pesos
         public static RegimeTributario GetRegimeTributarioByWeight(Random random)
         {
             var pesos = new Dictionary<RegimeTributario, int>
@@ -79,7 +77,6 @@ namespace GeneralLabSolutions.InfraStructure.Data
         }
 
 
-        // Função para gerar o número de documento baseado no tipo de pessoa
         public static string GerarDocumento(TipoDePessoa tipoPessoa, Random random)
         {
             if (tipoPessoa == TipoDePessoa.Fisica)
@@ -91,7 +88,6 @@ namespace GeneralLabSolutions.InfraStructure.Data
             }
         }
 
-        // Função para gerar email (mantida)
         public static string GerarEmail(string nomeCliente, Random random)
         {
             var nomeTratado = nomeCliente.ToLower().Replace(" ", ".").Replace(",", "").Replace("Ltda", "").Replace("Inc", "").Replace("SA", "").Replace("Ass", "");
@@ -99,8 +95,7 @@ namespace GeneralLabSolutions.InfraStructure.Data
             var dominioAleatorio = dominios [random.Next(dominios.Count)];
             return $"{nomeTratado.Split('.').First()}{random.Next(1, 99)}@{dominioAleatorio}"; // Adiciona um número para mais unicidade
         }
-
-        // NOVA Função para gerar telefone principal
+        
         public static string GerarTelefonePrincipal(Random random)
         {
             return $"({random.Next(11, 99)}) 9{random.Next(1000, 9999)}-{random.Next(1000, 9999)}";
@@ -150,7 +145,7 @@ namespace GeneralLabSolutions.InfraStructure.Data
                 {
                     var tipoPessoa = GetTipoDePessoaByWeight(random);
                     var documento = GerarDocumento(tipoPessoa, random);
-                    var email = GerarEmail(nomeCliente, random); // Gerar email
+                    var email = GerarEmail(nomeCliente, random);
 
                     var cliente = new Cliente(
                         nome: nomeCliente,
@@ -185,7 +180,7 @@ namespace GeneralLabSolutions.InfraStructure.Data
 
                 try
                 {
-                    context.SaveChanges(); // Mantendo o SaveChanges aqui por enquanto, conforme sua solicitação
+                    context.SaveChanges(); // Mantendo o SaveChanges aqui por enquanto
                     Console.WriteLine("SeedData para Cliente gerado com sucesso!");
                 } catch (Exception ex)
                 {

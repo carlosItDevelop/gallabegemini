@@ -1,12 +1,13 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 // using Microsoft.Extensions.DependencyInjection; // Não mais necessário aqui
 using System;
 using System.Collections.Generic; // Para List<>
 using System.Linq; // Para Any, Select
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataContato
     {

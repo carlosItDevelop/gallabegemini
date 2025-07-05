@@ -1,14 +1,10 @@
-﻿using GeneralLabSolutions.Domain.Entities;
+﻿using System.Linq.Expressions;
+using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Extensions.Helpers.Generics;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using GeneralLabSolutions.InfraStructure.Repository.Base;
-using Microsoft.EntityFrameworkCore; // Necessário
-using System;                       // Necessário
-using System.Collections.Generic;   // Necessário para List<>
-using System.Linq;                  // Necessário para Any, Where, etc.
-using System.Linq.Expressions;      // Necessário para Expression<>
-using System.Threading.Tasks;       // Necessário
+using Microsoft.EntityFrameworkCore;
 
 namespace GeneralLabSolutions.InfraStructure.Repository
 {
@@ -19,16 +15,22 @@ namespace GeneralLabSolutions.InfraStructure.Repository
 
         public ClienteRepository(AppDbContext context) : base(context) { }
 
+
+        #region: Métodos para busca em Cliente
         public async Task<bool> TemCliente(Guid id)
         {
             return await _context.Cliente.AnyAsync(x => x.Id == id);
         }
 
-        // Exemplo de implementação para Buscar
         public async Task<IEnumerable<Cliente>> Buscar(Expression<Func<Cliente, bool>> predicate)
         {
             return await _context.Cliente.AsNoTracking().Where(predicate).ToListAsync();
         }
+
+        #endregion: Fim Métodos para busca em Cliente
+
+
+        #region: ObterTodosPaginado
 
         public async Task<PagedResult<Cliente>> ObterTodosPaginado(int pageIndex, int pageSize, string? query = null)
         {
@@ -58,22 +60,54 @@ namespace GeneralLabSolutions.InfraStructure.Repository
 
         }
 
+        #endregion: Fim ObterTodosPaginado
+
+
+        #region: Métodos para Cliente Completo
+
+        /// <summary>
+        /// Obtém o cliente completo com todas as suas coleções de Pessoa.
+        /// </summary>
+        public async Task<Cliente?> ObterClienteCompleto(Guid clienteId)
+        {
+            return await _context.Cliente
+                                 .Include(c => c.Pessoa)
+                                     .ThenInclude(p => p.DadosBancarios)
+                                 .Include(c => c.Pessoa)
+                                     .ThenInclude(p => p.Telefones)
+                                 .Include(c => c.Pessoa) // Inclui Pessoa novamente para encadear
+                                     .ThenInclude(p => p.Contatos)
+                                 .Include(c => c.Pessoa) // Inclui Pessoa novamente para encadear
+                                     .ThenInclude(p => p.Enderecos)
+                                 .Include(c => c.Pedidos) // Se necessário
+                                     .ThenInclude(p => p.Itens) // Se necessário
+                                 .AsSplitQuery()
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(c => c.Id == clienteId);
+        }
+
+        #endregion: Fim Métodos Cliente Completo
+
+
         #region: Métodos para Dados Bancários (Mantidos)
+
+        // ToDo: Mudar ObterDadosBancariosPorClienteId para ObterDadosBancariosPorPessoaId.
+        public async Task<List<DadosBancarios>> ObterDadosBancariosPorClienteId(Guid pessoaId)
+        {
+            return await _context.DadosBancarios
+                .Where(x => x.PessoaId == pessoaId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<Cliente?> ObterClienteComDadosBancarios(Guid clienteId)
         {
             return await _context.Cliente
                                  .Include(c => c.Pessoa)
                                      .ThenInclude(p => p.DadosBancarios)
                                      .AsSplitQuery()
+                                     .AsNoTracking()
                                  .FirstOrDefaultAsync(c => c.Id == clienteId);
-        }
-
-        public async Task<List<DadosBancarios>> ObterDadosBancariosPorClienteId(Guid pessoaId)
-        {
-            return await _context.DadosBancarios
-                .Where(x => x.PessoaId == pessoaId)
-                .AsNoTracking() // Boa prática para listas de leitura
-                .ToListAsync();
         }
 
         public async Task<DadosBancarios?> ObterDadosBancariosPorId(Guid dadosBancariosId)
@@ -82,6 +116,7 @@ namespace GeneralLabSolutions.InfraStructure.Repository
             return await _context.DadosBancarios
                 .FirstOrDefaultAsync(x => x.Id == dadosBancariosId);
         }
+
 
         public async Task AdicionarDadosBancariosAsync(Cliente cliente, DadosBancarios novo)
         {
@@ -113,6 +148,24 @@ namespace GeneralLabSolutions.InfraStructure.Repository
                                  .FirstOrDefaultAsync(c => c.Id == clienteId);
         }
 
+
+        public async Task<List<Telefone>> ObterTelefonesPorClienteId(Guid pessoaId)
+        {
+            return await _context.Telefone
+                .Where(x => x.PessoaId == pessoaId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<Telefone?> ObterTelefonePorId(Guid telefoneId)
+        {
+            // Se necessário fora do agregado, mas geralmente não é recomendado
+            return await _context.Telefone
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == telefoneId);
+        }
+
+
         /// <summary>
         /// Define explicitamente o estado de um novo Telefone como 'Added'.
         /// </summary>
@@ -140,30 +193,6 @@ namespace GeneralLabSolutions.InfraStructure.Repository
         #endregion: FIM NOVAS IMPLEMENTAÇÕES PARA TELEFONE
 
 
-        #region: ObterClienteCompleto
-
-        /// <summary>
-        /// Obtém o cliente completo com todas as suas coleções de Pessoa.
-        /// </summary>
-        public async Task<Cliente?> ObterClienteCompleto(Guid clienteId)
-        {
-            return await _context.Cliente
-                                 .Include(c => c.Pessoa)
-                                     .ThenInclude(p => p.DadosBancarios)
-                                 .Include(c => c.Pessoa)
-                                     .ThenInclude(p => p.Telefones)
-                                 .Include(c => c.Pessoa)
-                                     .ThenInclude(p => p.Contatos)
-                                 .Include(c => c.Pessoa) // Inclui Pessoa novamente para encadear
-                                     .ThenInclude(p => p.Enderecos) // *** ADICIONADO INCLUSÃO DE ENDEREÇOS ***
-                                 .Include(c => c.Pedidos) // Se necessário
-                                 .AsSplitQuery()
-                                 .FirstOrDefaultAsync(c => c.Id == clienteId);
-        }
-
-        #endregion
-
-
         #region Métodos Contatos
 
         /// <summary>
@@ -176,6 +205,22 @@ namespace GeneralLabSolutions.InfraStructure.Repository
                                      .ThenInclude(p => p.Contatos) // Inclui a nova coleção
                                      .AsSplitQuery()
                                  .FirstOrDefaultAsync(c => c.Id == clienteId);
+        }
+
+        public async Task<List<Contato>> ObterContatosPorClienteId(Guid pessoaId)
+        {
+            return await _context.Contato
+                .Where(x => x.PessoaId == pessoaId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<Contato?> ObterContatoPorId(Guid contatoId)
+        {
+            // Se necessário fora do agregado, mas geralmente não é recomendado
+            return await _context.Contato
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == contatoId);
         }
 
         /// <summary>
@@ -201,6 +246,22 @@ namespace GeneralLabSolutions.InfraStructure.Repository
 
 
         #region Métodos Endereços
+
+        public async Task<List<Endereco>> ObterEnderecosPorClienteId(Guid pessoaId)
+        {
+            return await _context.Endereco
+                .Where(x => x.PessoaId == pessoaId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<Endereco?> ObterEnderecoPorId(Guid enderecoId)
+        {
+            // Se necessário fora do agregado, mas geralmente não é recomendado
+            return await _context.Endereco
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == enderecoId);
+        }
 
         /// <summary>
         /// Obtém um cliente incluindo seus dados de Pessoa e a coleção de Endereços.
@@ -235,6 +296,7 @@ namespace GeneralLabSolutions.InfraStructure.Repository
             _context.Entry(endereco).State = EntityState.Deleted;
             await Task.CompletedTask;
         }
+
         #endregion
 
 

@@ -1,8 +1,8 @@
 ﻿// ... (outros using)
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class DbInitializer
     {
@@ -13,14 +13,14 @@ namespace GeneralLabSolutions.InfraStructure.Data
         /// <returns></returns>
         public static async Task InitializeAsync(IServiceProvider serviceProvider)
         {
-            // ToDo: Vou manter como está, por enquanto. Documentador; não esqueça dessa decisão!
+            // ToDo: Vou manter como está, por enquanto.
 
             using (var scope = serviceProvider.CreateScope())
             {
                 var scopedProvider = scope.ServiceProvider;
                 var context = scopedProvider.GetRequiredService<AppDbContext>();
 
-                // Usar uma única transação para todos os SeedData
+                // Usar uma única transação para todos os SeedData (refatorar)
                 using (var transaction = await context.Database.BeginTransactionAsync())
                 {
                     try
@@ -63,14 +63,12 @@ namespace GeneralLabSolutions.InfraStructure.Data
                         await context.SaveChangesAsync();
                         await transaction.CommitAsync();
 
-                        // Adicionar mensagens de sucesso para cada SeedData, se necessário
-
                         Console.WriteLine("\n\n================================\nSeedData executado com sucesso!");
                     } catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
                         Console.WriteLine($"Erro durante a execução do SeedData: {ex.Message}");
-                        // Aqui você pode logar o erro, lançar a exceção novamente, etc.
+                        // Aqui podemos logar o erro, lançar a exceção novamente, etc.
                         throw;
                     }
                 }

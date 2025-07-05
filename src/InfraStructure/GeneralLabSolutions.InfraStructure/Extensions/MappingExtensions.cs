@@ -23,14 +23,14 @@ namespace GeneralLabSolutions.InfraStructure.Extensions
             );
 
             propertyBuilder.HasConversion(toProvider);
-            propertyBuilder.HasColumnType("varchar(40)"); // Aumentando um pouco por segurança
+            propertyBuilder.HasColumnType("varchar(40)");
 
             return propertyBuilder;
         }
 
         // --- MÉTODOS HELPERS PRIVADOS ---
 
-        // Converte um Enum para sua string (lendo o atributo)
+        // Converte um Enum para a string (lendo o atributo)
         private static string ToEnumString<TEnum>(this TEnum value) where TEnum : struct, Enum
         {
             var enumType = typeof(TEnum);

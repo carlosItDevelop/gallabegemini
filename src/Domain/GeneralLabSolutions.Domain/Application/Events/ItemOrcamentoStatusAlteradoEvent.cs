@@ -1,5 +1,5 @@
-﻿using GeneralLabSolutions.Domain.Mensageria;
-using GeneralLabSolutions.SharedKernel.Enums;
+﻿using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
+using GeneralLabSolutions.Domain.Mensageria;
 
 namespace GeneralLabSolutions.Domain.Application.Events
 {

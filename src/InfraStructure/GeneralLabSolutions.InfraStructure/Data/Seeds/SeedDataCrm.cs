@@ -1,12 +1,13 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Entities.CRM;
 using GeneralLabSolutions.Domain.Enums;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataCrm
     {

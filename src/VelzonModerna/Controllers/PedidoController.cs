@@ -1,6 +1,6 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.InfraStructure.Data;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;

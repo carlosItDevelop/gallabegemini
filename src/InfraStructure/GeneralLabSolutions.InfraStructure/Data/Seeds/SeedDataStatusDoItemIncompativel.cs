@@ -1,5 +1,5 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

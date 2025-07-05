@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VelzonModerna.ViewModels;

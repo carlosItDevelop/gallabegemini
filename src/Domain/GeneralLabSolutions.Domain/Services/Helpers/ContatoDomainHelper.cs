@@ -22,12 +22,12 @@ namespace GeneralLabSolutions.Domain.Services.Helpers
                 throw new InvalidOperationException($"A Pessoa associada ao {typeof(T).Name} não foi carregada.");
 
             var novoContato = new Contato(
-                nome,
-                email,
-                telefone,
-                tipoDeContato,
-                aggregateRoot.Pessoa.Id
-            )
+                                    nome,
+                                    email,
+                                    telefone,
+                                    tipoDeContato,
+                                    aggregateRoot.Pessoa.Id
+                                )
             {
                 EmailAlternativo = emailAlternativo ?? string.Empty,
                 TelefoneAlternativo = telefoneAlternativo ?? string.Empty,
@@ -37,28 +37,28 @@ namespace GeneralLabSolutions.Domain.Services.Helpers
             aggregateRoot.Pessoa.Contatos.Add(novoContato);
 
             aggregateRoot.AdicionarEvento(new ContatoAdicionadoEvent(
-                aggregateId: aggregateRoot.Id,
-                contatoId: novoContato.Id,
-                nome: nome,
-                email: email,
-                telefone: telefone,
-                tipoDeContato: tipoDeContato
+                                aggregateId: aggregateRoot.Id,
+                                contatoId: novoContato.Id,
+                                nome: nome,
+                                email: email,
+                                telefone: telefone,
+                                tipoDeContato: tipoDeContato
             ));
 
             return novoContato;
         }
 
         public static void AtualizarContatoGenerico<T>(
-            T aggregateRoot,
-            Guid contatoId,
-            string nome,
-            string email,
-            string telefone,
-            TipoDeContato tipoDeContato,
-            string emailAlternativo = "",
-            string telefoneAlternativo = "",
-            string observacao = "")
-            where T : IPessoaContainer
+                                T aggregateRoot,
+                                Guid contatoId,
+                                string nome,
+                                string email,
+                                string telefone,
+                                TipoDeContato tipoDeContato,
+                                string emailAlternativo = "",
+                                string telefoneAlternativo = "",
+                                string observacao = "")
+                                where T : IPessoaContainer
         {
             if (aggregateRoot.Pessoa is null || aggregateRoot.Pessoa.Contatos is null)
                 throw new InvalidOperationException($"A Pessoa ou a coleção de Contatos associada ao {typeof(T).Name} não foi carregada.");
@@ -79,12 +79,12 @@ namespace GeneralLabSolutions.Domain.Services.Helpers
             contatoParaAtualizar.AtualizarObservacao(observacao);
 
             aggregateRoot.AdicionarEvento(new ContatoAtualizadoEvent(
-                aggregateId: aggregateRoot.Id,
-                contatoId: contatoId,
-                nome: nome,
-                email: email,
-                telefone: telefone,
-                tipoDeContato: tipoDeContato
+                                aggregateId: aggregateRoot.Id,
+                                contatoId: contatoId,
+                                nome: nome,
+                                email: email,
+                                telefone: telefone,
+                                tipoDeContato: tipoDeContato
             ));
         }
 
@@ -104,8 +104,8 @@ namespace GeneralLabSolutions.Domain.Services.Helpers
             aggregateRoot.Pessoa.Contatos.Remove(contatoParaRemover);
 
             aggregateRoot.AdicionarEvento(new ContatoRemovidoEvent(
-                aggregateId: aggregateRoot.Id,
-                contatoId: contatoId
+                                aggregateId: aggregateRoot.Id,
+                                contatoId: contatoId
             ));
 
             return contatoParaRemover;

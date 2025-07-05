@@ -3,8 +3,7 @@ using MediatR;
 
 namespace GeneralLabSolutions.Domain.Application.Handlers
 {
-    public class ClienteRegistradoEventHandler 
-                            : INotificationHandler<ClienteRegistradoEvent>
+    public class ClienteRegistradoEventHandler : INotificationHandler<ClienteRegistradoEvent>
     {
         public async Task Handle(ClienteRegistradoEvent notification, CancellationToken cancellationToken)
         {

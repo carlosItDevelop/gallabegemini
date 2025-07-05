@@ -1,7 +1,6 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Services;
 using GeneralLabSolutions.WebApiCore.Usuario;
-using GeneralLabSolutions.InfraStructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,7 @@ using GeneralLabSolutions.Domain.Settings;
 using Microsoft.Extensions.Options;
 using VelzonModerna.Helpers;
 using GeneralLabSolutions.CoreShared.Interfaces;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 
 
 namespace VelzonModerna.Controllers

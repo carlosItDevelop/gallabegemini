@@ -1,6 +1,6 @@
 ﻿using GeneralLabSolutions.CoreShared.DTOs.DtosAgenteDeIA;
 using GeneralLabSolutions.CoreShared.Interfaces;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore; // Não se esqueça deste using
 
 namespace GeneralLabSolutions.InfraStructure.Repository

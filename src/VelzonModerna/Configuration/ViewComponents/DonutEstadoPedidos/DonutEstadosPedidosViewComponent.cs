@@ -1,5 +1,5 @@
 ﻿using GeneralLabSolutions.CoreShared.Interfaces;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 using Microsoft.AspNetCore.Mvc;
 using VelzonModerna.ViewModels;
 

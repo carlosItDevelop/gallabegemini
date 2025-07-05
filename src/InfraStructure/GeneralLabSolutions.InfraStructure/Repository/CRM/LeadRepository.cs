@@ -2,7 +2,7 @@
 using GeneralLabSolutions.Domain.Entities.CRM;
 using GeneralLabSolutions.Domain.Interfaces;
 using GeneralLabSolutions.Domain.Interfaces.CRM;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using GeneralLabSolutions.InfraStructure.Repository.Base;
 
 namespace GeneralLabSolutions.InfraStructure.Repository.CRM

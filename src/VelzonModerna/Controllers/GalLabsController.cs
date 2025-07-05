@@ -1,7 +1,7 @@
 ﻿using GeneralLabSolutions.CoreShared.DTOs.DtosGraficos;
 using GeneralLabSolutions.CoreShared.Interfaces;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.SharedKernel.Enums;
 using Microsoft.AspNetCore.Mvc;
 using VelzonModerna.ViewModels;
 

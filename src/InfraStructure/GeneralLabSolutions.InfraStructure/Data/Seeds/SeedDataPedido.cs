@@ -1,9 +1,10 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataPedido
     {
@@ -210,8 +211,8 @@ namespace GeneralLabSolutions.InfraStructure.Data
             {
                 // Verificar se existe alguma incompatibilidade entre o estado atual e o novo status
                 if (incompatibilidades.Any(i =>
-                    (i.StatusDoItemId == estadoAtual.StatusDoItemId && i.StatusDoItemIncompativelId == novoStatus.Id) ||
-                    (i.StatusDoItemId == novoStatus.Id && i.StatusDoItemIncompativelId == estadoAtual.StatusDoItemId)))
+                    i.StatusDoItemId == estadoAtual.StatusDoItemId && i.StatusDoItemIncompativelId == novoStatus.Id ||
+                    i.StatusDoItemId == novoStatus.Id && i.StatusDoItemIncompativelId == estadoAtual.StatusDoItemId))
                 {
                     return false; // Incompatibilidade encontrada
                 }

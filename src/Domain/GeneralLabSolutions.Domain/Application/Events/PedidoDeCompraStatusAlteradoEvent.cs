@@ -1,6 +1,6 @@
 ﻿// PedidoDeCompraCriadoEvent.cs
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 using GeneralLabSolutions.Domain.Mensageria;
-using GeneralLabSolutions.SharedKernel.Enums;
 // PedidoDeCompraStatusAlteradoEvent.cs
 public class PedidoDeCompraStatusAlteradoEvent : DomainEvent
 {

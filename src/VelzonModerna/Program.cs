@@ -1,19 +1,15 @@
-using GeneralLabSolutions.CoreShared.Interfaces;
-using GeneralLabSolutions.Domain.Configurations; // Presumo que seja usado por AddServicesAndDepencencyInjections
-using GeneralLabSolutions.Domain.Interfaces;   // Presumo que seja usado por AddServicesAndDepencencyInjections
-using GeneralLabSolutions.Domain.Services;      // Presumo que seja usado por AddServicesAndDepencencyInjections
+using GeneralLabSolutions.Domain.Services;
 using GeneralLabSolutions.Domain.Settings;      // Para OpenAISettings
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
+using GeneralLabSolutions.InfraStructure.Data.Seeds;
 using GeneralLabSolutions.InfraStructure.IoC;
-using GeneralLabSolutions.InfraStructure.Repository; // Para DbInitializer
 using GeneralLabSolutions.WebApiCore.Extensions;  // Para AddIdentityConfiguration (IAspNetUser)
-using GeneralLabSolutions.WebApiCore.Usuario;     // Para IAspNetUser
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using VelzonModerna.Configuration.Extensions;
 using VelzonModerna.Configuration.Mappings;
 using VelzonModerna.Services;
-// using VelzonModerna.Workers; // Comentado no seu original
+// using VelzonModerna.Workers; // Comentado por enquanto;
 
 public class Program
 {
@@ -21,7 +17,6 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configurações de Configuration
         var configuration = builder.Configuration;
         configuration.SetBasePath(builder.Environment.ContentRootPath)
             .AddJsonFile("appsettings.json", true, true)
@@ -33,35 +28,28 @@ public class Program
             configuration.AddUserSecrets<Program>();
         }
 
-        // Logging
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
-        // Add services to the container.
-        builder.Services.AddMvcConfiguration(); // Seu método de extensão para MVC
+        builder.Services.AddMvcConfiguration()
+            .AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddServicesAndDepencencyInjections(configuration)
+             .AddAutoMapper(typeof(AutoMapperConfig));
 
-
-        // Injeções de dependência do seu projeto de Infraestrutura e Domínio
-        builder.Services.AddServicesAndDepencencyInjections(configuration);
-
-        // AutoMapper
-        builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
-
-        // Validação de CPF
         builder.Services.AddSingleton<IValidationAttributeAdapterProvider, CpfValidationAttributeAdapterProvider>();
 
-        // Paginação (se usado no MVC)
-        builder.Services.AddScoped<IPaginationService, PaginationService>(); // Se for usado pelo MVC, senão remover.
+        // Paginação (se usado no MVC) - Se for usado pelo MVC, senão remover.
+        builder.Services.AddScoped<IPaginationService, PaginationService>();
 
         // Configurações de Autenticação e Identity do ASP.NET Core (Cookies, etc.)
-        builder.Services.AddIdentityConfiguration(); // Registra IAspNetUser e configuração de Cookie Auth.
+        builder.Services.AddIdentityConfiguration();
 
-        // Configuração do AppSettingsMvc
         builder.Services.Configure<AppSettingsMvc>(options =>
         {
+            // ToDo: Verifique se as chaves estão corretas no appsettings.json ou secrets.json
+            // ToDo: Refatorar para evitar hardcoding de chaves
             options.AutenticacaoUrl = configuration.GetValue<string>("AutenticacaoUrl");
             options.UserAdminUrl = configuration.GetValue<string>("UserAdminUrl");
         });
@@ -107,13 +95,12 @@ public class Program
 
         var app = builder.Build();
 
-        // Chamada para o DbInitializer (se este for o projeto que inicializa o BD)
+
         if (app.Environment.IsDevelopment())
         {
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                // Se DbInitializer é do seu projeto de Infra, e AppDbContext está registrado corretamente, deve funcionar.
                 await DbInitializer.InitializeAsync(services);
             }
         }
@@ -121,15 +108,15 @@ public class Program
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error"); // Ou sua página de erro customizada
+            app.UseExceptionHandler("/Home/Error"); // Ou página de erro customizada
             app.UseHsts();
         } else
         {
-            app.UseDeveloperExceptionPage(); // Mantém a página de erro detalhada em dev
+            app.UseDeveloperExceptionPage();
         }
 
         // Middleware de tratamento de exceções customizado (para 401, 404, etc.)
-        app.UseMiddleware<ExceptionMiddleware>(); // Certifique-se que este middleware está correto
+        app.UseMiddleware<ExceptionMiddleware>(); // Certificar se este middleware está 100% funcional
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
@@ -142,7 +129,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=GalLabs}/{action=GlDashboard}/{id?}"); // Sua rota padrão
+            pattern: "{controller=GalLabs}/{action=GlDashboard}/{id?}");
 
         app.Run();
     }

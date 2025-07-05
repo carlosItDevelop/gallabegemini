@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Extensions.Helpers.Generics;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using GeneralLabSolutions.InfraStructure.Repository.Base;
 using Microsoft.EntityFrameworkCore;
 

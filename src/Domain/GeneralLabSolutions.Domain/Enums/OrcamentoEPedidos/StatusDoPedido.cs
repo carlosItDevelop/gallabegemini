@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace GeneralLabSolutions.SharedKernel.Enums
+namespace GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos
 {
     public enum StatusDoPedido
     {

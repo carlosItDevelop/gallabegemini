@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeneralLabSolutions.InfraStructure.Repository.Base

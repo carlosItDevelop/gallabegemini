@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GeneralLabSolutions.Domain.Enums;
-using GeneralLabSolutions.SharedKernel.Enums; // Para StatusPedidoCompra e StatusItemPedidoCompra
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 namespace VelzonModerna.ViewModels.PedidoDeCompra
 {

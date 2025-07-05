@@ -201,7 +201,7 @@ namespace VelzonModerna.Controllers
             {
                 // Busca os dados bancários específicos.
                 // A melhor forma é buscar através do agregado para garantir o pertencimento.
-                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto(fornecedorId);
+                var fornecedorCompleto = await _fornecedorRepository.ObterFornecedorCompleto (fornecedorId);
                 var dadosBancarios = fornecedorCompleto?.Pessoa?.DadosBancarios.FirstOrDefault(d => d.Id == dadosBancariosId.Value);
 
                 if (dadosBancarios is null)

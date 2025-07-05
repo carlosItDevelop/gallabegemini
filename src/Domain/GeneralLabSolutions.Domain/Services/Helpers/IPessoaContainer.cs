@@ -1,6 +1,7 @@
+using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Mensageria;
 
-namespace GeneralLabSolutions.Domain.Entities
+namespace GeneralLabSolutions.Domain.Services.Helpers
 {
     public interface IPessoaContainer
     {

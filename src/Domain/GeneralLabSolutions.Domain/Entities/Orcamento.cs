@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GeneralLabSolutions.Domain.Application.Events;
+﻿using GeneralLabSolutions.Domain.Application.Events;
 using GeneralLabSolutions.Domain.DomainObjects;
 using GeneralLabSolutions.Domain.Entities.Audit;
-using GeneralLabSolutions.SharedKernel.Enums;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 namespace GeneralLabSolutions.Domain.Entities
 {

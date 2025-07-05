@@ -1,12 +1,13 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
+
 // using Microsoft.EntityFrameworkCore; // Não necessário aqui
 // using Microsoft.Extensions.DependencyInjection; // Não necessário aqui
-using GeneralLabSolutions.InfraStructure.Data; // Using correto
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GeneralLabSolutions.InfraStructure.Data
+namespace GeneralLabSolutions.InfraStructure.Data.Seeds
 {
     public static class SeedDataCalendarEvent
     {

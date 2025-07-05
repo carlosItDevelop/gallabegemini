@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using GeneralLabSolutions.Domain.Entities;
 using GeneralLabSolutions.Domain.Extensions.Helpers.Generics;
 using GeneralLabSolutions.Domain.Interfaces;
-using GeneralLabSolutions.InfraStructure.Data;
+using GeneralLabSolutions.InfraStructure.Data.ORM;
 using GeneralLabSolutions.InfraStructure.Repository.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,7 +58,7 @@ namespace GeneralLabSolutions.InfraStructure.Repository
         // INÍCIO DA IMPLEMENTAÇÃO DOS NOVOS MÉTODOS
         // ================================================================
 
-        #region Obter Agregado Completo
+        #region Métodos para Dados Bancários
         public async Task<Fornecedor?> ObterFornecedorCompleto(Guid fornecedorId)
         {
             return await _context.Fornecedor
@@ -74,9 +74,37 @@ namespace GeneralLabSolutions.InfraStructure.Repository
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(f => f.Id == fornecedorId);
         }
-        #endregion
 
-        #region Métodos para Dados Bancários
+
+        // ToDo: Mudar ObterDadosBancariosPorFornecedorId para ObterDadosBancariosPorPessoaId.
+        public async Task<List<DadosBancarios>> ObterDadosBancariosPorFornecedorId(Guid pessoaId)
+        {
+            return await _context.DadosBancarios
+                .Where(x => x.PessoaId == pessoaId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+
+        public async Task<Fornecedor?> ObterFornecedorComDadosBancarios(Guid FornecedorId)
+        {
+            return await _context.Fornecedor
+                .Include(f => f.Pessoa)
+                    .ThenInclude(p => p.DadosBancarios)
+                .AsNoTracking()
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(f => f.Id == FornecedorId);
+        }
+
+
+        public async Task<DadosBancarios?> ObterDadosBancariosPorId(Guid dadosBancariosId)
+        {
+            // Sem AsNoTracking aqui, pois pode ser para edição
+            return await _context.DadosBancarios
+                .FirstOrDefaultAsync(x => x.Id == dadosBancariosId);
+        }
+
+
         public async Task AdicionarDadosBancariosAsync(Fornecedor fornecedor, DadosBancarios novo)
         {
             _context.Fornecedor.Attach(fornecedor);

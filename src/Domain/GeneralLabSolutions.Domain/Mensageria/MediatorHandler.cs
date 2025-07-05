@@ -1,5 +1,4 @@
-﻿
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using MediatR;
 
 namespace GeneralLabSolutions.Domain.Mensageria

@@ -1,7 +1,7 @@
 ﻿namespace GeneralLabSolutions.Domain.Interfaces
 {
-	public interface IUnitOfWork
-	{
-		Task<bool> CommitAsync();
-	}
+    public interface IUnitOfWork
+    {
+        Task<bool> CommitAsync();
+    }
 }

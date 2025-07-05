@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GeneralLabSolutions.Domain.Extensions.Helpers.Generics
+﻿namespace GeneralLabSolutions.Domain.Extensions.Helpers.Generics
 {
     public class PagedResult<T> where T : class
     {

@@ -1,6 +1,6 @@
 ﻿using GeneralLabSolutions.Domain.Entities;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 using GeneralLabSolutions.InfraStructure.Extensions;
-using GeneralLabSolutions.SharedKernel.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

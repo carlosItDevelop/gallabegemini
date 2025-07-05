@@ -1,6 +1,7 @@
 ﻿using GeneralLabSolutions.Domain.DomainObjects;
-using GeneralLabSolutions.Domain.Entities.Base;
 using GeneralLabSolutions.Domain.Entities;
+using GeneralLabSolutions.Domain.Entities.Base;
+using GeneralLabSolutions.Domain.Enums.OrcamentoEPedidos;
 
 public class ItemPedidoDeCompra : EntityBase
 {
